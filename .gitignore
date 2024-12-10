@@ -1,0 +1,11 @@
+.DS_Store
+*.pyc
+*.egg-info
+*.swp
+*:Zone.Identifier
+tags
+
+**/.vscode
+/.idea
+/node_modules
+/__pycache__

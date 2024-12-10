@@ -1,0 +1,31 @@
+[project]
+name = "kenya_compliance"
+authors = [
+    { name = "Navari Ltd", email = "solutions@navari.co.ke"}
+]
+description = "KRA Etims Integration for ERPNext based applications"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    # "frappe~=15.0.0" # Installed and managed by bench.
+    "aiohttp==3.9.1",
+    "deprecation==2.1.0",
+    "qrcode==7.4.2"
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.isort]
+profile = "black"
+known_frappe = "frappe"
+known_erpnext = "erpnext"
+no_lines_before = ["ERPNEXT"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FRAPPE", "ERPNEXT", "FIRSTPARTY", "LOCALFOLDER"]
+
+# These dependencies are only installed when developer mode is enabled
+[tool.bench.dev-dependencies]
+pre-commit = "~=3.7.1"
+flake8 = "~=7.1.0"
