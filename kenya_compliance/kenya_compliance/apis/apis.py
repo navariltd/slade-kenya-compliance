@@ -131,36 +131,10 @@ def perform_customer_search(request_data: str) -> None:
     Args:
         request_data (str): Data received from the client
     """
-    data: dict = json.loads(request_data)
-
-    company_name = data["company_name"]
-
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
-    route_path, last_request_date = get_route_path("CustSearchReq")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-        payload = {"custmTin": data["tax_id"]}
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = partial(
-            customer_search_on_success, document_name=data["name"]
+    return process_request(
+            request_data, "CustSearchReq", customer_search_on_success, method="POST", doctype="Customer"
         )
-        endpoints_builder.error_callback = on_error
-
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="default",
-            timeout=300,
-            doctype="Customer",
-            document_name=data["name"],
-            job_name=f"{data['name']}_customer_search",
-        )
-
+    
 
 @frappe.whitelist()
 def perform_item_registration(item_name: str) -> dict | None:

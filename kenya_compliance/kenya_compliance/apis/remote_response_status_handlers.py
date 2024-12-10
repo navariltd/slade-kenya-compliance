@@ -85,12 +85,12 @@ def customer_search_on_success(
         "Customer",
         document_name,
         {
-            "custom_tax_payers_name": response["taxprNm"],
-            "custom_tax_payers_status": response["taxprSttsCd"],
-            "custom_county_name": response["prvncNm"],
-            "custom_subcounty_name": response["dstrtNm"],
-            "custom_tax_locality_name": response["sctrNm"],
-            "custom_location_name": response["locDesc"],
+            "custom_tax_payers_name": response["partner_name"],
+            # "custom_tax_payers_status": response["taxprSttsCd"],
+            "custom_county_name": response["town"],
+            "custom_subcounty_name": response["town"],
+            "custom_tax_locality_name": response["physical_address"],
+            "custom_location_name": response["physical_address"],
             "custom_is_validated": 1,
         },
     )

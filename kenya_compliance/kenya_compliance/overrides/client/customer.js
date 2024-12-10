@@ -13,8 +13,8 @@ frappe.ui.form.on(doctype, {
               "kenya_compliance.kenya_compliance.apis.apis.perform_customer_search",
             args: {
               request_data: {
-                name: frm.doc.name,
-                tax_id: frm.doc.tax_id,
+                doc_name: frm.doc.name,
+                customer_pin: frm.doc.tax_id,
                 company_name: companyName,
               },
             },
