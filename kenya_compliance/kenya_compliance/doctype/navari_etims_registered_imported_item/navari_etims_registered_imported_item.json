@@ -27,7 +27,8 @@
   "quantity_unit_code",
   "agent_name",
   "invoice_foreign_currency",
-  "invoice_foreign_currency_rate"
+  "invoice_foreign_currency_rate",
+  "sent_to_etims"
  ],
  "fields": [
   {
@@ -144,6 +145,13 @@
    "fieldname": "product_name",
    "fieldtype": "Data",
    "label": "Product Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "sent_to_etims",
+   "fieldtype": "Check",
+   "label": "Sent to eTims",
+   "read_only": 1
   }
  ],
  "in_create": 1,
@@ -152,9 +160,13 @@
   {
    "link_doctype": "Purchase Invoice",
    "link_fieldname": "custom_source_registered_imported_item"
+  },
+  {
+   "link_doctype": "Item",
+   "link_fieldname": "custom_referenced_imported_item"
   }
  ],
- "modified": "2024-12-10 08:40:11.309053",
+ "modified": "2024-12-10 18:31:09.441192",
  "modified_by": "Administrator",
  "module": "Kenya Compliance",
  "name": "Navari eTims Registered Imported Item",

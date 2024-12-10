@@ -79,6 +79,7 @@ def process_request(request_data: str | dict, route_key: str, handler_function, 
         endpoints_builder.headers = headers
         endpoints_builder.url = url
         endpoints_builder.payload = data
+        endpoints_builder.request_description = route_key 
         endpoints_builder.method = method
         endpoints_builder.success_callback = handler_function
         endpoints_builder.error_callback = on_slade_error
@@ -690,7 +691,7 @@ def create_supplier(supplier_details: dict) -> Document:
 
 
 @frappe.whitelist()
-def create_items_from_fetched_registered_purchases(request_data: str) -> None:
+def create_items_from_fetched_registered(request_data: str) -> None:
     data = json.loads(request_data)
 
     if data["items"]:

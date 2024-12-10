@@ -151,92 +151,11 @@ def send_item_inventory_information() -> None:
             frappe.throw("Error Encountered", type(error), title="Error")
 
 
-@frappe.whitelist()
-def refresh_code_lists(vendor: str = "OSCU KRA") -> str | None:
-    company_name: str | None = frappe.defaults.get_user_default("Company")
-
-    headers = build_headers(company_name, vendor)
-    server_url = get_server_url(company_name, vendor)
-
-    code_search_route_path, last_request_date = get_route_path(
-        "CodeSearchReq"
-    )  # endpoint for code search
-
-    if headers and server_url and code_search_route_path:
-        url = f"{server_url}{code_search_route_path}"
-        payload = {
-            "lastReqDt": "20200101000000"
-        }  # Hard-coded to this date to get all code lists.
-
-        endpoints_builder.headers = headers
-        endpoints_builder.payload = payload
-        endpoints_builder.error_callback = on_error
-
-        # Fetch and update codes obtained from CodeSearchReq endpoint
-        endpoints_builder.url = url
-        endpoints_builder.success_callback = run_updater_functions
-        endpoints_builder.make_remote_call(doctype=None, document_name=None)
-
-        return "succeeded"
-
-
-@frappe.whitelist()
-def get_item_classification_codes(vendor="OSCU KRA") -> str | None:
-    company_name: str | None = frappe.defaults.get_user_default("Company")
-
-    headers = build_headers(company_name, vendor)
-    server_url = get_server_url(company_name, vendor)
-
-    item_cls_route_path, last_request_date = get_route_path(
-        "ItemClsSearchReq"
-    )  # overwriting last_request_date since it's not used elsewhere for this task
-
-    if headers and server_url and item_cls_route_path:
-        url = f"{server_url}{item_cls_route_path}"
-        payload = {
-            "lastReqDt": "20230101000000"
-        }  # Hard-coded to a this date to get all code lists.
-
-        endpoints_builder.url = url
-        endpoints_builder.headers = headers
-        endpoints_builder.payload = payload
-        endpoints_builder.error_callback = on_error
-
-        endpoints_builder.url = f"{server_url}{item_cls_route_path}"
-        endpoints_builder.success_callback = update_item_classification_codes
-
-        # endpoints_builder.make_remote_call(doctype=None, document_name=None)
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="long",
-            timeout=1200,
-            doctype=SETTINGS_DOCTYPE_NAME,
-        )
-
-        return "succeeded"
-
-
-def run_updater_functions(response: dict) -> None:
-    for class_list in response["data"]["clsList"]:
-        if class_list["cdClsNm"] == "Quantity Unit":
-            update_unit_of_quantity(class_list)
-
-        if class_list["cdClsNm"] == "Taxation Type":
-            update_taxation_type(class_list)
-
-        if class_list["cdClsNm"] == "Packing Unit":
-            update_packaging_units(class_list)
-
-        if class_list["cdClsNm"] == "Country":
-            update_countries(class_list)
-
-
 def update_documents(
     data: dict | list,
     doctype_name: str,
     field_mapping: dict,
-    filter_field: str = "id",
+    filter_field: str = "code",
 ) -> None:
     if isinstance(data, str):
         try:
@@ -303,7 +222,7 @@ def update_item_classification_codes(response: dict | list) -> None:
         response,
         ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
         field_mapping,
-        filter_field="id",
+        filter_field="classification_code",
     )
 
 

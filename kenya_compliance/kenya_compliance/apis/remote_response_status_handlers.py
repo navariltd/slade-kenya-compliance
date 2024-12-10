@@ -8,6 +8,7 @@ import frappe
 from ... import __version__
 from ..doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
+    IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
     ITEM_TYPE_DOCTYPE_NAME,
     NOTICES_DOCTYPE_NAME,
@@ -398,6 +399,7 @@ def stock_mvt_search_on_success(response: dict) -> None:
 
         doc.save()
 
+
 def imported_items_search_on_success(response: dict):
     items = response.get("results", [])
     batch_size = 20
@@ -428,12 +430,12 @@ def imported_items_search_on_success(response: dict):
                     COUNTRIES_DOCTYPE_NAME, "code", item.get("export_nation_code")
                 ),
                 "package": item.get("package"),
-                "packaging_unit_code": get_link_value(
-                    PACKAGING_UNIT_DOCTYPE_NAME, "name", item.get("packaging_unit_code")
+                "packaging_unit_code": get_or_create_link(
+                    PACKAGING_UNIT_DOCTYPE_NAME, "code", item.get("packaging_unit_code")
                 ),
                 "quantity": item.get("quantity"),
-                "quantity_unit_code": get_link_value(
-                    UNIT_OF_QUANTITY_DOCTYPE_NAME, "name", item.get("quantity_unit_code")
+                "quantity_unit_code": get_or_create_link(
+                    UNIT_OF_QUANTITY_DOCTYPE_NAME, "code", item.get("quantity_unit_code")
                 ),
                 "gross_weight": item.get("gross_weight"),
                 "net_weight": item.get("net_weight"),
@@ -443,6 +445,7 @@ def imported_items_search_on_success(response: dict):
                 "invoice_foreign_currency": item.get("invoice_foreign_currency_code"),
                 "invoice_foreign_currency_rate": item.get("invoice_foreign_currency_exchange"),
                 "slade_id": item_id,
+                "sent_to_etims": 1 if item.get("sent_to_etims") else 0
             }
 
             if existing_item:
@@ -451,9 +454,22 @@ def imported_items_search_on_success(response: dict):
                 item_doc.flags.ignore_mandatory = True
                 item_doc.save(ignore_permissions=True)
             else:
-                new_item = frappe.get_doc({"doctype": REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME, **request_data})
-                new_item.insert(ignore_permissions=True, ignore_mandatory=True, ignore_if_duplicate=True)
+                item_doc = frappe.get_doc({"doctype": REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME, **request_data})
+                item_doc.insert(ignore_permissions=True, ignore_mandatory=True, ignore_if_duplicate=True)
 
+            if item.get("product"):
+                product_name = get_link_value("Item", "custom_slade_id", item.get("product"))
+                import_item_status = get_link_value(IMPORTED_ITEMS_STATUS_DOCTYPE_NAME, "code", item.get("import_item_status_code"))
+                product = frappe.get_doc("Item", product_name)
+                product.custom_referenced_imported_item = item_doc.name
+                product.custom_imported_item_task_code =  item_doc.task_code
+                product.custom_hs_code =  item_doc.hs_code
+                product.custom_imported_item_submitted =  item_doc.sent_to_etims
+                product.custom_imported_item_status =  import_item_status
+                product.custom_imported_item_status_code = item.get("import_item_status_code") 
+                product.flags.ignore_mandatory = True
+                product.save()
+                
             counter += 1
             if counter % batch_size == 0:
                 frappe.db.commit()
@@ -463,6 +479,7 @@ def imported_items_search_on_success(response: dict):
                 title="Imported Item Sync Error",
                 message=f"Error while processing item with ID {item.get('id')}: {str(e)}",
             )
+            
 
     if counter % batch_size != 0:
         frappe.db.commit()
@@ -551,12 +568,12 @@ def item_search_on_success(response: dict):
                 "custom_etims_country_of_origin_code": item_data.get("country_of_origin"),
                 "valuation_rate": round(item_data.get("selling_price", 0.0), 2),
                 "last_purchase_rate": round(item_data.get("purchasing_price", 0.0), 2),
-                "custom_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "name", item_data.get("scu_item_classification")),
+                "custom_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "slade_id", item_data.get("scu_item_classification")),
                 "custom_etims_country_of_origin": get_link_value(COUNTRIES_DOCTYPE_NAME, "code", item_data.get("country_of_origin")),
-                "custom_packaging_unit": get_link_value(PACKAGING_UNIT_DOCTYPE_NAME, "name", item_data.get("packaging_unit")),
-                "custom_unit_of_quantity": get_link_value(UNIT_OF_QUANTITY_DOCTYPE_NAME, "name", item_data.get("quantity_unit")),
+                "custom_packaging_unit": get_link_value(PACKAGING_UNIT_DOCTYPE_NAME, "slade_id", item_data.get("packaging_unit")),
+                "custom_unit_of_quantity": get_link_value(UNIT_OF_QUANTITY_DOCTYPE_NAME, "slade_id", item_data.get("quantity_unit")),
                 "custom_item_type": get_link_value(ITEM_TYPE_DOCTYPE_NAME, "name", item_data.get("item_type")),
-                "custom_taxation_type": get_link_value(TAXATION_TYPE_DOCTYPE_NAME, "name", item_data.get("sale_taxes")[0]),
+                "custom_taxation_type": get_link_value(TAXATION_TYPE_DOCTYPE_NAME, "slade_id", item_data.get("sale_taxes")[0]),
                 "custom_product_type": get_link_value(PRODUCT_TYPE_DOCTYPE_NAME, "code", item_data.get("product_type")),
             }
 
@@ -566,6 +583,7 @@ def item_search_on_success(response: dict):
                 item_doc.flags.ignore_mandatory = True
                 item_doc.save(ignore_permissions=True)
             else:
+                request_data["item_group"] = "All Item Groups"
                 new_item = frappe.get_doc({"doctype": "Item", **request_data})
                 new_item.insert(ignore_permissions=True, ignore_mandatory=True, ignore_if_duplicate=True)
 
@@ -592,3 +610,27 @@ def get_link_value(doctype: str, field_name: str, value: str):
             message=f"Error while fetching link for {doctype} with {field_name}={value}: {str(e)}",
         )
         return None
+    
+
+def get_or_create_link(doctype: str, field_name: str, value: str):
+    if not value:
+        return None
+    
+    try:
+        link_name = frappe.db.get_value(doctype, {field_name: value}, "name")
+        if not link_name:
+            link_name = frappe.get_doc({
+                "doctype": doctype,
+                field_name: value,
+                "code": value,
+            }).insert(ignore_permissions=True, ignore_mandatory=True).name
+            frappe.db.commit()
+        return link_name
+    except Exception as e:
+        frappe.log_error(
+            title=f"Error in get_or_create_link for {doctype}",
+            message=f"Error in {doctype} - {value}: {str(e)}",
+        )
+        return None
+
+

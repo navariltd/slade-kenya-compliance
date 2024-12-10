@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:slade_id",
+ "autoname": "field:code",
  "creation": "2024-03-12 11:57:21.356371",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -24,7 +24,8 @@
    "fieldname": "code",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Code"
+   "label": "Code",
+   "unique": 1
   },
   {
    "fieldname": "sort_order",
@@ -58,7 +59,7 @@
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-05 17:46:20.512470",
+ "modified": "2024-12-10 16:40:02.289044",
  "modified_by": "Administrator",
  "module": "Kenya Compliance",
  "name": "Navari eTims Packaging Unit",

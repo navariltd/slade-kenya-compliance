@@ -1,4 +1,4 @@
-const doctypeName = 'Navari eTims Registered Imported Item';
+const doctypeName = "Navari eTims Registered Imported Item";
 
 frappe.ui.form.on(doctypeName, {
   refresh: function (frm) {
@@ -22,11 +22,11 @@ frappe.ui.form.on(doctypeName, {
 
     if (!frm.is_new()) {
       frm.add_custom_button(
-        __('Create Item'),
+        __("Create Item"),
         function () {
           frappe.call({
             method:
-              'kenya_compliance.kenya_compliance.apis.apis.create_items_from_fetched_registered_purchases',
+              "kenya_compliance.kenya_compliance.apis.apis.create_items_from_fetched_registered",
             args: {
               request_data: {
                 items: item,
@@ -34,7 +34,7 @@ frappe.ui.form.on(doctypeName, {
             },
             callback: (response) => {
               frappe.msgprint(
-                'Item has been created. Please go to the created Item and provide required eTims Details.',
+                "Item has been created. Please go to the created Item and provide required eTims Details."
               );
             },
             error: (error) => {
@@ -42,15 +42,15 @@ frappe.ui.form.on(doctypeName, {
             },
           });
         },
-        __('eTims Actions'),
+        __("eTims Actions")
       );
 
       frm.add_custom_button(
-        __('Create Supplier'),
+        __("Create Supplier"),
         function () {
           frappe.call({
             method:
-              'kenya_compliance.kenya_compliance.apis.apis.create_supplier_from_fetched_registered_purchases',
+              "kenya_compliance.kenya_compliance.apis.apis.create_supplier_from_fetched_registered_purchases",
             args: {
               request_data: {
                 name: frm.doc.name,
@@ -64,7 +64,7 @@ frappe.ui.form.on(doctypeName, {
             },
             callback: (response) => {
               frappe.msgprint(
-                'Supplier has been created. Please confirm the details captured.',
+                "Supplier has been created. Please confirm the details captured."
               );
             },
             error: (error) => {
@@ -72,21 +72,21 @@ frappe.ui.form.on(doctypeName, {
             },
           });
         },
-        __('eTims Actions'),
+        __("eTims Actions")
       );
 
       frappe.db.get_value(
-        'Item',
+        "Item",
         { custom_referenced_imported_item: frm.doc.name },
-        ['custom_item_registered'],
+        ["custom_item_registered"],
         (response) => {
           if (parseInt(response.custom_item_registered) === 1) {
             frm.add_custom_button(
-              __('Create Purchase Invoice'),
+              __("Create Purchase Invoice"),
               function () {
                 frappe.call({
                   method:
-                    'kenya_compliance.kenya_compliance.apis.apis.create_purchase_invoice_from_request',
+                    "kenya_compliance.kenya_compliance.apis.apis.create_purchase_invoice_from_request",
                   args: {
                     request_data: {
                       name: frm.doc.name,
@@ -102,7 +102,7 @@ frappe.ui.form.on(doctypeName, {
                   },
                   callback: (response) => {
                     frappe.msgprint(
-                      'Purchase Invoice has been created. Please go to the created Invoice and provide required eTims Details.',
+                      "Purchase Invoice has been created. Please go to the created Invoice and provide required eTims Details."
                     );
                   },
                   error: (error) => {
@@ -110,10 +110,10 @@ frappe.ui.form.on(doctypeName, {
                   },
                 });
               },
-              __('eTims Actions'),
+              __("eTims Actions")
             );
           }
-        },
+        }
       );
     }
   },

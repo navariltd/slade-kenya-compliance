@@ -28,7 +28,7 @@ frappe.listview_settings[doctypeName].onload = function (listview) {
         args: {
           request_data: {
             company_name: companyName,
-            sent_to_etims: true,
+            // sent_to_etims: true,
           },
         },
         callback: (response) => {},

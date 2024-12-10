@@ -252,6 +252,7 @@ class Slade360EndpointsBuilder(BaseEndpointsBuilder):
     def __init__(self) -> None:
         super().__init__()
         self._url: str | None = None
+        self._request_description: str | None = None
         self._payload: dict | None = None
         self._headers: dict | None = None
         self._method: Literal["GET", "POST", "PATCH"] | None = None
@@ -276,6 +277,14 @@ class Slade360EndpointsBuilder(BaseEndpointsBuilder):
     @url.setter
     def url(self, new_url: str) -> None:
         self._url = new_url
+
+    @property
+    def request_description(self) -> str | None:
+        return self._request_description
+
+    @request_description.setter
+    def request_description(self, new_request_description: str) -> None:
+        self._request_description = new_request_description
 
     @property
     def payload(self) -> dict | None:
@@ -357,7 +366,8 @@ class Slade360EndpointsBuilder(BaseEndpointsBuilder):
         if not retrying:
             self.integration_request = create_request_log(
                 data=self._payload,
-                is_remote_request=True,
+                request_description=self._request_description,
+                is_remote_request=True,  
                 service_name="Slade360",
                 request_headers=self._headers,
                 url=self._url,
@@ -372,7 +382,6 @@ class Slade360EndpointsBuilder(BaseEndpointsBuilder):
                 )
             elif self._method == "GET":
                 self._payload["page_size"] = 15000
-                print(self._payload)
                 response = requests.get(
                     self._url, headers=self._headers, params=self._payload
                 )

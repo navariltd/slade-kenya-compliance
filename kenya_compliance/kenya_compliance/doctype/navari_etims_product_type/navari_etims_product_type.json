@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:slade_id",
+ "autoname": "field:code",
  "creation": "2024-03-28 11:11:38.421607",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -25,7 +25,8 @@
    "fieldname": "code",
    "fieldtype": "Data",
    "in_standard_filter": 1,
-   "label": "Code"
+   "label": "Code",
+   "unique": 1
   },
   {
    "fieldname": "sort_order",
@@ -59,13 +60,13 @@
    "fieldname": "slade_id",
    "fieldtype": "Data",
    "in_standard_filter": 1,
-   "label": "slade_id",
+   "label": "Slade ID",
    "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-05 17:47:13.932646",
+ "modified": "2024-12-10 16:42:50.124068",
  "modified_by": "Administrator",
  "module": "Kenya Compliance",
  "name": "Navari eTims Product Type",

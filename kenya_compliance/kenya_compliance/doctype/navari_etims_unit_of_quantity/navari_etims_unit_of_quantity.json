@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:slade_id",
+ "autoname": "field:code",
  "creation": "2024-03-12 14:06:44.196801",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -25,7 +25,8 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Code"
+   "label": "Code",
+   "unique": 1
   },
   {
    "fieldname": "sort_order",
@@ -56,14 +57,14 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "slade_id",
+   "label": "Slade ID",
    "unique": 1
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-05 17:46:42.619648",
+ "modified": "2024-12-10 17:38:33.248702",
  "modified_by": "Administrator",
  "module": "Kenya Compliance",
  "name": "Navari eTims Unit of Quantity",
@@ -83,7 +84,7 @@
    "write": 1
   }
  ],
- "search_fields": "code, code_name",
+ "search_fields": "code, code_name, slade_id",
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

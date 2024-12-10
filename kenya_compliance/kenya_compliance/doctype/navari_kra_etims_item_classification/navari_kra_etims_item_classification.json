@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:slade_id",
+ "autoname": "field:itemclscd",
  "creation": "2024-03-05 00:35:38.544554",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -51,7 +51,8 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Item Classification Code",
-   "non_negative": 1
+   "non_negative": 1,
+   "unique": 1
   },
   {
    "fieldname": "taxtycd",
@@ -80,7 +81,7 @@
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-05 17:36:47.897040",
+ "modified": "2024-12-10 16:44:33.176168",
  "modified_by": "Administrator",
  "module": "Kenya Compliance",
  "name": "Navari KRA eTims Item Classification",
