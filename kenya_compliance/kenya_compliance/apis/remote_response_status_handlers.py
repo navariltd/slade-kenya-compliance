@@ -398,72 +398,97 @@ def stock_mvt_search_on_success(response: dict) -> None:
 
         doc.save()
 
-
-def imported_items_search_on_success(response: dict) -> None:
-    items = response["data"]["itemList"]
-
-    def create_if_not_exists(doctype: str, code: str) -> str:
-        """Create the code if the record doesn't exist for the doctype
-
-        Args:
-            doctype (str): The doctype to check and create
-            code (str): The code to filter the record
-
-        Returns:
-            str: The code of the created record
-        """
-        present_code = frappe.db.exists(doctype, {"code": code})
-
-        if not present_code:
-            created = frappe.get_doc(
-                {
-                    "doctype": doctype,
-                    "code": code,
-                    "code_name": code,
-                    "code_description": code,
-                }
-            ).insert(ignore_permissions=True, ignore_if_duplicate=True)
-
-            return created.code_name
-
-        return present_code
+def imported_items_search_on_success(response: dict):
+    items = response.get("results", [])
+    batch_size = 20
+    counter = 0
 
     for item in items:
-        doc = frappe.new_doc(REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME)
+        try:
+            item_id = item.get("id")
+            existing_item = frappe.db.get_value(
+                REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
+                {"slade_id": item_id},
+                "name",
+                order_by="creation desc",
+            )
 
-        doc.item_name = item["itemNm"]
-        doc.task_code = item["taskCd"]
-        doc.declaration_date = datetime.strptime(item["dclDe"], "%d%m%Y")
-        doc.item_sequence = item["itemSeq"]
-        doc.declaration_number = item["dclNo"]
-        doc.hs_code = item["hsCd"]
-        doc.origin_nation_code = frappe.db.get_value(
-            COUNTRIES_DOCTYPE_NAME, {"code": item["orgnNatCd"]}, "code_name"
-        )
-        doc.export_nation_code = frappe.db.get_value(
-            COUNTRIES_DOCTYPE_NAME, {"code": item["exptNatCd"]}, "code_name"
-        )
-        doc.package = item["pkg"]
-        doc.packaging_unit_code = create_if_not_exists(
-            PACKAGING_UNIT_DOCTYPE_NAME, item["pkgUnitCd"]
-        )
-        doc.quantity = item["qty"]
-        doc.quantity_unit_code = create_if_not_exists(
-            UNIT_OF_QUANTITY_DOCTYPE_NAME, item["qtyUnitCd"]
-        )
-        doc.gross_weight = item["totWt"]
-        doc.net_weight = item["netWt"]
-        doc.suppliers_name = item["spplrNm"]
-        doc.agent_name = item["agntNm"]
-        doc.invoice_foreign_currency_amount = item["invcFcurAmt"]
-        doc.invoice_foreign_currency = item["invcFcurCd"]
-        doc.invoice_foreign_currency_rate = item["invcFcurExcrt"]
+            request_data = {
+                "item_name": item.get("item_name"),
+                "product_name": item.get("product_name"),
+                "task_code": item.get("task_code"),
+                "declaration_date": parse_date(item.get("declaration_date")),
+                "item_sequence": item.get("item_sequence"),
+                "declaration_number": item.get("declaration_number"),
+                "hs_code": item.get("hs_code"),
+                "origin_nation_code": get_link_value(
+                    COUNTRIES_DOCTYPE_NAME, "code", item.get("origin_nation_code")
+                ),
+                "export_nation_code": get_link_value(
+                    COUNTRIES_DOCTYPE_NAME, "code", item.get("export_nation_code")
+                ),
+                "package": item.get("package"),
+                "packaging_unit_code": get_link_value(
+                    PACKAGING_UNIT_DOCTYPE_NAME, "name", item.get("packaging_unit_code")
+                ),
+                "quantity": item.get("quantity"),
+                "quantity_unit_code": get_link_value(
+                    UNIT_OF_QUANTITY_DOCTYPE_NAME, "name", item.get("quantity_unit_code")
+                ),
+                "gross_weight": item.get("gross_weight"),
+                "net_weight": item.get("net_weight"),
+                "suppliers_name": item.get("supplier_name"),
+                "agent_name": item.get("agent_name"),
+                "invoice_foreign_currency_amount": item.get("invoice_foreign_currency_amount"),
+                "invoice_foreign_currency": item.get("invoice_foreign_currency_code"),
+                "invoice_foreign_currency_rate": item.get("invoice_foreign_currency_exchange"),
+                "slade_id": item_id,
+            }
 
-        doc.save()
+            if existing_item:
+                item_doc = frappe.get_doc(REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME, existing_item)
+                item_doc.update(request_data)
+                item_doc.flags.ignore_mandatory = True
+                item_doc.save(ignore_permissions=True)
+            else:
+                new_item = frappe.get_doc({"doctype": REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME, **request_data})
+                new_item.insert(ignore_permissions=True, ignore_mandatory=True, ignore_if_duplicate=True)
+
+            counter += 1
+            if counter % batch_size == 0:
+                frappe.db.commit()
+
+        except Exception as e:
+            frappe.log_error(
+                title="Imported Item Sync Error",
+                message=f"Error while processing item with ID {item.get('id')}: {str(e)}",
+            )
+
+    if counter % batch_size != 0:
+        frappe.db.commit()
 
     frappe.msgprint(
-        "Imported Items Fetched. Go to <b>Navari eTims Registered Imported Item</b> Doctype for more information"
+        "Imported Items fetched successfully. Go to <b>Navari eTims Registered Imported Item</b> Doctype for more information."
     )
+
+
+def parse_date(date_str):
+    formats = [
+        "%d%m%Y", "%Y-%m-%d", "%d-%m-%Y", "%m/%d/%Y", 
+        "%d/%m/%Y", "%Y/%m/%d", "%B %d, %Y", 
+        "%b %d, %Y", "%Y.%m.%d"
+    ]
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            continue
+    if date_str.isdigit():
+        try:
+            return datetime.fromtimestamp(int(date_str))
+        except ValueError:
+            pass
+    raise ValueError(f"Invalid date format: {date_str}")
 
 
 def search_branch_request_on_success(response: dict) -> None:

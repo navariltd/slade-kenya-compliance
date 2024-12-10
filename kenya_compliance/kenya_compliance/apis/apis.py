@@ -359,32 +359,9 @@ def perform_item_search(request_data: str) -> None:
 
 @frappe.whitelist()
 def perform_import_item_search(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-
-    company_name = data["company_name"]
-
-    if "branch_code" in data:
-        headers = build_headers(company_name, data["branch_code"])
-        server_url = get_server_url(company_name, data["branch_code"])
-
-    else:
-        headers = build_headers(company_name)
-        server_url = get_server_url(company_name)
-
-    route_path, last_request_date = get_route_path("ImportItemSearchReq")
-
-    if headers and server_url and route_path:
-        request_date = add_to_date(datetime.now(), years=-1).strftime("%Y%m%d%H%M%S")
-        url = f"{server_url}{route_path}"
-        payload = {"lastReqDt": request_date}
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = imported_items_search_on_success
-        endpoints_builder.error_callback = on_error
-
-        endpoints_builder.make_remote_call()
+    process_request(
+        request_data, "ImportItemSearchReq", imported_items_search_on_success, doctype="Item"
+    )
 
 
 @frappe.whitelist()
