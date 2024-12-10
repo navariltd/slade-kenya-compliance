@@ -43,6 +43,13 @@ from .remote_response_status_handlers import (
     submit_inventory_on_success,
     user_details_submission_on_success,
 )
+from ..background_tasks.tasks import (
+    update_countries,
+    update_item_classification_codes,
+    update_packaging_units,
+    update_taxation_type,
+    update_unit_of_quantity,
+)
 
 from .api_builder import Slade360EndpointsBuilder
 from .remote_response_status_handlers import notices_search_on_success, on_slade_error
@@ -448,35 +455,6 @@ def submit_inventory(request_data: str) -> None:
 
 
 @frappe.whitelist()
-def perform_item_classification_search(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-
-    company_name = data["company_name"]
-
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
-    route_path, last_request_date = get_route_path("ItemClsSearchReq")
-
-    if headers and server_url and route_path:
-        request_date = last_request_date.strftime("%Y%m%d%H%M%S")
-
-        url = f"{server_url}{route_path}"
-        payload = {"lastReqDt": request_date}
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = lambda response: frappe.msgprint(
-            f"{response}"
-        )
-        endpoints_builder.error_callback = on_error
-
-        endpoints_builder.make_remote_call(
-            doctype="Item",
-        )
-
-
-@frappe.whitelist()
 def search_branch_request(request_data: str) -> None:
     data: dict = json.loads(request_data)
 
@@ -552,30 +530,36 @@ def send_imported_item_request(request_data: str) -> None:
 
 
 @frappe.whitelist()
-def perform_notice_search(request_data: str) -> None:
-    data: dict = json.loads(request_data)
+def perform_notice_search(request_data: str) -> str:
+    """Function to perform notice search."""
+    message = process_request(
+        request_data, "NoticeSearchReq", notices_search_on_success
+    )
+    return message
 
-    company_name = data["company_name"]
 
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
+@frappe.whitelist()
+def refresh_code_lists(request_data: str) -> str:
+    """Refresh code lists based on request data."""
+    tasks = [
+        ("CurrencySearchReq", update_countries),
+        ("PackagingUnitSearchReq", update_packaging_units),
+        ("UOMSearchReq", update_unit_of_quantity),
+        ("TaxSearchReq", update_taxation_type),
+    ]
 
-    route_path, last_request_date = get_route_path("NoticeSearchReq")
-    request_date = add_to_date(datetime.now(), years=-1).strftime("%Y%m%d%H%M%S")
+    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
 
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-        payload = {"lastReqDt": request_date}
+    return " ".join(messages)
 
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = notices_search_on_success
-        endpoints_builder.error_callback = on_error
 
-        endpoints_builder.make_remote_call(
-            doctype=SETTINGS_DOCTYPE_NAME, document_name=data.get("name", None)
-        )
+@frappe.whitelist()
+def get_item_classification_codes(request_data: str) -> str:
+    """Function to get item classification codes."""
+    message = process_request(
+        request_data, "ItemClsSearchReq", update_item_classification_codes
+    )
+    return message
 
 
 @frappe.whitelist()

@@ -11,7 +11,7 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.slade.perform_notice_search",
+              "kenya_compliance.kenya_compliance.apis.apis.perform_notice_search",
             args: {
               request_data: {
                 document_name: frm.doc.name,
@@ -32,7 +32,7 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.slade.refresh_code_lists",
+              "kenya_compliance.kenya_compliance.apis.apis.refresh_code_lists",
             args: {
               request_data: {
                 document_name: frm.doc.name,
@@ -53,7 +53,7 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.slade.get_item_classification_codes",
+              "kenya_compliance.kenya_compliance.apis.apis.get_item_classification_codes",
             args: {
               request_data: {
                 document_name: frm.doc.name,
