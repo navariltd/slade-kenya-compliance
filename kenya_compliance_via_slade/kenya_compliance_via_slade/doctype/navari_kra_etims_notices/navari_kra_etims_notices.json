@@ -1,0 +1,92 @@
+{
+ "actions": [],
+ "autoname": "format:{notice_number}",
+ "creation": "2024-09-11 11:30:43.801696",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "notice_number",
+  "registration_name",
+  "details_url",
+  "column_break_atft",
+  "title",
+  "registration_datetime",
+  "section_break_qjdy",
+  "contents"
+ ],
+ "fields": [
+  {
+   "fieldname": "notice_number",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Notice Number",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Title"
+  },
+  {
+   "fieldname": "column_break_atft",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "registration_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Registration Name"
+  },
+  {
+   "fieldname": "registration_datetime",
+   "fieldtype": "Datetime",
+   "label": "Registration Datetime"
+  },
+  {
+   "fieldname": "details_url",
+   "fieldtype": "Data",
+   "label": "Details URL",
+   "options": "URL"
+  },
+  {
+   "fieldname": "section_break_qjdy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "contents",
+   "fieldtype": "Text Editor",
+   "label": "Contents"
+  }
+ ],
+ "in_create": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-12-13 08:39:27.270074",
+ "modified_by": "Administrator",
+ "module": "Kenya Compliance Via Slade",
+ "name": "Navari KRA eTims Notices",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

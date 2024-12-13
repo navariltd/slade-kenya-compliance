@@ -1,26 +1,111 @@
+from .kenya_compliance_via_slade.doctype.doctype_names_mapping import (
+    COUNTRIES_DOCTYPE_NAME,
+    IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
+    ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+    PACKAGING_UNIT_DOCTYPE_NAME,
+    PAYMENT_TYPE_DOCTYPE_NAME,
+    PRODUCT_TYPE_DOCTYPE_NAME,
+    PURCHASE_RECEIPT_DOCTYPE_NAME,
+    ROUTES_TABLE_DOCTYPE_NAME,
+    STOCK_MOVEMENT_TYPE_DOCTYPE_NAME,
+    TAXATION_TYPE_DOCTYPE_NAME,
+    TRANSACTION_PROGRESS_DOCTYPE_NAME,
+    TRANSACTION_TYPE_DOCTYPE_NAME,
+    UNIT_OF_QUANTITY_DOCTYPE_NAME,
+)
+
 app_name = "kenya_compliance_via_slade"
-app_title = "Kenya Compliance Via Slade"
-app_publisher = "Navari"
-app_description = "Kenya Compliance via Slade360"
+app_title = "Navari KRA eTIMS Integration"
+app_publisher = "Navari Ltd"
+app_description = (
+    "KRA eTIMS Online Sales Control Unit (OSCU) Integration with ERPNext by Navari Ltd"
+)
 app_email = "solutions@navari.co.ke"
-app_license = "agpl-3.0"
+app_license = "GNU Affero General Public License v3.0"
+required_apps = ["frappe/erpnext"]
 
-# Apps
-# ------------------
 
-# required_apps = []
-
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "kenya_compliance_via_slade",
-# 		"logo": "/assets/kenya_compliance_via_slade/logo.png",
-# 		"title": "Kenya Compliance Via Slade",
-# 		"route": "/kenya_compliance_via_slade",
-# 		"has_permission": "kenya_compliance_via_slade.api.permission.has_app_permission"
-# 	}
-# ]
-
+# Fixtures
+# --------
+fixtures = [
+    {
+        "doctype": "Custom Field",
+        "filters": [
+            [
+                "dt",
+                "in",
+                (
+                    "Item",
+                    "Sales Invoice",
+                    "Sales Invoice Item",
+                    "Purchase Invoice",
+                    "Purchase Invoice Item",
+                    "Customer",
+                    "Customer Group",
+                    "Stock Ledger Entry",
+                    "BOM",
+                    "Warehouse",
+                    "Item Tax Template",
+                    "Branch",
+                    "Supplier",
+                ),
+            ],
+            ["is_system_generated", "=", 0],
+        ],
+    },
+    {"dt": TRANSACTION_TYPE_DOCTYPE_NAME},
+    {"dt": PURCHASE_RECEIPT_DOCTYPE_NAME},
+    {"dt": UNIT_OF_QUANTITY_DOCTYPE_NAME},
+    {"dt": IMPORTED_ITEMS_STATUS_DOCTYPE_NAME},
+    {"dt": ROUTES_TABLE_DOCTYPE_NAME},
+    {"dt": COUNTRIES_DOCTYPE_NAME},
+    {"dt": ITEM_CLASSIFICATIONS_DOCTYPE_NAME},
+    {
+        "dt": TAXATION_TYPE_DOCTYPE_NAME,
+        "filters": [["name", "in", ("A", "B", "C", "D", "E")]],
+    },
+    {
+        "dt": PRODUCT_TYPE_DOCTYPE_NAME,
+        "filters": [["name", "in", (1, 2, 3)]],
+    },
+    {"dt": PACKAGING_UNIT_DOCTYPE_NAME},
+    {"dt": STOCK_MOVEMENT_TYPE_DOCTYPE_NAME},
+    {
+        "dt": PAYMENT_TYPE_DOCTYPE_NAME,
+        "filters": [
+            [
+                "name",
+                "in",
+                (
+                    "CASH",
+                    "CREDIT",
+                    "CASH/CREDIT",
+                    "BANK CHECK",
+                    "DEBIT&CREDIT CARD",
+                    "MOBILE MONEY",
+                    "OTHER",
+                ),
+            ]
+        ],
+    },
+    {
+        "dt": TRANSACTION_PROGRESS_DOCTYPE_NAME,
+        "filters": [
+            [
+                "name",
+                "in",
+                (
+                    "Wait for Approval",
+                    "Approved",
+                    "Cancel Requested",
+                    "Canceled",
+                    "Credit Note Generated",
+                    "Transferred",
+                ),
+            ]
+        ],
+    },
+]
 # Includes in <head>
 # ------------------
 
@@ -43,8 +128,20 @@ app_license = "agpl-3.0"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_js = {
+    "Sales Invoice": "kenya_compliance_via_slade/overrides/client/sales_invoice.js",
+    "Purchase Invoice": "kenya_compliance_via_slade/overrides/client/purchase_invoice.js",
+    "Customer": "kenya_compliance_via_slade/overrides/client/customer.js",
+    "Item": "kenya_compliance_via_slade/overrides/client/items.js",
+    "BOM": "kenya_compliance_via_slade/overrides/client/bom.js",
+    "Branch": "kenya_compliance_via_slade/overrides/client/branch.js",
+}
+
+doctype_list_js = {
+    "Item": "kenya_compliance_via_slade/overrides/client/items_list.js",
+    "Sales Invoice": "kenya_compliance_via_slade/overrides/client/sales_invoice_list.js",
+    "Branch": "kenya_compliance_via_slade/overrides/client/branch_list.js",
+}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -83,13 +180,15 @@ app_license = "agpl-3.0"
 # ------------
 
 # before_install = "kenya_compliance_via_slade.install.before_install"
-# after_install = "kenya_compliance_via_slade.install.after_install"
+# after_install = "kenya_compliance_via_slade.kenya_compliance_via_slade.setup.after_install.after_install"
 
 # Uninstallation
 # ------------
 
 # before_uninstall = "kenya_compliance_via_slade.uninstall.before_uninstall"
-# after_uninstall = "kenya_compliance_via_slade.uninstall.after_uninstall"
+# after_uninstall = (
+#     "kenya_compliance_via_slade.kenya_compliance_via_slade.setup.after_uninstall.after_uninstall"
+# )
 
 # Integration Setup
 # ------------------
@@ -137,34 +236,68 @@ app_license = "agpl-3.0"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    # 	"*": {
+    # 		"on_update": "method",
+    # 		"on_cancel": "method",
+    # 		"on_trash": "method"
+    # 	}
+    "Sales Invoice": {
+        "before_save": ["kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"],
+        "on_submit": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.sales_invoice.on_submit"
+        ],
+        "validate": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.shared_overrides.validate"
+        ],
+        "before_cancel": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.sales_invoice.before_cancel"
+        ],
+    },
+    "Purchase Invoice": {
+        "before_save": ["kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"],
+        "on_submit": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.purchase_invoice.on_submit"
+        ],
+        "validate": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.purchase_invoice.validate"
+        ],
+        "before_cancel": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.sales_invoice.before_cancel"
+        ],
+    },
+    "Item": {
+        "validate": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.validate"
+        ],
+        "on_trash": "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.prevent_item_deletion",
+    },
+}
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"kenya_compliance_via_slade.tasks.all"
-# 	],
-# 	"daily": [
-# 		"kenya_compliance_via_slade.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"kenya_compliance_via_slade.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"kenya_compliance_via_slade.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"kenya_compliance_via_slade.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+    "all": [
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_stock_information",
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_item_inventory_information",
+    ],
+    # 	"daily": [
+    # 		"kenya_compliance_via_slade.tasks.daily"
+    # 	],
+    "hourly": [
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_sales_invoices_information",
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_purchase_information",
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_notices",
+    ],
+    # 	"weekly": [
+    # 		"kenya_compliance_via_slade.tasks.weekly"
+    # 	],
+    "monthly": [
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_code_lists",
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.get_item_classification_codes",
+    ],
+}
 
 # Testing
 # -------
@@ -234,11 +367,3 @@ app_license = "agpl-3.0"
 # auth_hooks = [
 # 	"kenya_compliance_via_slade.auth.validate"
 # ]
-
-# Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
-
-# default_log_clearing_doctypes = {
-# 	"Logging DocType Name": 30  # days to retain logs
-# }
-
