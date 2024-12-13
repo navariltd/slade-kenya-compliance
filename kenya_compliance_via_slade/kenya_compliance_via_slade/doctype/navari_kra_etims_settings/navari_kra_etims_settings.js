@@ -11,7 +11,7 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.perform_notice_search",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_notice_search",
             args: {
               request_data: {
                 name: frm.doc.name,
@@ -32,7 +32,7 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.background_tasks.tasks.refresh_code_lists",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_code_lists",
             args: {
               request_data: {
                 name: frm.doc.name,
@@ -53,7 +53,7 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.background_tasks.tasks.get_item_classification_codes",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.get_item_classification_codes",
             args: {},
             callback: (response) => {},
             error: (error) => {
@@ -69,7 +69,7 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
       //   function () {
       //     frappe.call({
       //       method:
-      //         'kenya_compliance.kenya_compliance.apis.apis.perform_stock_movement_search',
+      //         'kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_stock_movement_search',
       //       args: {
       //         request_data: {
       //           name: frm.doc.name,
@@ -91,7 +91,8 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
       __("Ping Server"),
       function () {
         frappe.call({
-          method: "kenya_compliance.kenya_compliance.apis.apis.ping_server",
+          method:
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.ping_server",
           args: {
             request_data: {
               server_url: frm.doc.server_url,

@@ -10,7 +10,7 @@ frappe.ui.form.on(doctype, {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.perform_customer_search",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_customer_search",
             args: {
               request_data: {
                 doc_name: frm.doc.name,
@@ -35,7 +35,7 @@ frappe.ui.form.on(doctype, {
           function () {
             frappe.call({
               method:
-                "kenya_compliance.kenya_compliance.apis.apis.send_branch_customer_details",
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_branch_customer_details",
               args: {
                 request_data: {
                   document_name: frm.doc.name,
@@ -71,7 +71,7 @@ frappe.ui.form.on(doctype, {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.send_insurance_details",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_insurance_details",
             args: {
               request_data: {
                 name: frm.doc.name,

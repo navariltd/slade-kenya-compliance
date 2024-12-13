@@ -30,7 +30,7 @@ frappe.ui.form.on(itemDoctypName, {
             // call with all options
             frappe.call({
               method:
-                "kenya_compliance.kenya_compliance.apis.apis.perform_item_registration",
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_item_registration",
               args: {
                 item_name: frm.doc.name,
               },
@@ -53,7 +53,7 @@ frappe.ui.form.on(itemDoctypName, {
       //     function () {
       //       frappe.call({
       //         method:
-      //           'kenya_compliance.kenya_compliance.apis.apis.submit_inventory',
+      //           'kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_inventory',
       //         args: {
       //           request_data: {
       //             company_name: companyName,
@@ -89,7 +89,7 @@ frappe.ui.form.on(itemDoctypName, {
           function () {
             frappe.call({
               method:
-                "kenya_compliance.kenya_compliance.apis.apis.send_imported_item_request",
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_imported_item_request",
               args: {
                 request_data: {
                   company_name: companyName,
