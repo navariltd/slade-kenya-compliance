@@ -20,7 +20,7 @@ frappe.ui.form.on(doctype, {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.submit_item_composition",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_item_composition",
             args: {
               request_data: {
                 name: frm.doc.name,

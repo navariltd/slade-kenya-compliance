@@ -9,7 +9,7 @@ frappe.ui.form.on(doctype, {
       function () {
         frappe.call({
           method:
-            "kenya_compliance.kenya_compliance.apis.apis.perform_import_item_search",
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_import_item_search",
           args: {
             request_data: {
               company_name: companyName,

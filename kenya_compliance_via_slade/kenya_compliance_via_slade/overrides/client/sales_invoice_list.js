@@ -11,7 +11,7 @@ function bulkSubmitInvoices(listview, doctype) {
 
   frappe.call({
     method:
-      "kenya_compliance.kenya_compliance.apis.apis.bulk_submit_sales_invoices",
+      "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.bulk_submit_sales_invoices",
     args: {
       docs_list: itemsToSubmit,
     },

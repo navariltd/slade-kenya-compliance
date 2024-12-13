@@ -6,7 +6,7 @@ frappe.listview_settings[doctypeName].onload = function (listview) {
   listview.page.add_inner_button(__("Get Imported Items"), function (listview) {
     frappe.call({
       method:
-        "kenya_compliance.kenya_compliance.apis.apis.perform_import_item_search",
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_import_item_search",
       args: {
         request_data: {
           company_name: companyName,
@@ -24,7 +24,7 @@ frappe.listview_settings[doctypeName].onload = function (listview) {
     function (listview) {
       frappe.call({
         method:
-          "kenya_compliance.kenya_compliance.apis.apis.perform_item_search",
+          "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_item_search",
         args: {
           request_data: {
             company_name: companyName,
@@ -45,7 +45,8 @@ frappe.listview_settings[doctypeName].onload = function (listview) {
       .map((item) => item.name);
 
     frappe.call({
-      method: "kenya_compliance.kenya_compliance.apis.apis.bulk_register_item",
+      method:
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.bulk_register_item",
       args: {
         docs_list: itemsToRegister,
       },

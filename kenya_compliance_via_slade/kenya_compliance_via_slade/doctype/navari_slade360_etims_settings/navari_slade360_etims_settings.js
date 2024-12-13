@@ -11,11 +11,12 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.perform_notice_search",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_notice_search",
             args: {
               request_data: {
                 document_name: frm.doc.name,
                 company_name: companyName,
+                branch_id: frm.doc.bhfid,
               },
             },
             callback: (response) => {},
@@ -32,11 +33,12 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.refresh_code_lists",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.refresh_code_lists",
             args: {
               request_data: {
                 document_name: frm.doc.name,
                 company_name: companyName,
+                branch_id: frm.doc.bhfid,
               },
             },
             callback: (response) => {},
@@ -53,11 +55,12 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.get_item_classification_codes",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_item_classification_codes",
             args: {
               request_data: {
                 document_name: frm.doc.name,
                 company_name: companyName,
+                branch_id: frm.doc.bhfid,
               },
             },
 
@@ -86,7 +89,7 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
 
                 frappe.call({
                   method:
-                    "kenya_compliance.kenya_compliance.apis.apis.initialize_device",
+                    "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.initialize_device",
                   args: {
                     request_data: {
                       document_name: frm.doc.name,
@@ -123,7 +126,7 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
       //   function () {
       //     frappe.call({
       //       method:
-      //         "kenya_compliance.kenya_compliance.apis.apis.perform_stock_movement_search",
+      //         "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_stock_movement_search",
       //       args: {
       //         request_data: {
       //           name: frm.doc.name,
@@ -146,7 +149,7 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
       function () {
         frappe.call({
           method:
-            "kenya_compliance.kenya_compliance.utils.update_navari_settings_with_token",
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.utils.update_navari_settings_with_token",
           args: {
             docname: frm.doc.name,
           },
@@ -159,7 +162,7 @@ frappe.ui.form.on("Navari Slade360 eTims Settings", {
     //   __("Ping Server"),
     //   function () {
     //     frappe.call({
-    //       method: "kenya_compliance.kenya_compliance.apis.apis.ping_server",
+    //       method: "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.ping_server",
     //       args: {
     //         request_data: {
     //           server_url: frm.doc.server_url,

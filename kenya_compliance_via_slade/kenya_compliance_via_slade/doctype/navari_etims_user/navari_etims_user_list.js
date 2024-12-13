@@ -9,7 +9,7 @@ frappe.listview_settings[doctypeName] = {
       function (listview) {
         frappe.call({
           method:
-            "kenya_compliance.kenya_compliance.apis.apis.create_branch_user",
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.create_branch_user",
           args: {
             request_data: {
               company_name: companyName,
