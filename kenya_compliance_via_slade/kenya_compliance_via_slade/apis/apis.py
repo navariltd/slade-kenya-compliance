@@ -35,7 +35,7 @@ from .remote_response_status_handlers import (
     imported_items_search_on_success,
     item_composition_submission_on_success,
     item_registration_on_success,
-    item_search_on_success,
+    item_search_on_success, 
     notices_search_on_success,
     on_error,
     purchase_search_on_success,
@@ -49,6 +49,7 @@ from ..background_tasks.tasks import (
     update_countries,
     update_currencies,
     update_item_classification_codes,
+    update_organisations,
     update_packaging_units,
     update_taxation_type,
     update_unit_of_quantity,
@@ -66,7 +67,7 @@ def process_request(request_data: str | dict, route_key: str, handler_function, 
         data = json.loads(request_data)
     elif isinstance(request_data, dict):
         data = request_data
-    company_name = data.get("company_name")  
+    company_name = data.get("company_name") or frappe.defaults.get_user_default("Company") 
     branch_id = data.get("branch_id") or "00"
     document_name = data.get("document_name", None)
 
@@ -470,6 +471,20 @@ def refresh_code_lists(request_data: str) -> str:
         ("PackagingUnitSearchReq", update_packaging_units),
         ("UOMSearchReq", update_unit_of_quantity),
         ("TaxSearchReq", update_taxation_type),
+    ]
+
+    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
+
+    return " ".join(messages)
+
+
+@frappe.whitelist()
+def search_organisations_request(request_data: str) -> str:
+    """Refresh code lists based on request data."""
+    tasks = [
+        ("OrgSearchReq", update_organisations),
+        ("BhfSearchReq", update_organisations),
+        ("DeptSearchReq", update_organisations),
     ]
 
     messages = [process_request(request_data, task[0], task[1]) for task in tasks]

@@ -9,6 +9,7 @@ from ..apis.remote_response_status_handlers import on_error
 from ..doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+    ORGANISATION_UNIT_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
@@ -286,3 +287,59 @@ def update_countries(data: list, document_name: str) -> None:
         doc.save()
 
     frappe.db.commit()
+
+
+def update_organisations(data: dict, document_name: str) -> None:
+    doc_list = data if isinstance(data, list) else data.get("results", data)
+    for record in doc_list:
+        create_org_parent_if_missing(record)
+    field_mapping = {
+        "slade_id": "id",
+        "active": lambda x: 1 if x.get("active") else 0,
+        "phone_number": "phone_number",
+        "default_store": lambda x: x.get("default_store").get("id") if isinstance(x.get("default_store"), dict) else x.get("default_store"),
+        "organisation_tax_pin": "organisation_tax_pin",
+        "is_etims_verified": lambda x: 1 if x.get("is_etims_verified") else 0,
+        "org_name": "name",
+        "description": "description",
+        "email_address": "email_address",
+        "physical_address": "physical_address",
+        "postal_address": "postal_address",
+        "web_address": "web_address",
+        "orgunit_type": "orgunit_type",
+        "default_country": "default_country",
+        "etims_branch_id": "etims_branch_id",
+        "county_name": "county_name",
+        "sub_county_name": "sub_county_name",
+        "tax_locality_name": "tax_locality_name",
+        "location_description": "location_description",
+        "manager_name": "manager_name",
+        "is_headquater": lambda x: 1 if x.get("is_headquater") else 0,
+        "username": "username",
+        "password": "password",
+        "use_cluster_doc_details": lambda x: 1 if x.get("use_cluster_doc_details") else 0,
+        "parent_navari_slade360_organisation": "parent"
+    }
+    update_documents(data, ORGANISATION_UNIT_DOCTYPE_NAME, field_mapping, filter_field="id")
+
+
+def create_org_parent_if_missing(data: dict) -> None:
+    parent_id = data.get("parent", None)
+    
+    if not parent_id or not isinstance(parent_id, str) or len(parent_id.strip()) == 0:
+        return
+    
+    parent_exists = frappe.db.exists(ORGANISATION_UNIT_DOCTYPE_NAME, {"slade_id": parent_id})
+    if not parent_exists:
+        frappe.get_doc({
+            "doctype": ORGANISATION_UNIT_DOCTYPE_NAME,
+            "slade_id": parent_id,
+            "org_name": data.get("parent_name", ""),
+            "phone_number": data.get("parent_phone_number", ""),
+            "is_group": 1,
+        }).insert(ignore_permissions=True)
+    else:
+        parent_doc = frappe.get_doc(ORGANISATION_UNIT_DOCTYPE_NAME, {"slade_id": parent_id})
+        if parent_doc.is_group != 1:
+            parent_doc.is_group = 1  
+            parent_doc.save(ignore_permissions=True)
