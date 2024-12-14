@@ -372,21 +372,6 @@ def build_invoice_payload(
     Returns:
         dict[str, str | int | float]: The payload
     """
-    post_time = invoice.posting_time
-
-    # Ensure post_time is a string if it's a timedelta
-    if isinstance(post_time, timedelta):
-        post_time = str(post_time)
-
-    # Parse posting date and time
-    posting_date = build_datetime_from_string(
-        f"{invoice.posting_date} {post_time[:8].replace('.', '')}",
-        format="%Y-%m-%d %H:%M:%S",
-    )
-
-    validated_date = posting_date.strftime("%Y%m%d%H%M%S")
-    sales_date = posting_date.strftime("%Y%m%d")
-
     # Fetch list of invoice items
     items_list = get_invoice_items_list(invoice)
 
@@ -397,6 +382,7 @@ def build_invoice_payload(
         
     payload = {
         "made_by": invoice.owner,
+        "document_name": invoice.name,
         "branch_id": invoice.branch,
         "company_name": company_name,
         "updated_by_name": invoice.modified_by,
@@ -431,7 +417,7 @@ def build_invoice_payload(
         "source_document": invoice.return_against,
         "description": invoice.remarks or "New",
         "reference_number": invoice.po_no,
-        "invoice_date": invoice.posting_date,
+        "invoice_date": str(invoice.posting_date),
         "parent_document": invoice.return_against,
         "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
         "payment_term": invoice.payment_terms_template,
@@ -439,7 +425,7 @@ def build_invoice_payload(
         # "discount": round(invoice.discount_amount, 2),
         "payment_plan": None,  
         "currency": frappe.get_value("Currency", invoice.currency, "slade_id"),
-        "source_organisation_unit": "iiiii",
+        "source_organisation_unit": invoice.custom_slade_organisation,
     }
 
     return payload

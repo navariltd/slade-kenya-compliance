@@ -113,7 +113,7 @@ def bulk_submit_sales_invoices(docs_list: str) -> None:
         for invoice in all_sales_invoices:
             if record == invoice.name:
                 doc = frappe.get_doc("Sales Invoice", record, for_update=False)
-                on_submit(doc, method=None)
+                on_submit(doc, method=None) 
 
 
 @frappe.whitelist()

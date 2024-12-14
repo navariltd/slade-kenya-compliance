@@ -37,7 +37,20 @@ def generic_invoices_on_submit_override(
 
     invoice_identifier = "C" if doc.is_return else "S"
     payload = build_invoice_payload(doc, invoice_identifier, company_name)
-    process_request(payload, "TrnsSalesSaveWrReq", sales_information_submission_on_success, method="POST", doctype=invoice_type)
+    additional_context = {
+        "invoice_type": invoice_type,
+    }
+    process_request(
+        payload,
+        "TrnsSalesSaveWrReq",
+        lambda response, document_name: sales_information_submission_on_success(
+            response,
+            document_name,
+            **additional_context,
+        ),
+        method="POST",
+        doctype=invoice_type,
+    )
 
     
     
