@@ -246,6 +246,11 @@ def get_slade_server_url(company_name: str, branch_id: str = "00") -> str | None
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
         ["server_url"],
         as_dict=True,
+    ) or frappe.db.get_value(
+        "Navari Slade360 eTims Settings",
+        {"company": company_name, "is_active": 1},
+        ["server_url"],
+        as_dict=True,
     )
 
     if settings:
@@ -291,7 +296,13 @@ def build_slade_headers(
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
         ["access_token", "token_expiry", "name"],
         as_dict=True,
+    ) or  frappe.db.get_value(
+        "Navari Slade360 eTims Settings",
+        {"company": company_name, "is_active": 1},
+        ["access_token", "token_expiry", "name"],
+        as_dict=True,
     )
+
 
     if settings:
         access_token = settings.get("access_token")
@@ -361,21 +372,6 @@ def build_invoice_payload(
     Returns:
         dict[str, str | int | float]: The payload
     """
-    post_time = invoice.posting_time
-
-    # Ensure post_time is a string if it's a timedelta
-    if isinstance(post_time, timedelta):
-        post_time = str(post_time)
-
-    # Parse posting date and time
-    posting_date = build_datetime_from_string(
-        f"{invoice.posting_date} {post_time[:8].replace('.', '')}",
-        format="%Y-%m-%d %H:%M:%S",
-    )
-
-    validated_date = posting_date.strftime("%Y%m%d%H%M%S")
-    sales_date = posting_date.strftime("%Y%m%d")
-
     # Fetch list of invoice items
     items_list = get_invoice_items_list(invoice)
 
@@ -383,69 +379,119 @@ def build_invoice_payload(
     invoice_name = invoice.name
     if invoice.amended_from:
         invoice_name = clean_invc_no(invoice_name)
-
+        
     payload = {
-        "invcNo": get_invoice_number(invoice_name),
-        "orgInvcNo": (
-            0
-            if invoice_type_identifier == "S"
-            else frappe.get_doc(
-                "Sales Invoice", invoice.return_against
-            ).custom_submission_sequence_number
-        ),
-        "trdInvcNo": invoice_name,
-        "custTin": invoice.tax_id if invoice.tax_id else None,
-        "custNm": None,
-        "rcptTyCd": invoice_type_identifier if invoice_type_identifier == "S" else "R",
-        "pmtTyCd": invoice.custom_payment_type_code,
-        "salesSttsCd": invoice.custom_transaction_progress_code,
-        "cfmDt": validated_date,
-        "salesDt": sales_date,
-        "stockRlsDt": validated_date,
-        "cnclReqDt": None,
-        "cnclDt": None,
-        "rfdDt": None,
-        "rfdRsnCd": None,
-        "totItemCnt": len(items_list),
-        "taxRtA": taxation_type.get("A", {}).get("tax_rate", 0),
-        "taxRtB": taxation_type.get("B", {}).get("tax_rate", 0),
-        "taxRtC": taxation_type.get("C", {}).get("tax_rate", 0),
-        "taxRtD": taxation_type.get("D", {}).get("tax_rate", 0),
-        "taxRtE": taxation_type.get("E", {}).get("tax_rate", 0),
-        "taxAmtA": taxation_type.get("A", {}).get("tax_amount", 0),
-        "taxAmtB": taxation_type.get("B", {}).get("tax_amount", 0),
-        "taxAmtC": taxation_type.get("C", {}).get("tax_amount", 0),
-        "taxAmtD": taxation_type.get("D", {}).get("tax_amount", 0),
-        "taxAmtE": taxation_type.get("E", {}).get("tax_amount", 0),
-        "taxblAmtA": taxation_type.get("A", {}).get("taxable_amount", 0),
-        "taxblAmtB": taxation_type.get("B", {}).get("taxable_amount", 0),
-        "taxblAmtC": taxation_type.get("C", {}).get("taxable_amount", 0),
-        "taxblAmtD": taxation_type.get("D", {}).get("taxable_amount", 0),
-        "taxblAmtE": taxation_type.get("E", {}).get("taxable_amount", 0),
-        "totTaxblAmt": round(invoice.base_net_total, 2),
-        "totTaxAmt": round(invoice.total_taxes_and_charges, 2),
-        "totAmt": round(invoice.grand_total, 2),
-        "prchrAcptcYn": "Y",
-        "remark": None,
-        "regrId": split_user_email(invoice.owner),
-        "regrNm": invoice.owner,
-        "modrId": split_user_email(invoice.modified_by),
-        "modrNm": invoice.modified_by,
-        "receipt": {
-            "custTin": invoice.tax_id if invoice.tax_id else None,
-            "custMblNo": None,
-            "rptNo": 1,
-            "rcptPbctDt": validated_date,
-            "trdeNm": "",
-            "adrs": "",
-            "topMsg": "ERPNext",
-            "btmMsg": "",
-            "prchrAcptcYn": "Y",
+        "made_by": invoice.owner,
+        "document_name": invoice.name,
+        "branch_id": invoice.branch,
+        "company_name": company_name,
+        "updated_by_name": invoice.modified_by,
+        "parent_document_number": invoice.return_against,
+        "active_pricelist": invoice.selling_price_list,
+        "invoice_amount_balance": round(invoice.outstanding_amount, 2),
+        "paid_invoice_amount": round(invoice.grand_total - invoice.outstanding_amount, 2),
+        "sales_invoice_lines": items_list,
+        "total_amount_paid": round(invoice.grand_total - invoice.outstanding_amount, 2),
+        "tax_exclusive_amount": round(invoice.net_total, 2),
+        "pricelist": invoice.selling_price_list,
+        "total_amount": round(invoice.grand_total, 2),
+        "payments": invoice.payments or [],
+        "payment_runs": [], 
+        "payment_methods": {}, 
+        "is_signed": True, 
+        "etims_invoice_counter": None,  
+        "sales_invoice_tax_table": {
+            "A":  taxation_type.get("A", {}).get("tax_rate", 0),
+            "B":  taxation_type.get("B", {}).get("tax_rate", 0),
+            "C":  taxation_type.get("C", {}).get("tax_rate", 0),
+            "D":  taxation_type.get("D", {}).get("tax_rate", 0),
+            "E":  taxation_type.get("E", {}).get("tax_rate", 0),
         },
-        "itemList": items_list,
+        "total_gross_amount": round(invoice.base_total, 2),
+        "total_vat": round(invoice.total_taxes_and_charges, 2),
+        "total_items_discount": round(invoice.discount_amount, 2),
+        "total_tax": round(invoice.total_taxes_and_charges, 2),
+        "total_net_amount": round(invoice.net_total, 2),
+        "active": invoice.docstatus == 1,
+        "document_number": invoice.name,
+        "source_document": invoice.return_against,
+        "description": invoice.remarks or "New",
+        "reference_number": invoice.po_no,
+        "invoice_date": str(invoice.posting_date),
+        "parent_document": invoice.return_against,
+        "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
+        "payment_term": invoice.payment_terms_template,
+        "gdn": None,  
+        # "discount": round(invoice.discount_amount, 2),
+        "payment_plan": None,  
+        "currency": frappe.get_value("Currency", invoice.currency, "slade_id"),
+        "source_organisation_unit": invoice.custom_slade_organisation,
     }
 
     return payload
+
+    # payload = {
+    #     "invcNo": get_invoice_number(invoice_name),
+    #     "orgInvcNo": (
+    #         0
+    #         if invoice_type_identifier == "S"
+    #         else frappe.get_doc(
+    #             "Sales Invoice", invoice.return_against
+    #         ).custom_submission_sequence_number
+    #     ),
+    #     "trdInvcNo": invoice_name,
+    #     "custTin": invoice.tax_id if invoice.tax_id else None,
+    #     "custNm": None,
+    #     "rcptTyCd": invoice_type_identifier if invoice_type_identifier == "S" else "R",
+    #     "pmtTyCd": invoice.custom_payment_type_code,
+    #     "salesSttsCd": invoice.custom_transaction_progress_code,
+    #     "cfmDt": validated_date,
+    #     "salesDt": sales_date,
+    #     "stockRlsDt": validated_date,
+    #     "cnclReqDt": None,
+    #     "cnclDt": None,
+    #     "rfdDt": None,
+    #     "rfdRsnCd": None,
+    #     "totItemCnt": len(items_list),
+    #     "taxRtA": taxation_type.get("A", {}).get("tax_rate", 0),
+    #     "taxRtB": taxation_type.get("B", {}).get("tax_rate", 0),
+    #     "taxRtC": taxation_type.get("C", {}).get("tax_rate", 0),
+    #     "taxRtD": taxation_type.get("D", {}).get("tax_rate", 0),
+    #     "taxRtE": taxation_type.get("E", {}).get("tax_rate", 0),
+    #     "taxAmtA": taxation_type.get("A", {}).get("tax_amount", 0),
+    #     "taxAmtB": taxation_type.get("B", {}).get("tax_amount", 0),
+    #     "taxAmtC": taxation_type.get("C", {}).get("tax_amount", 0),
+    #     "taxAmtD": taxation_type.get("D", {}).get("tax_amount", 0),
+    #     "taxAmtE": taxation_type.get("E", {}).get("tax_amount", 0),
+    #     "taxblAmtA": taxation_type.get("A", {}).get("taxable_amount", 0),
+    #     "taxblAmtB": taxation_type.get("B", {}).get("taxable_amount", 0),
+    #     "taxblAmtC": taxation_type.get("C", {}).get("taxable_amount", 0),
+    #     "taxblAmtD": taxation_type.get("D", {}).get("taxable_amount", 0),
+    #     "taxblAmtE": taxation_type.get("E", {}).get("taxable_amount", 0),
+    #     "totTaxblAmt": round(invoice.base_net_total, 2),
+    #     "totTaxAmt": round(invoice.total_taxes_and_charges, 2),
+    #     "totAmt": round(invoice.grand_total, 2),
+    #     "prchrAcptcYn": "Y",
+    #     "remark": None,
+    #     "regrId": split_user_email(invoice.owner),
+    #     "regrNm": invoice.owner,
+    #     "modrId": split_user_email(invoice.modified_by),
+    #     "modrNm": invoice.modified_by,
+    #     "receipt": {
+    #         "custTin": invoice.tax_id if invoice.tax_id else None,
+    #         "custMblNo": None,
+    #         "rptNo": 1,
+    #         "rcptPbctDt": validated_date,
+    #         "trdeNm": "",
+    #         "adrs": "",
+    #         "topMsg": "ERPNext",
+    #         "btmMsg": "",
+    #         "prchrAcptcYn": "Y",
+    #     },
+    #     "itemList": items_list,
+    # }
+
+    # return payload
 
 
 # def build_invoice_payload(

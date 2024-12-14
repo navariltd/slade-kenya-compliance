@@ -11,6 +11,7 @@ from ...apis.remote_response_status_handlers import (
     on_error,
     sales_information_submission_on_success,
 )
+from ...apis.apis import process_request
 from ...utils import (
     build_headers,
     build_invoice_payload,
@@ -33,47 +34,61 @@ def generic_invoices_on_submit_override(
         The Type of the invoice. Either Sales, or POS
     """
     company_name = doc.company
-    vendor = "OSCU KRA"
-    headers = build_headers(company_name, vendor, doc.branch)
-    server_url = get_server_url(company_name, vendor, doc.branch)
-    route_path, last_request_date = get_route_path("TrnsSalesSaveWrReq")
 
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
+    invoice_identifier = "C" if doc.is_return else "S"
+    payload = build_invoice_payload(doc, invoice_identifier, company_name)
+    additional_context = {
+        "invoice_type": invoice_type,
+    }
+    process_request(
+        payload,
+        "TrnsSalesSaveWrReq",
+        lambda response, document_name: sales_information_submission_on_success(
+            response,
+            document_name,
+            **additional_context,
+        ),
+        method="POST",
+        doctype=invoice_type,
+    )
 
-        invoice_identifier = "C" if doc.is_return else "S"
-        payload = build_invoice_payload(doc, invoice_identifier, company_name)
+    
+    
+    # if headers and server_url and route_path:
+    #     url = f"{server_url}{route_path}" 
 
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = partial(
-            sales_information_submission_on_success,
-            document_name=doc.name,
-            invoice_type=invoice_type,
-            company_name=company_name,
-            invoice_number=payload["invcNo"],
-            pin=headers.get("tin"),
-            branch_id=headers.get("bhfId"),
-        )
-        endpoints_builder.error_callback = on_error
 
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="default",
-            timeout=300,
-            job_name=f"{doc.name}_send_sales_request",
-            doctype=invoice_type,
-            document_name=doc.name,
-        )
+    #     endpoints_builder.headers = headers
+    #     endpoints_builder.url = url
+    #     endpoints_builder.payload = payload
+    #     endpoints_builder.success_callback = partial(
+    #         sales_information_submission_on_success,
+    #         document_name=doc.name,
+    #         invoice_type=invoice_type,
+    #         company_name=company_name,
+    #         invoice_number=payload["invcNo"],
+    #         pin=headers.get("tin"),
+    #         branch_id=headers.get("bhfId"),
+    #     )
+    #     endpoints_builder.error_callback = on_error
+
+    #     frappe.enqueue(
+    #         endpoints_builder.make_remote_call,
+    #         is_async=True,
+    #         queue="default",
+    #         timeout=300,
+    #         job_name=f"{doc.name}_send_sales_request",
+    #         doctype=invoice_type,
+    #         document_name=doc.name,
+    #     )
 
 
 def validate(doc: Document, method: str) -> None:
-    vendor = "OSCU KRA"
-    doc.custom_scu_id = get_curr_env_etims_settings(
-        frappe.defaults.get_user_default("Company"), vendor, doc.branch
-    ).scu_id
+    pass
+    # vendor = ""
+    # doc.custom_scu_id = get_curr_env_etims_settings(
+    #     frappe.defaults.get_user_default("Company"), vendor, doc.branch
+    # ).scu_id
 
     # item_taxes = get_itemised_tax_breakup_data(doc)
 

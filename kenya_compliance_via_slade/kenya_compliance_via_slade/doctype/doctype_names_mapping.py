@@ -11,6 +11,7 @@ TAXATION_TYPE_DOCTYPE_NAME: Final[str] = "Navari KRA eTims Taxation Type"
 PAYMENT_TYPE_DOCTYPE_NAME: Final[str] = "Navari KRA eTims Payment Type"
 TRANSACTION_PROGRESS_DOCTYPE_NAME: Final[str] = "Navari KRA eTims Transaction Progress"
 PACKAGING_UNIT_DOCTYPE_NAME: Final[str] = "Navari eTims Packaging Unit"
+ORGANISATION_UNIT_DOCTYPE_NAME: Final[str] = "Navari Slade360 Organisation"
 UNIT_OF_QUANTITY_DOCTYPE_NAME: Final[str] = "Navari eTims Unit of Quantity"
 ENVIRONMENT_SPECIFICATION_DOCTYPE_NAME: Final[str] = (
     "Navari KRA eTims Environment Identifier"
