@@ -12,8 +12,21 @@ from frappe.model.document import Document
 from frappe.utils.dateutils import add_to_date
 
 from ..doctype.doctype_names_mapping import (
-    COUNTRIES_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,
+    USER_DOCTYPE_NAME,
+    COUNTRIES_DOCTYPE_NAME,
+    IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
+    ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+    ITEM_TYPE_DOCTYPE_NAME,
+    NOTICES_DOCTYPE_NAME,
+    PACKAGING_UNIT_DOCTYPE_NAME,
+    PRODUCT_TYPE_DOCTYPE_NAME,
+    REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
+    REGISTERED_PURCHASES_DOCTYPE_NAME,
+    REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM,
+    REGISTERED_STOCK_MOVEMENTS_DOCTYPE_NAME,
+    TAXATION_TYPE_DOCTYPE_NAME,
+    UNIT_OF_QUANTITY_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
 )
 from ..utils import (
@@ -145,7 +158,7 @@ def perform_customer_search(request_data: str) -> None:
 @frappe.whitelist()
 def perform_item_registration(item_name: str) -> dict | None:
     item = frappe.get_doc("Item", item_name)
-    tax = item.get("custom_taxation_type")
+    tax = get_link_value(TAXATION_TYPE_DOCTYPE_NAME, "cd", item.get("custom_taxation_type"), "slade_id")
     sent_to_slade = item.get("custom_sent_to_slade", False)
     custom_slade_id = item.get("custom_slade_id", None)
 
@@ -158,13 +171,13 @@ def perform_item_registration(item_name: str) -> dict | None:
         "company_name": frappe.defaults.get_user_default("Company"),
         "code": item.get("item_code"),
         "scu_item_code": item.get("custom_item_code_etims"),
-        "scu_item_classification": item.get("custom_item_classification"),
-        "product_type": item.get("custom_product_type"),
+        "scu_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "code", item.get("custom_item_classification"), "slade_id"),
+        "product_type": get_link_value(PRODUCT_TYPE_DOCTYPE_NAME, "code", item.get("custom_product_type"), "slade_id"),
         "item_type": item.get("custom_item_type"),
         "preferred_name": item.get("item_name"),
-        "country_of_origin": item.get("custom_etims_country_of_origin_code"),
-        "packaging_unit": item.get("custom_packaging_unit"),
-        "quantity_unit": item.get("custom_unit_of_quantity"),
+        "country_of_origin": get_link_value(COUNTRIES_DOCTYPE_NAME, "code", item.get("custom_etims_country_of_origin_code"), "slade_id"),
+        "packaging_unit": get_link_value(PACKAGING_UNIT_DOCTYPE_NAME, "code", item.get("custom_packaging_unit"), "slade_id"),
+        "quantity_unit": get_link_value(UNIT_OF_QUANTITY_DOCTYPE_NAME, "code", item.get("custom_unit_of_quantity"), "slade_id"),
         "sale_taxes": [tax],
         "selling_price": round(item.get("valuation_rate", 0), 2),
         "purchasing_price": round(item.get("last_purchase_rate", 0), 2),

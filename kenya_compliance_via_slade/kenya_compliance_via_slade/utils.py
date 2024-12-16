@@ -912,9 +912,9 @@ def update_navari_settings_with_token(docname):
 
 
 
-def get_link_value(doctype: str, field_name: str, value: str):
+def get_link_value(doctype: str, field_name: str, value: str, return_field : str = "name"):
     try:
-        return frappe.db.get_value(doctype, {field_name: value}, "name")
+        return frappe.db.get_value(doctype, {field_name: value}, return_field)
     except Exception as e:
         frappe.log_error(
             title=f"Error Fetching Link for {doctype}",
