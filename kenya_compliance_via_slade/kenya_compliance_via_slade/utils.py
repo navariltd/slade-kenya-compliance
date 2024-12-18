@@ -372,10 +372,6 @@ def build_invoice_payload(
     Returns:
         dict[str, str | int | float]: The payload
     """
-    # Fetch list of invoice items
-    items_list = get_invoice_items_list(invoice)
-
-    # Determine the invoice number format
     invoice_name = invoice.name
     if invoice.amended_from:
         invoice_name = clean_invc_no(invoice_name)
@@ -390,7 +386,6 @@ def build_invoice_payload(
         "active_pricelist": invoice.selling_price_list,
         "invoice_amount_balance": round(invoice.outstanding_amount, 2),
         "paid_invoice_amount": round(invoice.grand_total - invoice.outstanding_amount, 2),
-        "sales_invoice_lines": items_list,
         "total_amount_paid": round(invoice.grand_total - invoice.outstanding_amount, 2),
         "tax_exclusive_amount": round(invoice.net_total, 2),
         "pricelist": invoice.selling_price_list,
@@ -422,7 +417,6 @@ def build_invoice_payload(
         "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
         "payment_term": invoice.payment_terms_template,
         "gdn": None,  
-        # "discount": round(invoice.discount_amount, 2),
         "payment_plan": None,  
         "currency": frappe.get_value("Currency", invoice.currency, "slade_id"),
         "source_organisation_unit": invoice.custom_slade_organisation,
@@ -622,34 +616,41 @@ def get_invoice_items_list(invoice: Document) -> list[dict[str, str | int | None
         # actual_tax_amount = item_taxes[index][tax_head]["tax_amount"]
 
         # tax_amount = round(actual_tax_amount, 2)
-
+        
         items_list.append(
             {
-                "itemSeq": item.idx,
-                "itemCd": item.custom_item_code_etims,
-                "itemClsCd": item.custom_item_classification,
-                "itemNm": item.item_name,
-                "bcd": item.barcode,
-                "pkgUnitCd": item.custom_packaging_unit_code,
-                "pkg": 1,
-                "qtyUnitCd": item.custom_unit_of_quantity_code,
-                "qty": abs(item.qty),
-                "prc": round(item.base_rate, 2),
-                "splyAmt": round(item.base_amount, 2),
-                "dcRt": round(item.discount_percentage, 2) or 0,
-                "dcAmt": round(item.discount_amount, 2) or 0,
-                "isrccCd": None,
-                "isrccNm": None,
-                "isrcRt": None,
-                "isrcAmt": None,
-                "taxTyCd": item.custom_taxation_type_code,
-                "taxblAmt": round(item.net_amount, 2),  # taxable_amount,
-                # "taxAmt": tax_amount,
-                "taxAmt": round(item.custom_tax_amount, 2),
-                "totAmt": round(item.net_amount + item.custom_tax_amount, 2),
-                # "totAmt": (taxable_amount + tax_amount),
+                "product": item.item_code,
+                "quantity": abs(item.qty),
             }
         )
+
+        # items_list.append(
+        #     {
+        #         "itemSeq": item.idx,
+        #         "itemCd": item.custom_item_code_etims,
+        #         "itemClsCd": item.custom_item_classification,
+        #         "itemNm": item.item_name,
+        #         "bcd": item.barcode,
+        #         "pkgUnitCd": item.custom_packaging_unit_code,
+        #         "pkg": 1,
+        #         "qtyUnitCd": item.custom_unit_of_quantity_code,
+        #         "qty": abs(item.qty),
+        #         "prc": round(item.base_rate, 2),
+        #         "splyAmt": round(item.base_amount, 2),
+        #         "dcRt": round(item.discount_percentage, 2) or 0,
+        #         "dcAmt": round(item.discount_amount, 2) or 0,
+        #         "isrccCd": None,
+        #         "isrccNm": None,
+        #         "isrcRt": None,
+        #         "isrcAmt": None,
+        #         "taxTyCd": item.custom_taxation_type_code,
+        #         "taxblAmt": round(item.net_amount, 2),  # taxable_amount,
+        #         # "taxAmt": tax_amount,
+        #         "taxAmt": round(item.custom_tax_amount, 2),
+        #         "totAmt": round(item.net_amount + item.custom_tax_amount, 2),
+        #         # "totAmt": (taxable_amount + tax_amount),
+        #     }
+        # )
 
     return items_list
 
@@ -944,3 +945,13 @@ def get_or_create_link(doctype: str, field_name: str, value: str):
         )
         return None
 
+
+def process_dynamic_url(route_path: str, request_data: dict) -> str:
+    import re
+    placeholders = re.findall(r"\{(.*?)\}", route_path)
+    for placeholder in placeholders:
+        if placeholder in request_data:
+            route_path = route_path.replace(f"{{{placeholder}}}", str(request_data.get(placeholder)))
+        else:
+            raise ValueError(f"Missing required placeholder: '{placeholder}' in request_data.")
+    return route_path

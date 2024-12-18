@@ -122,8 +122,9 @@ def customer_insurance_details_submission_on_success(
 def customer_branch_details_submission_on_success(
     response: dict, document_name: str
 ) -> None:
+    doctype = "Supplier" if response.get("is_supplier") else "Customer"
     frappe.db.set_value(
-        "Customer",
+        doctype,
         document_name,
         {"custom_details_submitted_successfully": 1, "slade_id": response.get("id")},
     )
@@ -162,14 +163,120 @@ def sales_information_submission_on_success(
     document_name: str,
     invoice_type: str,
 ) -> None:
+    """
+    Callback function executed after successfully processing an item.
+    Updates the invoice with custom ID and submission status.
+    """
     frappe.db.set_value(
         invoice_type,
         document_name,
         {
             "custom_slade_id": response.get("id"),
-            "custom_successfully_submitted": 1
+            "custom_successfully_submitted": 1,
         },
     )
+    frappe.enqueue(
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.remote_response_status_handlers.process_invoice_items",
+        document_name=document_name,
+        invoice_type=invoice_type,
+        invoice_slade_id=response.get("id"),
+        queue="long",  
+    )
+
+
+def process_invoice_items(
+    document_name: str,
+    invoice_type: str,
+    invoice_slade_id: str
+) -> None:
+    """
+    Retrieves the specific invoice, extracts all items, and sends each
+    item separately.
+    """
+    from .apis import process_request
+    invoice = frappe.get_doc(invoice_type, document_name)
+
+    if not invoice:
+        frappe.throw(f"{invoice_type} with name {document_name} not found.")
+
+    items = invoice.get("items", [])
+    items_table_doctype = frappe.get_meta(invoice_type).get_field("items").options
+    if not items:
+        frappe.throw(f"No items found for {invoice_type} {document_name}.")
+
+    for item in items:
+        payload = {
+            "product": get_link_value("Item", "name", item.get("item_code"), "custom_slade_id"),
+            "quantity": item.get("qty"),
+            "rate": item.get("rate"),
+            "amount": item.get("amount"),
+            "sales_invoice": invoice_slade_id,
+            "document_name": item.get("name")
+        }
+        additional_context = {
+            "invoice_type": items_table_doctype,
+        }
+        process_request(
+            payload,
+            "SalesLineSaveReq",
+            lambda response, document_name: sales_item_submission_on_success(
+                response,
+                document_name,
+                **additional_context,
+            ),
+            method="POST",
+            doctype=items_table_doctype,
+        )
+    process_sales_transition(document_name, invoice_type, invoice_slade_id)
+
+
+def process_sales_transition(document_name: str, invoice_type: str, invoice_slade_id: str) -> None:
+    from .apis import process_request
+
+    def handle_transition_success(response):
+        process_sales_sign(document_name, invoice_type, invoice_slade_id)
+
+    payload = {
+        "invoice_id": invoice_slade_id,
+        "document_name": document_name
+    }
+
+    process_request(
+        payload,
+        "SalesTransitionReq",
+        handle_transition_success,
+        method="PATCH",
+        doctype=invoice_type,
+    )
+
+
+def process_sales_sign(document_name: str, invoice_type: str, invoice_slade_id: str) -> None:
+    from .apis import process_request
+
+    payload = {
+        "invoice_id": invoice_slade_id,
+        "document_name": document_name
+    }
+
+    process_request(
+        payload,
+        "SalesSignInvReq",
+        lambda response: frappe.msgprint(f"Invoice {document_name} successfully processed and signed."),
+        method="POST",
+        doctype=invoice_type,
+    )
+      
+
+def sales_item_submission_on_success(
+    response: dict,
+    document_name: str,
+    invoice_type: str,
+) -> None:
+    updates = {
+        "custom_slade_id": response.get("id"),
+        "custom_sent_to_slade": 1,
+    }
+    frappe.db.set_value(invoice_type, document_name, updates)
 
 
 def item_composition_submission_on_success(response: dict, document_name: str) -> None:
@@ -184,6 +291,7 @@ def purchase_invoice_submission_on_success(response: dict, document_name: str) -
         "Purchase Invoice",
         document_name,
         {
+            "custom_slade_id": response.get("id"),
             "custom_submitted_successfully": 1,
         },
     )
@@ -499,7 +607,7 @@ def search_branch_request_on_success(response: dict, document_name: str) -> None
         try:
             doc = frappe.get_doc(
                 "Branch",
-                {"custom_slade_id": branch["id"]},
+                {"slade_id": branch["id"]},
                 for_update=True,
             )
 
@@ -508,7 +616,7 @@ def search_branch_request_on_success(response: dict, document_name: str) -> None
 
         finally:
             doc.branch = branch["id"]
-            doc.custom_slade_id = branch["id"]
+            doc.slade_id = branch["id"]
             doc.custom_etims_device_serial_no = branch["etims_device_serial_no"]            
             doc.custom_branch_code = branch["etims_branch_id"]
             doc.custom_pin = branch["organisation_tax_pin"]

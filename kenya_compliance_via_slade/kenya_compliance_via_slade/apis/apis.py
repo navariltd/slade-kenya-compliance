@@ -38,6 +38,7 @@ from ..utils import (
     get_route_path,
     get_server_url,
     make_get_request,
+    process_dynamic_url,
     split_user_email,
 )
 from .remote_response_status_handlers import (
@@ -87,6 +88,8 @@ def process_request(request_data: str | dict, route_key: str, handler_function, 
     headers = build_slade_headers(company_name, branch_id)
     server_url = get_slade_server_url(company_name, branch_id)
     route_path, _ = get_route_path(route_key, "VSCU Slade 360")
+    
+    route_path = process_dynamic_url(route_path, request_data)
 
     if method == "GET":
         if document_name: data.pop("document_name") 
@@ -243,10 +246,15 @@ def send_branch_customer_details(request_data: str) -> None:
     data["phone_number"] = "+254" + phone_number[-9:] if len(phone_number) >= 9 else None
 
     currency_name = data.get("currency")
+    if "doctype" in data:
+        doctype = data.pop("doctype")
+    else:
+        doctype = "Customer"
+
     if currency_name:
         data["currency"] = frappe.get_value("Currency", currency_name, "slade_id")
 
-    return process_request(json.dumps(data), "BhfCustSaveReq", customer_branch_details_submission_on_success, method="POST", doctype="Customer")
+    return process_request(json.dumps(data), "BhfCustSaveReq", customer_branch_details_submission_on_success, method="POST", doctype=doctype)
 
 
 @frappe.whitelist()

@@ -132,6 +132,7 @@ doctype_js = {
     "Sales Invoice": "kenya_compliance_via_slade/overrides/client/sales_invoice.js",
     "Purchase Invoice": "kenya_compliance_via_slade/overrides/client/purchase_invoice.js",
     "Customer": "kenya_compliance_via_slade/overrides/client/customer.js",
+    "Supplier": "kenya_compliance_via_slade/overrides/client/supplier.js",
     "Item": "kenya_compliance_via_slade/overrides/client/items.js",
     "BOM": "kenya_compliance_via_slade/overrides/client/bom.js",
     "Branch": "kenya_compliance_via_slade/overrides/client/branch.js",
