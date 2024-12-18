@@ -713,7 +713,7 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
     )
     
     if not set_warehouse:
-        set_warehouse = frappe.get_value("Warehouse", {}, "name")  # use first warehouse match if not available for the branch
+        set_warehouse = frappe.get_value("Warehouse", {"is_group": 0}, "name")  # use first warehouse match if not available for the branch
 
     # Create the Purchase Invoice
     purchase_invoice = frappe.new_doc("Purchase Invoice")
@@ -722,6 +722,7 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
     purchase_invoice.update_stock = 1 
     purchase_invoice.set_warehouse = set_warehouse
     purchase_invoice.branch = data["branch"]
+    purchase_invoice.custom_slade_organisation = data["organisation"]
     purchase_invoice.bill_no = data["supplier_invoice_no"]
     purchase_invoice.bill_date = data["supplier_invoice_date"]
     purchase_invoice.bill_date = data["supplier_invoice_date"]
