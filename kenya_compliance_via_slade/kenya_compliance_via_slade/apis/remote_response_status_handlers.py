@@ -286,7 +286,6 @@ def item_composition_submission_on_success(response: dict, document_name: str) -
 
 
 def purchase_invoice_submission_on_success(response: dict, document_name: str) -> None:
-    # Update Invoice fields from KRA's response
     frappe.db.set_value(
         "Purchase Invoice",
         document_name,
@@ -303,100 +302,167 @@ def stock_mvt_submission_on_success(response: dict, document_name: str) -> None:
     )
 
 
-def purchase_search_on_success(reponse: dict, document_name: str) -> None:
-    sales_list = reponse["data"]["saleList"]
+def purchase_search_on_success(response: dict, document_name: str) -> None:
+    sales_list = response if isinstance(response, list) else response.get("results")
 
     for sale in sales_list:
-        created_record = create_purchase_from_search_details(sale)
+        registered_purchase = create_purchase_from_search_details(sale)
+        frappe.enqueue(
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.remote_response_status_handlers.fetch_purchase_items",
+            registered_purchase=registered_purchase,
+            queue="long",  
+        )
 
-        for item in sale["itemList"]:
-            create_and_link_purchase_item(item, created_record)
+
+def fetch_purchase_items(registered_purchase: str) -> None:
+    from .apis import process_request
+
+    payload = {
+        "purchase_invoice": registered_purchase,
+        "document_name": registered_purchase
+    }
+
+    process_request(
+        payload,
+        "TrnsPurchaseItemReq",
+        create_and_link_purchase_item,
+        method="GET",
+        doctype=REGISTERED_PURCHASES_DOCTYPE_NAME,
+    )
+
+def parse_datetime(date_str: str, format: str = "%Y-%m-%dT%H:%M:%S%z") -> str:
+    if not date_str:
+        return 
+    try:
+        if "T" in date_str:  
+            parsed_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S%z")
+        else: 
+            parsed_date = datetime.strptime(date_str, "%Y-%m-%d")
+        return parsed_date.strftime("%Y-%m-%d %H:%M:%S") 
+    except Exception as e:
+        frappe.log_error(f"Invalid datetime format: {date_str}", title="Datetime Parsing Error")
+        return None
+
 
 
 def create_purchase_from_search_details(fetched_purchase: dict) -> str:
-    doc = frappe.new_doc(REGISTERED_PURCHASES_DOCTYPE_NAME)
+    """
+    Create and submit a new registered purchase document using details from fetched_purchase.
+    """
+    existing_doc = frappe.get_value(
+        REGISTERED_PURCHASES_DOCTYPE_NAME, 
+        {"slade_id": fetched_purchase["id"]}, 
+        "name"
+    )
 
-    doc.supplier_name = fetched_purchase["spplrNm"]
-    doc.supplier_pin = fetched_purchase["spplrTin"]
-    doc.supplier_branch_id = fetched_purchase["spplrBhfId"]
-    doc.supplier_invoice_number = fetched_purchase["spplrInvcNo"]
+    if existing_doc:
+        doc = frappe.get_doc(REGISTERED_PURCHASES_DOCTYPE_NAME, existing_doc)
+        doc.flags.ignore_permissions = True
+        doc.flags.ignore_validate_update_after_submit = True
+    else:
+        doc = frappe.new_doc(REGISTERED_PURCHASES_DOCTYPE_NAME)
 
-    doc.receipt_type_code = fetched_purchase["rcptTyCd"]
-    doc.payment_type_code = frappe.get_doc(
-        "Navari KRA eTims Payment Type", {"code": fetched_purchase["pmtTyCd"]}, ["name"]
-    ).name
+    
+    doc.slade_id =  fetched_purchase["id"]
+
+    doc.supplier_name = fetched_purchase["supplier_name"]
+    doc.supplier_pin = fetched_purchase["supplier_pin"]
+    doc.supplier_branch_id = fetched_purchase["supplier_branch_id"]
+    doc.supplier_invoice_number = fetched_purchase["supplier_invoice_number"]
+
+    doc.receipt_type_code = fetched_purchase["receipt_type_code"]
+    if fetched_purchase.get("payment_type_code"):
+        doc.payment_type_code = frappe.get_doc(
+            "Navari KRA eTims Payment Type", 
+            {"code": fetched_purchase["payment_type_code"]}, 
+            ["name"]
+        ).name
+
+    doc.validated_date = parse_datetime(fetched_purchase["validated_date"])
+    doc.sales_date = parse_datetime(fetched_purchase["sale_date"])
+    doc.stock_released_date = parse_datetime(fetched_purchase["stock_released_date"])
     doc.remarks = fetched_purchase["remark"]
-    doc.validated_date = fetched_purchase["cfmDt"]
-    doc.sales_date = fetched_purchase["salesDt"]
-    doc.stock_released_date = fetched_purchase["stockRlsDt"]
-    doc.total_item_count = fetched_purchase["totItemCnt"]
-    doc.taxable_amount_a = fetched_purchase["taxblAmtA"]
-    doc.taxable_amount_b = fetched_purchase["taxblAmtB"]
-    doc.taxable_amount_c = fetched_purchase["taxblAmtC"]
-    doc.taxable_amount_d = fetched_purchase["taxblAmtD"]
-    doc.taxable_amount_e = fetched_purchase["taxblAmtE"]
 
-    doc.tax_rate_a = fetched_purchase["taxRtA"]
-    doc.tax_rate_b = fetched_purchase["taxRtB"]
-    doc.tax_rate_c = fetched_purchase["taxRtC"]
-    doc.tax_rate_d = fetched_purchase["taxRtD"]
-    doc.tax_rate_e = fetched_purchase["taxRtE"]
+    doc.total_item_count = fetched_purchase["total_item_count"]
+    doc.total_taxable_amount = fetched_purchase["total_taxable_amount"]
+    doc.total_tax_amount = fetched_purchase["total_tax_amount"]
+    doc.total_amount = fetched_purchase["total_amount"]
 
-    doc.tax_amount_a = fetched_purchase["taxAmtA"]
-    doc.tax_amount_b = fetched_purchase["taxAmtB"]
-    doc.tax_amount_c = fetched_purchase["taxAmtC"]
-    doc.tax_amount_d = fetched_purchase["taxAmtD"]
-    doc.tax_amount_e = fetched_purchase["taxAmtE"]
+    doc.taxable_amount_a = fetched_purchase.get("taxable_amount_A", 0.0)
+    doc.taxable_amount_b = fetched_purchase.get("taxable_amount_B", 0.0)
+    doc.taxable_amount_c = fetched_purchase.get("taxable_amount_C", 0.0)
+    doc.taxable_amount_d = fetched_purchase.get("taxable_amount_D", 0.0)
+    doc.taxable_amount_e = fetched_purchase.get("taxable_amount_E", 0.0)
 
-    doc.total_taxable_amount = fetched_purchase["totTaxblAmt"]
-    doc.total_tax_amount = fetched_purchase["totTaxAmt"]
-    doc.total_amount = fetched_purchase["totAmt"]
+    doc.tax_rate_a = fetched_purchase.get("tax_rate_A", 0.0)
+    doc.tax_rate_b = fetched_purchase.get("tax_rate_B", 0.0)
+    doc.tax_rate_c = fetched_purchase.get("tax_rate_C", 0.0)
+    doc.tax_rate_d = fetched_purchase.get("tax_rate_D", 0.0)
+    doc.tax_rate_e = fetched_purchase.get("tax_rate_E", 0.0)
+
+    doc.tax_amount_a = fetched_purchase.get("tax_amount_A", 0.0)
+    doc.tax_amount_b = fetched_purchase.get("tax_amount_B", 0.0)
+    doc.tax_amount_c = fetched_purchase.get("tax_amount_C", 0.0)
+    doc.tax_amount_d = fetched_purchase.get("tax_amount_D", 0.0)
+    doc.tax_amount_e = fetched_purchase.get("tax_amount_E", 0.0)
+
+    doc.workflow_state = fetched_purchase["workflow_state"]
+    doc.branch = fetched_purchase["branch"]
+    doc.organisation = fetched_purchase["organisation"]
+    doc.can_send_to_etims = fetched_purchase["can_send_to_etims"]
 
     try:
         doc.submit()
-
     except frappe.exceptions.DuplicateEntryError:
-        frappe.log_error(title="Duplicate entries")
+        frappe.log_error(title="Duplicate entries", message=f"Duplicate for document: {doc.name}")
 
     return doc.name
 
 
-def create_and_link_purchase_item(item: dict, parent_record: str) -> None:
-    item_cls_code = item["itemClsCd"]
+def create_and_link_purchase_item(response: dict, document_name: str) -> None:
+    item_list = response if isinstance(response, list) else response.get("results")
+    parent_record = frappe.get_doc(REGISTERED_PURCHASES_DOCTYPE_NAME, document_name)
+    parent_record.flags.ignore_permissions = True
+    parent_record.flags.ignore_validate_update_after_submit = True
+    
+    for item in item_list:
+        existing_item = frappe.get_all(REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM, filters={"slade_id": item["id"]})
+        
+        if existing_item:
+            registered_item = frappe.get_doc(REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM, item["id"])
+            registered_item.flags.ignore_permissions = True
+            registered_item.flags.ignore_validate_update_after_submit = True
+        else:
+            registered_item = frappe.new_doc(REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM)
 
-    if not frappe.db.exists(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, item_cls_code):
-        doc = frappe.new_doc(ITEM_CLASSIFICATIONS_DOCTYPE_NAME)
-        doc.itemclscd = item_cls_code
-        doc.taxtycd = item["taxTyCd"]
-        doc.save()
+        registered_item.slade_id = item["id"]
+        registered_item.item_name = item["item_name"]
+        registered_item.purchase_invoice = item["purchase_invoice"]
+        registered_item.is_mapped = 1 if item["is_mapped"] else 0
+        registered_item.product_name = item["product_name"]
+        registered_item.product_code = item["product_code"]
+        registered_item.item_code = item["item_code"]  
+        registered_item.item_classification_code_data = item["item_classification_code"]  
+        registered_item.item_classification_code = get_or_create_link(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "itemclscd", item["item_classification_code"] )
+        registered_item.item_sequence = item["item_sequence_number"]
+        registered_item.barcode = item["barcode"]
+        registered_item.package = item["package"]
+        registered_item.packaging_unit_code = item["package_unit_code"]
+        registered_item.quantity = item["quantity"]
+        registered_item.quantity_unit_code = item["quantity_unit_code"]
+        registered_item.unit_price = item["unit_price"]
+        registered_item.supply_amount = item["supply_amount"]
+        registered_item.discount_rate = item["discount_rate"]
+        registered_item.discount_amount = item["discount_amount"]
+        registered_item.taxation_type_code = item["taxation_type_code"]
+        registered_item.taxable_amount = item["taxable_amount"]
+        registered_item.tax_amount = item["tax_amount"]
+        registered_item.total_amount = item["total_amount"]
+        registered_item.save()
 
-        item_cls_code = doc.name
-
-    registered_item = frappe.new_doc(REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM)
-
-    registered_item.parent = parent_record
-    registered_item.parentfield = "items"
-    registered_item.parenttype = "Navari eTims Registered Purchases"
-
-    registered_item.item_name = item["itemNm"]
-    registered_item.item_code = item["itemCd"]
-    registered_item.item_sequence = item["itemSeq"]
-    registered_item.item_classification_code = item_cls_code
-    registered_item.barcode = item["bcd"]
-    registered_item.package = item["pkg"]
-    registered_item.packaging_unit_code = item["pkgUnitCd"]
-    registered_item.quantity = item["qty"]
-    registered_item.quantity_unit_code = item["qtyUnitCd"]
-    registered_item.unit_price = item["prc"]
-    registered_item.supply_amount = item["splyAmt"]
-    registered_item.discount_rate = item["dcRt"]
-    registered_item.discount_amount = item["dcAmt"]
-    registered_item.taxation_type_code = item["taxTyCd"]
-    registered_item.taxable_amount = item["taxblAmt"]
-    registered_item.tax_amount = item["taxAmt"]
-    registered_item.total_amount = item["totAmt"]
-
-    registered_item.save()
+        parent_record.append("items", registered_item)
+        
+    parent_record.save()
 
 
 def notices_search_on_success(response: dict | list, document_name: str) -> None:
@@ -514,6 +580,10 @@ def imported_items_search_on_success(response: dict, document_name: str):
                 "declaration_date": parse_date(item.get("declaration_date")),
                 "item_sequence": item.get("item_sequence"),
                 "declaration_number": item.get("declaration_number"),
+                "imported_item_status_code": item.get("import_item_status_code"),
+                "imported_item_status": get_link_value(
+                    IMPORTED_ITEMS_STATUS_DOCTYPE_NAME, "code", item.get("import_item_status_code")
+                ),
                 "hs_code": item.get("hs_code"),
                 "origin_nation_code": get_link_value(
                     COUNTRIES_DOCTYPE_NAME, "code", item.get("origin_nation_code")
@@ -551,14 +621,13 @@ def imported_items_search_on_success(response: dict, document_name: str):
 
             if item.get("product"):
                 product_name = get_link_value("Item", "custom_slade_id", item.get("product"))
-                import_item_status = get_link_value(IMPORTED_ITEMS_STATUS_DOCTYPE_NAME, "code", item.get("import_item_status_code"))
                 product = frappe.get_doc("Item", product_name)
                 product.custom_referenced_imported_item = item_doc.name
                 product.custom_imported_item_task_code =  item_doc.task_code
                 product.custom_hs_code =  item_doc.hs_code
                 product.custom_imported_item_submitted =  item_doc.sent_to_etims
-                product.custom_imported_item_status =  import_item_status
-                product.custom_imported_item_status_code = item.get("import_item_status_code") 
+                product.custom_imported_item_status =  item_doc.imported_item_status
+                product.custom_imported_item_status_code =  item_doc.imported_item_status_code
                 product.flags.ignore_mandatory = True
                 product.save()
                 
@@ -647,6 +716,7 @@ def item_search_on_success(response: dict, document_name: str):
             
             request_data = {
                 "item_name": item_data.get("name"),
+                "item_code": item_data.get("name"),
                 "custom_item_registered": 1 if item_data.get("sent_to_etims") else 0,
                 "custom_slade_id": item_data.get("id"),
                 "custom_sent_to_slade": 1,

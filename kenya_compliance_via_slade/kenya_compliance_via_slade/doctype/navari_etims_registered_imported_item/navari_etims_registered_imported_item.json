@@ -16,10 +16,13 @@
   "package",
   "quantity",
   "suppliers_name",
+  "imported_item_status_code",
   "invoice_foreign_currency_amount",
+  "purchase_invoice",
   "column_break_cbnh",
   "task_code",
   "export_nation_code",
+  "product_code",
   "declaration_number",
   "hs_code",
   "net_weight",
@@ -28,7 +31,9 @@
   "agent_name",
   "invoice_foreign_currency",
   "invoice_foreign_currency_rate",
-  "sent_to_etims"
+  "imported_item_status",
+  "sent_to_etims",
+  "is_mapped"
  ],
  "fields": [
   {
@@ -152,6 +157,34 @@
    "fieldtype": "Check",
    "label": "Sent to eTims",
    "read_only": 1
+  },
+  {
+   "fieldname": "imported_item_status_code",
+   "fieldtype": "Data",
+   "label": "imported Item Status Code"
+  },
+  {
+   "fieldname": "imported_item_status",
+   "fieldtype": "Link",
+   "label": "imported Item Status",
+   "options": "Navari eTims Import Item Status"
+  },
+  {
+   "fieldname": "product_code",
+   "fieldtype": "Data",
+   "label": "Product Code"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_mapped",
+   "fieldtype": "Check",
+   "label": "Is Mapped",
+   "read_only": 1
+  },
+  {
+   "fieldname": "purchase_invoice",
+   "fieldtype": "Data",
+   "label": "Purchase Invoice"
   }
  ],
  "in_create": 1,
@@ -166,7 +199,7 @@
    "link_fieldname": "custom_referenced_imported_item"
   }
  ],
- "modified": "2024-12-13 08:39:21.944950",
+ "modified": "2024-12-18 18:18:51.790986",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Registered Imported Item",

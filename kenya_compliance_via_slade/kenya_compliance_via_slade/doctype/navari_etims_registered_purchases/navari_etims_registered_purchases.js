@@ -12,7 +12,7 @@ frappe.ui.form.on(doctypeName, {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.create_supplier_from_fetched_registered_purchases",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.create_supplier_from_fetched_registered_purchases",
             args: {
               request_data: {
                 name: frm.doc.name,
@@ -35,7 +35,7 @@ frappe.ui.form.on(doctypeName, {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.create_items_from_fetched_registered",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.create_items_from_fetched_registered",
             args: {
               request_data: {
                 name: frm.doc.name,
@@ -56,7 +56,7 @@ frappe.ui.form.on(doctypeName, {
         function () {
           frappe.call({
             method:
-              "kenya_compliance.kenya_compliance.apis.apis.create_purchase_invoice_from_request",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.create_purchase_invoice_from_request",
             args: {
               request_data: {
                 name: frm.doc.name,
@@ -64,6 +64,7 @@ frappe.ui.form.on(doctypeName, {
                 supplier_name: frm.doc.supplier_name,
                 supplier_pin: frm.doc.supplier_pin,
                 supplier_branch_id: frm.doc.supplier_branch_id,
+                branch: frm.doc.branch,
                 supplier_invoice_no: frm.doc.supplier_invoice_number,
                 supplier_invoice_date: frm.doc.sales_date,
                 items: frm.doc.items,

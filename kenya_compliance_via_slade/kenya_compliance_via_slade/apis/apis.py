@@ -92,8 +92,11 @@ def process_request(request_data: str | dict, route_key: str, handler_function, 
     route_path = process_dynamic_url(route_path, request_data)
 
     if method == "GET":
-        if document_name: data.pop("document_name") 
-        if company_name: data.pop("company_name")
+        if "document_name" in data and data["document_name"]:
+            data.pop("document_name")
+
+        if "company_name" in data and data["company_name"]:
+            data.pop("company_name")
         
     if headers and server_url and route_path:
         url = f"{server_url}{route_path}"
@@ -174,7 +177,7 @@ def perform_item_registration(item_name: str) -> dict | None:
         "company_name": frappe.defaults.get_user_default("Company"),
         "code": item.get("item_code"),
         "scu_item_code": item.get("custom_item_code_etims"),
-        "scu_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "code", item.get("custom_item_classification"), "slade_id"),
+        "scu_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "itemclscd", item.get("custom_item_classification"), "slade_id"),
         "product_type": get_link_value(PRODUCT_TYPE_DOCTYPE_NAME, "code", item.get("custom_product_type"), "slade_id"),
         "item_type": item.get("custom_item_type"),
         "preferred_name": item.get("item_name"),
@@ -354,30 +357,10 @@ def perform_import_item_search_all_branches() -> None:
 
 @frappe.whitelist()
 def perform_purchases_search(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-
-    company_name = data["company_name"]
-
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
-    route_path, last_request_date = get_route_path("TrnsPurchaseSalesReq")
-
-    if headers and server_url and route_path:
-        request_date = last_request_date.strftime("%Y%m%d%H%M%S")
-
-        url = f"{server_url}{route_path}"
-        payload = {"lastReqDt": request_date}
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = purchase_search_on_success
-        endpoints_builder.error_callback = on_error
-
-        endpoints_builder.make_remote_call(
-            doctype="Purchase Invoice",
-        )
-
+    process_request(
+        request_data, "TrnsPurchaseSalesReq", purchase_search_on_success, doctype=REGISTERED_PURCHASES_DOCTYPE_NAME
+    )
+    
 
 @frappe.whitelist()
 def submit_inventory(request_data: str) -> None:
@@ -664,9 +647,11 @@ def create_item(item: dict | frappe._dict) -> Document:
 
     new_item = frappe.new_doc("Item")
     new_item.is_stock_item = 0  # Default to 0
-    new_item.item_code = item["item_name"]
+    new_item.item_code = item["item_code"]
+    new_item.item_name = item["item_name"]
     new_item.item_group = "All Item Groups"
-    new_item.custom_item_classification = item["item_classification_code"]
+    if "item_classification_code" in item:
+        new_item.custom_item_classification = item["item_classification_code"]
     new_item.custom_packaging_unit = item["packaging_unit_code"]
     new_item.custom_unit_of_quantity = (
         item.get("quantity_unit_code", None) or item["unit_of_quantity_code"]
@@ -719,13 +704,26 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
         if received_item["item_name"] not in all_existing_items:
             created_item = create_item(received_item)
             all_items.append(created_item)
+            
+    set_warehouse = frappe.get_value(
+        "Warehouse",
+        {"custom_branch": data["branch"]},
+        ["name"],
+        as_dict=True,
+    )
+    
+    if not set_warehouse:
+        set_warehouse = frappe.get_value("Warehouse", {}, "name")  # use first warehouse match if not available for the branch
 
     # Create the Purchase Invoice
     purchase_invoice = frappe.new_doc("Purchase Invoice")
     purchase_invoice.supplier = supplier or data["supplier_name"]
-    purchase_invoice.update_stock = 1
-    purchase_invoice.custom_supplier_branch_id = data["supplier_branch_id"]
+    purchase_invoice.supplier = supplier or data["supplier_name"]
+    purchase_invoice.update_stock = 1 
+    purchase_invoice.set_warehouse = set_warehouse
+    purchase_invoice.branch = data["branch"]
     purchase_invoice.bill_no = data["supplier_invoice_no"]
+    purchase_invoice.bill_date = data["supplier_invoice_date"]
     purchase_invoice.bill_date = data["supplier_invoice_date"]
 
     if "currency" in data:
@@ -761,11 +759,20 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
     )
 
     for item in data["items"]:
+        matching_item = frappe.get_all(
+            "Item",
+            filters={
+                "item_name": item["item_name"],
+                "custom_item_classification": item["item_classification_code"],
+            },
+            fields=["name"]  
+        )
+        item_code = matching_item[0]["name"]
         purchase_invoice.append(
             "items",
             {
                 "item_name": item["item_name"],
-                "item_code": item["item_name"],
+                "item_code": item_code,
                 "qty": item["quantity"],
                 "rate": item["unit_price"],
                 "expense_account": expense_account,
