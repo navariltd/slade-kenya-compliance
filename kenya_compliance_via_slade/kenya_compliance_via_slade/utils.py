@@ -893,9 +893,9 @@ def update_navari_settings_with_token(docname):
     settings_doc = frappe.get_doc("Navari Slade360 eTims Settings", docname)
     auth_server_url = settings_doc.auth_server_url
     username = settings_doc.auth_username
-    password = settings_doc.auth_password
-    client_id = settings_doc.client_id
-    client_secret = settings_doc.client_secret
+    client_id = settings_doc.client_id    
+    password = settings_doc.get_password('auth_password')
+    client_secret = settings_doc.get_password('client_secret')
 
     token_details = authenticate_and_get_token(
         auth_server_url, username, password, client_id, client_secret
