@@ -12,6 +12,7 @@ from ..doctype.doctype_names_mapping import (
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
     ITEM_TYPE_DOCTYPE_NAME,
     NOTICES_DOCTYPE_NAME,
+    ORGANISATION_UNIT_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     PRODUCT_TYPE_DOCTYPE_NAME,
     REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
@@ -132,8 +133,63 @@ def customer_branch_details_submission_on_success(
 
 def user_details_submission_on_success(response: dict, document_name: str) -> None:
     frappe.db.set_value(
-        USER_DOCTYPE_NAME, document_name, {"submitted_successfully_to_etims": 1}
+        USER_DOCTYPE_NAME,
+        document_name,
+        {
+            "submitted_successfully_to_etims": 1 if response.get("sent_to_etims") else 0, 
+            "slade_id": response.get("id"),
+            "sent_to_slade": 1
+        },
     )
+
+
+def user_details_fetch_on_success(response: dict, document_name: str) -> None:
+    result = response.get("results", [])[0] if response.get("results") else response
+    email = result.get("email")
+
+    existing_user = frappe.db.exists("User", {"email": email})
+    if not existing_user:
+        user = frappe.get_doc({
+            "doctype": "User",
+            "email": email,
+            "first_name": result.get("first_name"),
+            "last_name": result.get("last_name"),
+            "full_name": result.get("full_name"),
+            "enabled": 1,
+            "roles": [{"role": "System Manager"}]
+        })
+        user.insert(ignore_permissions=True)
+    else:
+        user = frappe.get_doc("User", existing_user)
+
+    workstation = (
+        result.get("user_workstations")[0]["workstation"]
+        if result.get("user_workstations") and len(result.get("user_workstations")) > 0
+        else None
+    )
+
+    data = {
+        "submitted_successfully_to_etims": 1 if response.get("sent_to_etims") else 0,
+        "slade_id": result.get("id"),
+        "sent_to_slade": 1,
+        "first_name": result.get("first_name"),
+        "last_name": result.get("last_name"),
+        "users_full_names": result.get("full_name"),
+        "email": email,
+        "workstation": workstation,
+        "organisation": result.get("organisation_id"),
+        "system_user": user.name,
+    }
+
+    existing_doc = frappe.db.exists("Navari eTims User", {"email": email})
+    if not existing_doc:
+        new_doc = frappe.get_doc({
+            "doctype": "Navari eTims User",
+            **data  
+        })
+        new_doc.insert(ignore_permissions=True)
+    else:
+        frappe.db.set_value("Navari eTims User", existing_doc, data)
 
 
 @deprecation.deprecated(
@@ -183,7 +239,7 @@ def sales_information_submission_on_success(
         queue="long",  
     )
 
-
+@frappe.whitelist()
 def process_invoice_items(
     document_name: str,
     invoice_type: str,
@@ -576,6 +632,7 @@ def imported_items_search_on_success(response: dict, document_name: str):
             request_data = {
                 "item_name": item.get("item_name"),
                 "product_name": item.get("product_name"),
+                "product_code": item.get("product_code"),
                 "task_code": item.get("task_code"),
                 "declaration_date": parse_date(item.get("declaration_date")),
                 "item_sequence": item.get("item_sequence"),
@@ -598,6 +655,12 @@ def imported_items_search_on_success(response: dict, document_name: str):
                 "quantity": item.get("quantity"),
                 "quantity_unit_code": get_or_create_link(
                     UNIT_OF_QUANTITY_DOCTYPE_NAME, "code", item.get("quantity_unit_code")
+                ),
+                "branch": get_or_create_link(
+                    "Branch", "slade_id", item.get("branch")
+                ),
+                "organisation": get_or_create_link(
+                    ORGANISATION_UNIT_DOCTYPE_NAME, "slade_id", item.get("organisation")
                 ),
                 "gross_weight": item.get("gross_weight"),
                 "net_weight": item.get("net_weight"),
@@ -625,6 +688,8 @@ def imported_items_search_on_success(response: dict, document_name: str):
                 product.custom_referenced_imported_item = item_doc.name
                 product.custom_imported_item_task_code =  item_doc.task_code
                 product.custom_hs_code =  item_doc.hs_code
+                product.custom_branch =  item_doc.branch
+                product.custom_organisation =  item_doc.organisation
                 product.custom_imported_item_submitted =  item_doc.sent_to_etims
                 product.custom_imported_item_status =  item_doc.imported_item_status
                 product.custom_imported_item_status_code =  item_doc.imported_item_status_code

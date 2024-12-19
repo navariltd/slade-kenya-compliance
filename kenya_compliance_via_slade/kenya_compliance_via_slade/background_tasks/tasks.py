@@ -11,6 +11,7 @@ from ..doctype.doctype_names_mapping import (
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
     ORGANISATION_UNIT_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
+    PAYMENT_TYPE_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
@@ -207,6 +208,24 @@ def update_packaging_units(data: dict, document_name: str) -> None:
         "code_description": "description",
     }
     update_documents(data, PACKAGING_UNIT_DOCTYPE_NAME, field_mapping)
+    
+
+def update_payment_methods(data: dict, document_name: str) -> None:
+    field_mapping = {
+        "slade_id": "id",
+        "account_details": "account_details",
+        "mobile_money_type": "mobile_money_type",
+        "mobile_money_business_number": "mobile_money_business_number",
+        "bank_name": "bank_name",
+        "bank_branch": "bank_branch",
+        "bank_account_number": "bank_account_number",
+        "active": lambda x: 1 if x.get("active") else 0,
+        "code_name": "name",
+        "description": "description",
+        "organisation": "organisation",
+        "account": "account"
+    }
+    update_documents(data, PAYMENT_TYPE_DOCTYPE_NAME, field_mapping, filter_field="id")
     
 
 def update_currencies(data: dict, document_name: str) -> None:

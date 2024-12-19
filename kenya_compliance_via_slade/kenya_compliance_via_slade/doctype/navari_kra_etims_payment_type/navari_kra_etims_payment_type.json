@@ -1,23 +1,30 @@
 {
  "actions": [],
- "autoname": "format:{code_name}",
+ "autoname": "field:slade_id",
  "creation": "2024-03-11 14:39:32.675317",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "payment_type_details_section",
+  "section_break_mvnn",
   "code",
   "sort_order",
-  "column_break_oagp",
+  "account_details",
+  "description",
+  "column_break_fkrl",
   "code_name",
-  "code_description"
+  "code_description",
+  "slade_id",
+  "organisation",
+  "account",
+  "active",
+  "column_break_efis",
+  "bank_name",
+  "bank_branch",
+  "bank_account_number",
+  "mobile_money_business_number",
+  "mobile_money_type"
  ],
  "fields": [
-  {
-   "fieldname": "payment_type_details_section",
-   "fieldtype": "Section Break",
-   "label": "Payment Type Details"
-  },
   {
    "fieldname": "code",
    "fieldtype": "Data",
@@ -32,10 +39,6 @@
    "non_negative": 1
   },
   {
-   "fieldname": "column_break_oagp",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "code_name",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -48,16 +51,86 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Code Description"
+  },
+  {
+   "fieldname": "slade_id",
+   "fieldtype": "Data",
+   "label": "Slade ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "section_break_mvnn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "column_break_fkrl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "account",
+   "fieldtype": "Data",
+   "label": "Account"
+  },
+  {
+   "fieldname": "organisation",
+   "fieldtype": "Link",
+   "label": "Organisation",
+   "options": "Navari Slade360 Organisation"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Data",
+   "label": "Bank Name"
+  },
+  {
+   "fieldname": "bank_branch",
+   "fieldtype": "Data",
+   "label": "Bank Branch"
+  },
+  {
+   "fieldname": "bank_account_number",
+   "fieldtype": "Data",
+   "label": "Bank Account Number"
+  },
+  {
+   "fieldname": "account_details",
+   "fieldtype": "Data",
+   "label": "Account Details"
+  },
+  {
+   "fieldname": "mobile_money_type",
+   "fieldtype": "Data",
+   "label": "Mobile Money Type"
+  },
+  {
+   "fieldname": "mobile_money_business_number",
+   "fieldtype": "Data",
+   "label": "Mobile Money Business Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "Active"
+  },
+  {
+   "fieldname": "column_break_efis",
+   "fieldtype": "Column Break"
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-13 08:39:30.280173",
+ "modified": "2024-12-19 17:59:56.932990",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Payment Type",
- "naming_rule": "Expression",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -73,7 +146,9 @@
    "write": 1
   }
  ],
+ "search_fields": "code_name, slade_id, code",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "code_name"
 }

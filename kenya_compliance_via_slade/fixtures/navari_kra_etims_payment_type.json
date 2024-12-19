@@ -30,16 +30,6 @@
   "sort_order": 7
  },
  {
-  "code": "06",
-  "code_description": "ANY TRANSACTION USING MOBILE MONEY SYSTEM",
-  "code_name": "MOBILE MONEY",
-  "docstatus": 0,
-  "doctype": "Navari KRA eTims Payment Type",
-  "modified": "2024-03-11 14:44:50.659496",
-  "name": "MOBILE MONEY",
-  "sort_order": 6
- },
- {
   "code": "02",
   "code_description": "CREDIT",
   "code_name": "CREDIT",
@@ -48,6 +38,16 @@
   "modified": "2024-03-11 14:43:40.960905",
   "name": "CREDIT",
   "sort_order": 2
+ },
+ {
+  "code": "06",
+  "code_description": "ANY TRANSACTION USING MOBILE MONEY SYSTEM",
+  "code_name": "MOBILE MONEY",
+  "docstatus": 0,
+  "doctype": "Navari KRA eTims Payment Type",
+  "modified": "2024-03-11 14:44:50.659496",
+  "name": "MOBILE MONEY",
+  "sort_order": 6
  },
  {
   "code": "04",

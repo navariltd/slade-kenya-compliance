@@ -6,10 +6,18 @@
  "engine": "InnoDB",
  "field_order": [
   "system_user",
+  "first_name",
+  "last_name",
   "users_full_names",
+  "email",
+  "workstation",
   "column_break_bddz",
   "branch_id",
-  "submitted_successfully_to_etims"
+  "organisation",
+  "slade_id",
+  "submitted_successfully_to_etims",
+  "sent_to_slade",
+  "description"
  ],
  "fields": [
   {
@@ -47,11 +55,68 @@
    "fieldtype": "Check",
    "label": "Submitted Successfully to eTims",
    "read_only": 1
+  },
+  {
+   "fetch_from": "system_user.last_name",
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Last Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "system_user.first_name",
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "First Name",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "sent_to_slade",
+   "fieldtype": "Check",
+   "label": "Sent to Slade",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "system_user.bio",
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fetch_from": "system_user.email",
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "slade_id",
+   "fieldtype": "Data",
+   "label": "Slade ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Data",
+   "label": "Workstation"
+  },
+  {
+   "fieldname": "organisation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Organisation",
+   "options": "Navari Slade360 Organisation",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-13 08:39:35.050443",
+ "modified": "2024-12-19 14:36:12.553369",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims User",

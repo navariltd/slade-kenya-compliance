@@ -303,7 +303,6 @@ def build_slade_headers(
         as_dict=True,
     )
 
-
     if settings:
         access_token = settings.get("access_token")
         token_expiry = settings.get("token_expiry")
@@ -324,12 +323,25 @@ def build_slade_headers(
                 )
 
             access_token = new_settings.access_token
+            
+        logged_user = frappe.session.user
+        user_data = frappe.db.get_value(
+            "Navari eTims User",
+            {"system_user": logged_user},
+            ["workstation"],
+            as_dict=True,
+        )
 
+        workstation = user_data.get("workstation") if user_data else None
+        
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
+        
+        if workstation:
+            headers["X-Workstation"] = workstation
 
         return headers
 
@@ -392,9 +404,7 @@ def build_invoice_payload(
         "total_amount": round(invoice.grand_total, 2),
         "payments": invoice.payments or [],
         "payment_runs": [], 
-        "payment_methods": {}, 
-        "is_signed": True, 
-        "etims_invoice_counter": None,  
+        "payment_method": invoice.custom_payment_type,   
         "sales_invoice_tax_table": {
             "A":  taxation_type.get("A", {}).get("tax_rate", 0),
             "B":  taxation_type.get("B", {}).get("tax_rate", 0),
@@ -415,11 +425,10 @@ def build_invoice_payload(
         "invoice_date": str(invoice.posting_date),
         "parent_document": invoice.return_against,
         "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
-        "payment_term": invoice.payment_terms_template,
-        "gdn": None,  
-        "payment_plan": None,  
+        "payment_term": invoice.payment_terms_template,  
         "currency": frappe.get_value("Currency", invoice.currency, "slade_id"),
         "source_organisation_unit": invoice.custom_slade_organisation,
+        "sales_type": "cash",
     }
 
     return payload
@@ -946,12 +955,22 @@ def get_or_create_link(doctype: str, field_name: str, value: str):
         return None
 
 
-def process_dynamic_url(route_path: str, request_data: dict) -> str:
+def process_dynamic_url(route_path: str, request_data) -> str:
     import re
+    import json
+
+    if isinstance(request_data, str):
+        try:
+            request_data = json.loads(request_data)
+        except json.JSONDecodeError as e:
+            raise ValueError("Invalid JSON string in request_data.") from e
+
     placeholders = re.findall(r"\{(.*?)\}", route_path)
     for placeholder in placeholders:
         if placeholder in request_data:
-            route_path = route_path.replace(f"{{{placeholder}}}", str(request_data.get(placeholder)))
+            route_path = route_path.replace(f"{{{placeholder}}}", str(request_data[placeholder]))
         else:
             raise ValueError(f"Missing required placeholder: '{placeholder}' in request_data.")
+
     return route_path
+

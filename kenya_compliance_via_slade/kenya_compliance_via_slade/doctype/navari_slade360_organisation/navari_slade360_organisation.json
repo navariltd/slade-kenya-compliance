@@ -243,7 +243,7 @@
  "index_web_pages_for_search": 1,
  "is_tree": 1,
  "links": [],
- "modified": "2024-12-14 10:52:22.974091",
+ "modified": "2024-12-19 20:33:18.747413",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari Slade360 Organisation",
@@ -265,7 +265,6 @@
   }
  ],
  "search_fields": "org_name,email_address,phone_number",
- "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

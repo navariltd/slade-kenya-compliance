@@ -8,7 +8,7 @@ frappe.ui.form.on("Navari eTims Registered Stock Movement", {
       function () {
         frappe.call({
           method:
-            "kenya_compliance.kenya_compliance.apis.apis.create_stock_entry_from_stock_movement",
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.create_stock_entry_from_stock_movement",
           args: {
             request_data: {
               name: frm.doc.name,

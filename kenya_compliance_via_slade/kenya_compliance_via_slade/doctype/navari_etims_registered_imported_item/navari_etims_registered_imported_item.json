@@ -7,33 +7,36 @@
  "engine": "InnoDB",
  "field_order": [
   "item_name",
-  "slade_id",
   "product_name",
+  "product_code",
   "origin_nation_code",
   "declaration_date",
   "item_sequence",
-  "gross_weight",
   "package",
-  "quantity",
   "suppliers_name",
-  "imported_item_status_code",
   "invoice_foreign_currency_amount",
   "purchase_invoice",
   "column_break_cbnh",
   "task_code",
   "export_nation_code",
-  "product_code",
   "declaration_number",
   "hs_code",
-  "net_weight",
   "packaging_unit_code",
   "quantity_unit_code",
   "agent_name",
   "invoice_foreign_currency",
   "invoice_foreign_currency_rate",
+  "column_break_dkbf",
+  "slade_id",
+  "organisation",
+  "branch",
   "imported_item_status",
-  "sent_to_etims",
-  "is_mapped"
+  "imported_item_status_code",
+  "quantity",
+  "net_weight",
+  "gross_weight",
+  "is_mapped",
+  "sent_to_etims"
  ],
  "fields": [
   {
@@ -184,7 +187,24 @@
   {
    "fieldname": "purchase_invoice",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Purchase Invoice"
+  },
+  {
+   "fieldname": "organisation",
+   "fieldtype": "Link",
+   "label": "Organisation",
+   "options": "Navari Slade360 Organisation"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "column_break_dkbf",
+   "fieldtype": "Column Break"
   }
  ],
  "in_create": 1,
@@ -199,7 +219,7 @@
    "link_fieldname": "custom_referenced_imported_item"
   }
  ],
- "modified": "2024-12-18 18:18:51.790986",
+ "modified": "2024-12-19 20:55:14.339509",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Registered Imported Item",
