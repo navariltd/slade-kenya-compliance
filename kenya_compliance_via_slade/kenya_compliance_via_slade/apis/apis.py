@@ -45,6 +45,7 @@ from .remote_response_status_handlers import (
     customer_branch_details_submission_on_success,
     customer_insurance_details_submission_on_success,
     customer_search_on_success,
+    customers_search_on_success,
     imported_item_submission_on_success,
     imported_items_search_on_success,
     item_composition_submission_on_success,
@@ -262,6 +263,11 @@ def send_branch_customer_details(request_data: str) -> None:
 
 
 @frappe.whitelist()
+def search_customers_request(request_data: str) -> None:
+    return process_request(request_data, "CustomersSearchReq", customers_search_on_success)
+
+
+@frappe.whitelist()
 def get_my_user_details(request_data: str) -> None:
     return process_request(request_data, "BhfUserSearchReq", user_details_fetch_on_success, method="GET", doctype=USER_DOCTYPE_NAME)
     
@@ -275,7 +281,7 @@ def get_branch_user_details(request_data: str) -> None:
 def save_branch_user_details(request_data: str) -> None:
     return process_request(request_data, "BhfUserSaveReq", user_details_submission_on_success, method="POST", doctype=USER_DOCTYPE_NAME)
     
-
+    
 @frappe.whitelist()
 def create_branch_user() -> None:
     # TODO: Implement auto-creation through background tasks
@@ -284,14 +290,15 @@ def create_branch_user() -> None:
     )
 
     for user in present_users:
-        doc = frappe.new_doc(USER_DOCTYPE_NAME)
+        if not frappe.db.exists(USER_DOCTYPE_NAME, {"email": user.email}):
+            doc = frappe.new_doc(USER_DOCTYPE_NAME)
 
-        doc.system_user = user.email
-        doc.branch_id = frappe.get_value(
-            "Branch", {"custom_branch_code": "00"}, ["name"]
-        )  # Created users are assigned to Branch 00
+            doc.system_user = user.email
+            doc.branch_id = frappe.get_value(
+                "Branch", {"custom_branch_code": "00"}, ["name"]
+            )  # Created users are assigned to Branch 00
 
-        doc.save()
+            doc.save()
 
     frappe.msgprint("Inspect the Branches to make sure they are mapped correctly")
 

@@ -142,6 +142,7 @@ doctype_list_js = {
     "Item": "kenya_compliance_via_slade/overrides/client/items_list.js",
     "Sales Invoice": "kenya_compliance_via_slade/overrides/client/sales_invoice_list.js",
     "Branch": "kenya_compliance_via_slade/overrides/client/branch_list.js",
+    "Customer": "kenya_compliance_via_slade/overrides/client/customer_list.js",
 }
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}

@@ -834,3 +834,32 @@ def initialize_device_submission_on_success(
     response: dict, document_name: str
 ) -> None:
     pass
+
+
+def customers_search_on_success(response: dict, document_name: str) -> None:
+    data = response.get("results", [])
+    for customer in data:
+            existing_customer = frappe.db.exists("Customer", {"slade_id": customer["id"]})
+            data = {
+                "slade_id": customer["id"],
+                "customer_name": customer["partner_name"],
+                "email_id": customer["email_address"],
+                "mobile_no": customer["phone_number"],
+                "tax_id": customer.get("customer_tax_pin"),
+                "organisation": customer.get("organisation"),
+                "currency": customer.get("currency"),
+                "primary_address": customer.get("physical_address"),
+                "active": 1 if customer.get("active") else 0,
+                "custom_details_submitted_successfully": 1,
+                "customer_type": customer.get("customer_type").title() if customer.get("customer_type") in ["Company", "Individual", "Partnership"] else "Individual",
+            }
+
+            if existing_customer and customer.get("is_customer"):
+                doc = frappe.get_doc("Customer", existing_customer)
+                doc.update(data)
+                doc.save(ignore_permissions=True)
+            else:
+                doc = frappe.new_doc("Customer")
+                doc.update(data)
+                doc.insert(ignore_permissions=True)
+            frappe.db.commit()

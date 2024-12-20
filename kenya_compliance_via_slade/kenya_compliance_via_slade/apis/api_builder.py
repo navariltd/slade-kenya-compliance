@@ -381,7 +381,7 @@ class Slade360EndpointsBuilder(BaseEndpointsBuilder):
                     self._url, json=self._payload, headers=self._headers
                 )
             elif self._method == "GET":
-                self._payload["page_size"] = 15000
+                # self._payload["page_size"] = 15000
                 response = requests.get(
                     self._url, headers=self._headers, params=self._payload
                 )
