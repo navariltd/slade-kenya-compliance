@@ -180,7 +180,7 @@ def perform_item_registration(item_name: str) -> dict | None:
         "code": item.get("item_code"),
         "scu_item_code": item.get("custom_item_code_etims"),
         "scu_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "itemclscd", item.get("custom_item_classification"), "slade_id"),
-        "product_type": get_link_value(PRODUCT_TYPE_DOCTYPE_NAME, "code", item.get("custom_product_type"), "slade_id"),
+        "product_type": item.get("custom_product_type"),
         "item_type": item.get("custom_item_type"),
         "preferred_name": item.get("item_name"),
         "country_of_origin": get_link_value(COUNTRIES_DOCTYPE_NAME, "code", item.get("custom_etims_country_of_origin_code"), "slade_id"),
@@ -267,6 +267,12 @@ def search_customers_request(request_data: str) -> None:
     return process_request(request_data, "CustomersSearchReq", customers_search_on_success)
 
 
+
+@frappe.whitelist()
+def get_customer_details(request_data: str) -> None:
+    return process_request(request_data, "CustomerSearchReq", customers_search_on_success)
+
+
 @frappe.whitelist()
 def get_my_user_details(request_data: str) -> None:
     return process_request(request_data, "BhfUserSearchReq", user_details_fetch_on_success, method="GET", doctype=USER_DOCTYPE_NAME)
@@ -337,6 +343,13 @@ def perform_import_item_search_all_branches() -> None:
 def perform_purchases_search(request_data: str) -> None:
     process_request(
         request_data, "TrnsPurchaseSalesReq", purchase_search_on_success, doctype=REGISTERED_PURCHASES_DOCTYPE_NAME
+    )
+   
+    
+@frappe.whitelist()
+def perform_purchase_search(request_data: str) -> None:
+    process_request(
+        request_data, "TrnsPurchaseSearchReq", purchase_search_on_success, doctype=REGISTERED_PURCHASES_DOCTYPE_NAME
     )
     
 
@@ -589,7 +602,7 @@ def create_item(item: dict | frappe._dict) -> Document:
     new_item.item_code = item["item_code"]
     new_item.item_name = item["item_name"]
     new_item.item_group = "All Item Groups"
-    if "item_classification_code" in item:
+    if "item_classification_code" in item: 
         new_item.custom_item_classification = item["item_classification_code"]
     new_item.custom_packaging_unit = item["packaging_unit_code"]
     new_item.custom_unit_of_quantity = (
@@ -618,6 +631,7 @@ def create_item(item: dict | frappe._dict) -> Document:
     if "imported_item" in item:
         new_item.is_stock_item = 1
         new_item.custom_referenced_imported_item = item["imported_item"]
+        
 
     new_item.insert(ignore_mandatory=True, ignore_if_duplicate=True)
 
@@ -627,7 +641,10 @@ def create_item(item: dict | frappe._dict) -> Document:
 @frappe.whitelist()
 def create_purchase_invoice_from_request(request_data: str) -> None:
     data = json.loads(request_data)
-
+    
+    if not data.get("company_name"):
+        data["company_name"] = frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name")
+        
     # Check if supplier exists
     supplier = None
     if not frappe.db.exists("Supplier", data["supplier_name"], cache=False):
@@ -661,6 +678,7 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
     purchase_invoice.update_stock = 1 
     purchase_invoice.set_warehouse = set_warehouse
     purchase_invoice.branch = data["branch"]
+    purchase_invoice.company = data["company_name"]
     purchase_invoice.custom_slade_organisation = data["organisation"]
     purchase_invoice.bill_no = data["supplier_invoice_no"]
     purchase_invoice.bill_date = data["supplier_invoice_date"]

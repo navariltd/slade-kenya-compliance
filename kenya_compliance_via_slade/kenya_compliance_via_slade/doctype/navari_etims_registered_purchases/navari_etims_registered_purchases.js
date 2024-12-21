@@ -4,7 +4,22 @@ const doctypeName = "Navari eTims Registered Purchases";
 
 frappe.ui.form.on(doctypeName, {
   refresh: function (frm) {
-    const companyName = frappe.boot.sysdefaults.company;
+    let companyName = frappe.boot.sysdefaults.company;
+    if (companyName) {
+      frappe.call({
+        method: "frappe.client.get_list",
+        args: {
+          doctype: "Company",
+          fields: ["name"],
+          limit_page_length: 1,
+        },
+        callback: function (response) {
+          if (response.message && response.message.length > 0) {
+            companyName = response.message[0].name;
+          }
+        },
+      });
+    }
 
     if (!frm.is_new()) {
       frm.add_custom_button(
@@ -69,6 +84,28 @@ frappe.ui.form.on(doctypeName, {
                 supplier_invoice_no: frm.doc.supplier_invoice_number,
                 supplier_invoice_date: frm.doc.sales_date,
                 items: frm.doc.items,
+              },
+            },
+            callback: (response) => {},
+            error: (error) => {
+              // Error Handling is Defered to the Server
+            },
+          });
+        },
+        __("eTims Actions")
+      );
+
+      frm.add_custom_button(
+        __("Fetch Registered Purchase Details"),
+        function () {
+          frappe.call({
+            method:
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_purchase_search",
+            args: {
+              request_data: {
+                id: frm.doc.name,
+                document_name: frm.doc.name,
+                company_name: companyName,
               },
             },
             callback: (response) => {},

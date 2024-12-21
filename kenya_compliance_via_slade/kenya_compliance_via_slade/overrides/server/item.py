@@ -23,7 +23,7 @@ def before_insert(doc: Document, method: str) -> None:
 
     item_registration_data = {
         "name": doc.name,
-        "company_name": frappe.defaults.get_user_default("Company"),
+        "company_name": frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name"),
         "itemCd": doc.custom_item_code_etims,
         "itemClsCd": doc.custom_item_classification,
         "itemTyCd": doc.custom_product_type,
@@ -144,5 +144,6 @@ def validate(doc: Document, method: str) -> None:
 
 @frappe.whitelist()
 def prevent_item_deletion(doc, method):
-    if doc.custom_item_registered == 1:  # Assuming 1 means registered, adjust as needed
-        frappe.throw(_("Cannot delete registered items"))
+    # if doc.custom_item_registered == 1:  # Assuming 1 means registered, adjust as needed
+    #     frappe.throw(_("Cannot delete registered items"))
+    pass

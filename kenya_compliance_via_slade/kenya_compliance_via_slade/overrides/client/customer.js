@@ -62,6 +62,64 @@ frappe.ui.form.on(doctype, {
       }
     }
 
+    if (!frm.is_new() && frm.doc.slade_id) {
+      frm.add_custom_button(
+        __("Get Customer Detalis"),
+        function () {
+          frappe.call({
+            method:
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_customer_details",
+            args: {
+              request_data: {
+                doc_name: frm.doc.name,
+                id: frm.doc.slade_id,
+                company_name: companyName,
+              },
+            },
+            callback: (response) => {
+              frappe.msgprint("Search queued. Please check in later.");
+            },
+            error: (r) => {
+              // Error Handling is Defered to the Server
+            },
+          });
+        },
+        __("eTims Actions")
+      );
+
+      if (!frm.doc.custom_details_submitted_successfully) {
+        frm.add_custom_button(
+          __("Send Customer Details"),
+          function () {
+            frappe.call({
+              method:
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_branch_customer_details",
+              args: {
+                request_data: {
+                  document_name: frm.doc.name,
+                  customer_tax_pin: frm.doc.tax_id,
+                  partner_name: frm.doc.customer_name,
+                  company_name: companyName,
+                  registration_id: frm.doc.owner,
+                  modifier_id: frm.doc.modified_by,
+                  phone_number: frm.doc.mobile_no,
+                  currency: frm.doc.default_currency,
+                  is_customer: true,
+                  country: "KEN",
+                  customer_type: "INDIVIDUAL",
+                },
+              },
+              callback: (response) => {},
+              error: (r) => {
+                // Error Handling is Defered to the Server
+              },
+            });
+          },
+          __("eTims Actions")
+        );
+      }
+    }
+
     if (
       frm.doc.custom_insurance_applicable &&
       !frm.doc.custom_insurance_details_submitted_successfully

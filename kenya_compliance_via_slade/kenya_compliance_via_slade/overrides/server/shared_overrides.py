@@ -33,7 +33,7 @@ def generic_invoices_on_submit_override(
         invoice_type (Literal[&quot;Sales Invoice&quot;, &quot;POS Invoice&quot;]):
         The Type of the invoice. Either Sales, or POS
     """
-    company_name = doc.company
+    company_name = doc.company or frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name")
 
     invoice_identifier = "C" if doc.is_return else "S"
     payload = build_invoice_payload(doc, invoice_identifier, company_name)

@@ -264,7 +264,7 @@ def process_invoice_items(
         payload = {
             "product": get_link_value("Item", "name", item.get("item_code"), "custom_slade_id"),
             "quantity": item.get("qty"),
-            "rate": item.get("rate"),
+            "new_price": item.get("rate"),
             "amount": item.get("amount"),
             "sales_invoice": invoice_slade_id,
             "document_name": item.get("name")
@@ -289,8 +289,15 @@ def process_invoice_items(
 def process_sales_transition(document_name: str, invoice_type: str, invoice_slade_id: str) -> None:
     from .apis import process_request
 
-    def handle_transition_success(response):
-        process_sales_sign(document_name, invoice_type, invoice_slade_id)
+    def handle_transition_success(response, document_name):
+        # process_sales_sign(document_name, invoice_type, invoice_slade_id)
+        frappe.enqueue(
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.remote_response_status_handlers.process_sales_sign",
+            document_name=document_name,
+            invoice_type=invoice_type,
+            invoice_slade_id=response.get("id"),
+            queue="long",  
+        )
 
     payload = {
         "invoice_id": invoice_slade_id,
@@ -359,8 +366,7 @@ def stock_mvt_submission_on_success(response: dict, document_name: str) -> None:
 
 
 def purchase_search_on_success(response: dict, document_name: str) -> None:
-    sales_list = response if isinstance(response, list) else response.get("results")
-
+    sales_list = response.get("results", []) if isinstance(response, dict) else response if isinstance(response, list) else [response]
     for sale in sales_list:
         registered_purchase = create_purchase_from_search_details(sale)
         frappe.enqueue(
@@ -413,12 +419,11 @@ def create_purchase_from_search_details(fetched_purchase: dict) -> str:
 
     if existing_doc:
         doc = frappe.get_doc(REGISTERED_PURCHASES_DOCTYPE_NAME, existing_doc)
-        doc.flags.ignore_permissions = True
-        doc.flags.ignore_validate_update_after_submit = True
     else:
         doc = frappe.new_doc(REGISTERED_PURCHASES_DOCTYPE_NAME)
 
-    
+    doc.flags.ignore_permissions = True
+    doc.flags.ignore_validate_update_after_submit = True
     doc.slade_id =  fetched_purchase["id"]
 
     doc.supplier_name = fetched_purchase["supplier_name"]
@@ -541,6 +546,8 @@ def create_notice_if_new(notice: dict) -> None:
         return
 
     doc = frappe.new_doc(NOTICES_DOCTYPE_NAME)
+    doc.flags.ignore_permissions = True
+    doc.flags.ignore_validate_update_after_submit = True
     doc.update(
         {
             "notice_number": notice.get("notice_number"),
@@ -837,7 +844,9 @@ def initialize_device_submission_on_success(
 
 
 def customers_search_on_success(response: dict, document_name: str) -> None:
-    data = response.get("results", [])
+    data = response.get("results", []) if response.get("results") else response
+    if isinstance(data, dict):
+        data = [data]
     for customer in data:
             existing_customer = frappe.db.exists("Customer", {"slade_id": customer["id"]})
             data = {
