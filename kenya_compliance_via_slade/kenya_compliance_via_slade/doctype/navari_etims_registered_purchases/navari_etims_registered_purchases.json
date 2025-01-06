@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:{supplier_pin}-{supplier_invoice_number}",
+ "autoname": "field:slade_id",
  "creation": "2024-04-29 13:43:35.193165",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -15,10 +15,13 @@
   "receipt_type_code",
   "payment_type_code",
   "remarks",
+  "branch",
+  "slade_id",
   "column_break_oirf",
   "validated_date",
   "sales_date",
   "stock_released_date",
+  "organisation",
   "section_break_vtro",
   "items",
   "taxation_details_section",
@@ -278,6 +281,25 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "slade_id",
+   "fieldtype": "Data",
+   "label": "Slade ID",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "organisation",
+   "fieldtype": "Link",
+   "label": "Organisation",
+   "options": "Navari Slade360 Organisation"
   }
  ],
  "in_create": 1,
@@ -289,11 +311,11 @@
    "link_fieldname": "custom_source_registered_purchase"
   }
  ],
- "modified": "2024-12-13 08:39:28.264223",
+ "modified": "2024-12-18 19:34:51.999070",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Registered Purchases",
- "naming_rule": "Expression",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

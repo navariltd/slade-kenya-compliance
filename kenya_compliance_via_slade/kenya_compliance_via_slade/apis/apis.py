@@ -45,6 +45,7 @@ from .remote_response_status_handlers import (
     customer_branch_details_submission_on_success,
     customer_insurance_details_submission_on_success,
     customer_search_on_success,
+    customers_search_on_success,
     imported_item_submission_on_success,
     imported_items_search_on_success,
     item_composition_submission_on_success,
@@ -56,6 +57,7 @@ from .remote_response_status_handlers import (
     search_branch_request_on_success,
     stock_mvt_search_on_success,
     submit_inventory_on_success,
+    user_details_fetch_on_success,
     user_details_submission_on_success,
     initialize_device_submission_on_success,
 )
@@ -64,6 +66,7 @@ from ..background_tasks.tasks import (
     update_currencies,
     update_item_classification_codes,
     update_organisations,
+    update_payment_methods,
     update_packaging_units,
     update_taxation_type,
     update_unit_of_quantity,
@@ -81,7 +84,7 @@ def process_request(request_data: str | dict, route_key: str, handler_function, 
         data = json.loads(request_data)
     elif isinstance(request_data, dict):
         data = request_data
-    company_name = data.get("company_name") or frappe.defaults.get_user_default("Company") 
+    company_name = data.get("company_name") or frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name")
     branch_id = data.get("branch_id") or "00"
     document_name = data.get("document_name", None)
 
@@ -92,9 +95,11 @@ def process_request(request_data: str | dict, route_key: str, handler_function, 
     route_path = process_dynamic_url(route_path, request_data)
 
     if method == "GET":
-        if document_name: data.pop("document_name") 
-        if company_name: data.pop("company_name")
-        
+        if "document_name" in data and data["document_name"]:
+            data.pop("document_name")
+
+        if "company_name" in data and data["company_name"]:
+            data.pop("company_name")
     if headers and server_url and route_path:
         url = f"{server_url}{route_path}"
 
@@ -174,8 +179,8 @@ def perform_item_registration(item_name: str) -> dict | None:
         "company_name": frappe.defaults.get_user_default("Company"),
         "code": item.get("item_code"),
         "scu_item_code": item.get("custom_item_code_etims"),
-        "scu_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "code", item.get("custom_item_classification"), "slade_id"),
-        "product_type": get_link_value(PRODUCT_TYPE_DOCTYPE_NAME, "code", item.get("custom_product_type"), "slade_id"),
+        "scu_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "itemclscd", item.get("custom_item_classification"), "slade_id"),
+        "product_type": item.get("custom_product_type"),
         "item_type": item.get("custom_item_type"),
         "preferred_name": item.get("item_name"),
         "country_of_origin": get_link_value(COUNTRIES_DOCTYPE_NAME, "code", item.get("custom_etims_country_of_origin_code"), "slade_id"),
@@ -258,50 +263,31 @@ def send_branch_customer_details(request_data: str) -> None:
 
 
 @frappe.whitelist()
+def search_customers_request(request_data: str) -> None:
+    return process_request(request_data, "CustomersSearchReq", customers_search_on_success)
+
+
+
+@frappe.whitelist()
+def get_customer_details(request_data: str) -> None:
+    return process_request(request_data, "CustomerSearchReq", customers_search_on_success)
+
+
+@frappe.whitelist()
+def get_my_user_details(request_data: str) -> None:
+    return process_request(request_data, "BhfUserSearchReq", user_details_fetch_on_success, method="GET", doctype=USER_DOCTYPE_NAME)
+    
+
+@frappe.whitelist()
+def get_branch_user_details(request_data: str) -> None:
+    return process_request(request_data, "BhfUserSaveReq", user_details_fetch_on_success, method="GET", doctype=USER_DOCTYPE_NAME)
+    
+
+@frappe.whitelist()
 def save_branch_user_details(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-    company_name = data["company_name"]
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
-    route_path, last_request_date = get_route_path("BhfUserSaveReq")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-
-        payload = {
-            "userId": data["user_id"],
-            "userNm": data["full_names"],
-            "pwd": "password",  # TODO: Find a fix for this
-            "adrs": None,
-            "cntc": None,
-            "authCd": None,
-            "remark": None,
-            "useYn": "Y",
-            "regrNm": data["registration_id"],
-            "regrId": split_user_email(data["registration_id"]),
-            "modrNm": data["modifier_id"],
-            "modrId": split_user_email(data["modifier_id"]),
-        }
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = partial(
-            user_details_submission_on_success, document_name=data["name"]
-        )
-        endpoints_builder.error_callback = on_error
-
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="default",
-            timeout=300,
-            job_name=f"{data['name']}_send_branch_user_information",
-            doctype=USER_DOCTYPE_NAME,
-            document_name=data["name"],
-        )
-
-
+    return process_request(request_data, "BhfUserSaveReq", user_details_submission_on_success, method="POST", doctype=USER_DOCTYPE_NAME)
+    
+    
 @frappe.whitelist()
 def create_branch_user() -> None:
     # TODO: Implement auto-creation through background tasks
@@ -310,14 +296,15 @@ def create_branch_user() -> None:
     )
 
     for user in present_users:
-        doc = frappe.new_doc(USER_DOCTYPE_NAME)
+        if not frappe.db.exists(USER_DOCTYPE_NAME, {"email": user.email}):
+            doc = frappe.new_doc(USER_DOCTYPE_NAME)
 
-        doc.system_user = user.email
-        doc.branch_id = frappe.get_value(
-            "Branch", {"custom_branch_code": "00"}, ["name"]
-        )  # Created users are assigned to Branch 00
+            doc.system_user = user.email
+            doc.branch_id = frappe.get_value(
+                "Branch", {"custom_branch_code": "00"}, ["name"]
+            )  # Created users are assigned to Branch 00
 
-        doc.save()
+            doc.save()
 
     frappe.msgprint("Inspect the Branches to make sure they are mapped correctly")
 
@@ -354,30 +341,17 @@ def perform_import_item_search_all_branches() -> None:
 
 @frappe.whitelist()
 def perform_purchases_search(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-
-    company_name = data["company_name"]
-
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
-    route_path, last_request_date = get_route_path("TrnsPurchaseSalesReq")
-
-    if headers and server_url and route_path:
-        request_date = last_request_date.strftime("%Y%m%d%H%M%S")
-
-        url = f"{server_url}{route_path}"
-        payload = {"lastReqDt": request_date}
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = purchase_search_on_success
-        endpoints_builder.error_callback = on_error
-
-        endpoints_builder.make_remote_call(
-            doctype="Purchase Invoice",
-        )
-
+    process_request(
+        request_data, "TrnsPurchaseSalesReq", purchase_search_on_success, doctype=REGISTERED_PURCHASES_DOCTYPE_NAME
+    )
+   
+    
+@frappe.whitelist()
+def perform_purchase_search(request_data: str) -> None:
+    process_request(
+        request_data, "TrnsPurchaseSearchReq", purchase_search_on_success, doctype=REGISTERED_PURCHASES_DOCTYPE_NAME
+    )
+    
 
 @frappe.whitelist()
 def submit_inventory(request_data: str) -> None:
@@ -429,50 +403,10 @@ def search_branch_request(request_data: str) -> None:
 
 @frappe.whitelist()
 def send_imported_item_request(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-
-    company_name = data["company_name"]
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
-    route_path, last_request_date = get_route_path("ImportItemUpdateReq")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-        declaration_date = build_datetime_from_string(
-            data["declaration_date"], "%Y-%m-%d %H:%M:%S.%f"
-        ).strftime("%Y%m%d")
-
-        payload = {
-            "taskCd": data["task_code"],
-            "dclDe": declaration_date,
-            "itemSeq": data["item_sequence"],
-            "hsCd": data["hs_code"],
-            "itemClsCd": data["item_classification_code"],
-            "itemCd": data["item_code"],
-            "imptItemSttsCd": data["import_item_status"],
-            "remark": None,
-            "modrNm": data["modified_by"],
-            "modrId": split_user_email(data["modified_by"]),
-        }
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = partial(
-            imported_item_submission_on_success, document_name=data["name"]
-        )
-        endpoints_builder.error_callback = on_error
-
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="default",
-            timeout=300,
-            job_name=f"{data['name']}_submit_imported_item",
-            doctype="Item",
-            document_name=data["name"],
-        )
-
+    process_request(
+        request_data, "ImportItemSearchReq", imported_item_submission_on_success, method="POST", doctype="Item"
+    )
+    
 
 @frappe.whitelist()
 def perform_notice_search(request_data: str) -> str:
@@ -492,6 +426,7 @@ def refresh_code_lists(request_data: str) -> str:
         ("PackagingUnitSearchReq", update_packaging_units),
         ("UOMSearchReq", update_unit_of_quantity),
         ("TaxSearchReq", update_taxation_type),
+        ("PaymentMtdSearchReq", update_payment_methods),
     ]
 
     messages = [process_request(request_data, task[0], task[1]) for task in tasks]
@@ -664,9 +599,11 @@ def create_item(item: dict | frappe._dict) -> Document:
 
     new_item = frappe.new_doc("Item")
     new_item.is_stock_item = 0  # Default to 0
-    new_item.item_code = item["item_name"]
+    new_item.item_code = item["item_code"]
+    new_item.item_name = item["item_name"]
     new_item.item_group = "All Item Groups"
-    new_item.custom_item_classification = item["item_classification_code"]
+    if "item_classification_code" in item: 
+        new_item.custom_item_classification = item["item_classification_code"]
     new_item.custom_packaging_unit = item["packaging_unit_code"]
     new_item.custom_unit_of_quantity = (
         item.get("quantity_unit_code", None) or item["unit_of_quantity_code"]
@@ -694,6 +631,7 @@ def create_item(item: dict | frappe._dict) -> Document:
     if "imported_item" in item:
         new_item.is_stock_item = 1
         new_item.custom_referenced_imported_item = item["imported_item"]
+        
 
     new_item.insert(ignore_mandatory=True, ignore_if_duplicate=True)
 
@@ -703,7 +641,10 @@ def create_item(item: dict | frappe._dict) -> Document:
 @frappe.whitelist()
 def create_purchase_invoice_from_request(request_data: str) -> None:
     data = json.loads(request_data)
-
+    
+    if not data.get("company_name"):
+        data["company_name"] = frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name")
+        
     # Check if supplier exists
     supplier = None
     if not frappe.db.exists("Supplier", data["supplier_name"], cache=False):
@@ -719,13 +660,28 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
         if received_item["item_name"] not in all_existing_items:
             created_item = create_item(received_item)
             all_items.append(created_item)
+            
+    set_warehouse = frappe.get_value(
+        "Warehouse",
+        {"custom_branch": data["branch"]},
+        ["name"],
+        as_dict=True,
+    )
+    
+    if not set_warehouse:
+        set_warehouse = frappe.get_value("Warehouse", {"is_group": 0}, "name")  # use first warehouse match if not available for the branch
 
     # Create the Purchase Invoice
     purchase_invoice = frappe.new_doc("Purchase Invoice")
     purchase_invoice.supplier = supplier or data["supplier_name"]
-    purchase_invoice.update_stock = 1
-    purchase_invoice.custom_supplier_branch_id = data["supplier_branch_id"]
+    purchase_invoice.supplier = supplier or data["supplier_name"]
+    purchase_invoice.update_stock = 1 
+    purchase_invoice.set_warehouse = set_warehouse
+    purchase_invoice.branch = data["branch"]
+    purchase_invoice.company = data["company_name"]
+    purchase_invoice.custom_slade_organisation = data["organisation"]
     purchase_invoice.bill_no = data["supplier_invoice_no"]
+    purchase_invoice.bill_date = data["supplier_invoice_date"]
     purchase_invoice.bill_date = data["supplier_invoice_date"]
 
     if "currency" in data:
@@ -761,11 +717,20 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
     )
 
     for item in data["items"]:
+        matching_item = frappe.get_all(
+            "Item",
+            filters={
+                "item_name": item["item_name"],
+                "custom_item_classification": item["item_classification_code"],
+            },
+            fields=["name"]  
+        )
+        item_code = matching_item[0]["name"]
         purchase_invoice.append(
             "items",
             {
                 "item_name": item["item_name"],
-                "item_code": item["item_name"],
+                "item_code": item_code,
                 "qty": item["quantity"],
                 "rate": item["unit_price"],
                 "expense_account": expense_account,

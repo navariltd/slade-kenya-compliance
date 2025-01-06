@@ -303,7 +303,6 @@ def build_slade_headers(
         as_dict=True,
     )
 
-
     if settings:
         access_token = settings.get("access_token")
         token_expiry = settings.get("token_expiry")
@@ -324,12 +323,25 @@ def build_slade_headers(
                 )
 
             access_token = new_settings.access_token
+            
+        logged_user = frappe.session.user
+        user_data = frappe.db.get_value(
+            "Navari eTims User",
+            {"system_user": logged_user},
+            ["workstation"],
+            as_dict=True,
+        )
 
+        workstation = user_data.get("workstation") if user_data else None
+        
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
+        
+        if workstation:
+            headers["X-Workstation"] = workstation
 
         return headers
 
@@ -377,49 +389,48 @@ def build_invoice_payload(
         invoice_name = clean_invc_no(invoice_name)
         
     payload = {
-        "made_by": invoice.owner,
+        # "made_by": invoice.owner,
         "document_name": invoice.name,
         "branch_id": invoice.branch,
         "company_name": company_name,
-        "updated_by_name": invoice.modified_by,
-        "parent_document_number": invoice.return_against,
-        "active_pricelist": invoice.selling_price_list,
-        "invoice_amount_balance": round(invoice.outstanding_amount, 2),
-        "paid_invoice_amount": round(invoice.grand_total - invoice.outstanding_amount, 2),
-        "total_amount_paid": round(invoice.grand_total - invoice.outstanding_amount, 2),
-        "tax_exclusive_amount": round(invoice.net_total, 2),
-        "pricelist": invoice.selling_price_list,
-        "total_amount": round(invoice.grand_total, 2),
-        "payments": invoice.payments or [],
-        "payment_runs": [], 
-        "payment_methods": {}, 
-        "is_signed": True, 
-        "etims_invoice_counter": None,  
-        "sales_invoice_tax_table": {
-            "A":  taxation_type.get("A", {}).get("tax_rate", 0),
-            "B":  taxation_type.get("B", {}).get("tax_rate", 0),
-            "C":  taxation_type.get("C", {}).get("tax_rate", 0),
-            "D":  taxation_type.get("D", {}).get("tax_rate", 0),
-            "E":  taxation_type.get("E", {}).get("tax_rate", 0),
-        },
-        "total_gross_amount": round(invoice.base_total, 2),
-        "total_vat": round(invoice.total_taxes_and_charges, 2),
-        "total_items_discount": round(invoice.discount_amount, 2),
-        "total_tax": round(invoice.total_taxes_and_charges, 2),
-        "total_net_amount": round(invoice.net_total, 2),
-        "active": invoice.docstatus == 1,
-        "document_number": invoice.name,
-        "source_document": invoice.return_against,
+        
         "description": invoice.remarks or "New",
-        "reference_number": invoice.po_no,
-        "invoice_date": str(invoice.posting_date),
-        "parent_document": invoice.return_against,
+        "payment_method": invoice.custom_payment_type,   
         "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
-        "payment_term": invoice.payment_terms_template,
-        "gdn": None,  
-        "payment_plan": None,  
+        "invoice_date": str(invoice.posting_date),
         "currency": frappe.get_value("Currency", invoice.currency, "slade_id"),
         "source_organisation_unit": invoice.custom_slade_organisation,
+        "sales_type": "cash",
+        # "amount": round(invoice.grand_total, 2),
+        
+        # "updated_by_name": invoice.modified_by,
+        # "parent_document_number": invoice.return_against,
+        # "active_pricelist": invoice.selling_price_list,
+        # "invoice_amount_balance": round(invoice.outstanding_amount, 2),
+        # "paid_invoice_amount": round(invoice.grand_total - invoice.outstanding_amount, 2),
+        # "total_amount_paid": round(invoice.grand_total - invoice.outstanding_amount, 2),
+        # "tax_exclusive_amount": round(invoice.net_total, 2),
+        # "pricelist": invoice.selling_price_list,
+        # "payments": invoice.payments or [],
+        # "payment_runs": [], 
+        # "sales_invoice_tax_table": {
+        #     "A":  taxation_type.get("A", {}).get("tax_rate", 0),
+        #     "B":  taxation_type.get("B", {}).get("tax_rate", 0),
+        #     "C":  taxation_type.get("C", {}).get("tax_rate", 0),
+        #     "D":  taxation_type.get("D", {}).get("tax_rate", 0),
+        #     "E":  taxation_type.get("E", {}).get("tax_rate", 0),
+        # },
+        # "total_gross_amount": round(invoice.base_total, 2),
+        # "total_vat": round(invoice.total_taxes_and_charges, 2),
+        # "total_items_discount": round(invoice.discount_amount, 2),
+        # "total_tax": round(invoice.total_taxes_and_charges, 2),
+        # "total_net_amount": round(invoice.net_total, 2),
+        # "active": invoice.docstatus == 1,
+        # "document_number": invoice.name,
+        # "source_document": invoice.return_against,
+        # "reference_number": invoice.po_no,
+        # "parent_document": invoice.return_against,
+        # "payment_term": invoice.payment_terms_template,  
     }
 
     return payload
@@ -893,9 +904,9 @@ def update_navari_settings_with_token(docname):
     settings_doc = frappe.get_doc("Navari Slade360 eTims Settings", docname)
     auth_server_url = settings_doc.auth_server_url
     username = settings_doc.auth_username
-    password = settings_doc.auth_password
-    client_id = settings_doc.client_id
-    client_secret = settings_doc.client_secret
+    client_id = settings_doc.client_id    
+    password = settings_doc.get_password('auth_password')
+    client_secret = settings_doc.get_password('client_secret')
 
     token_details = authenticate_and_get_token(
         auth_server_url, username, password, client_id, client_secret
@@ -946,12 +957,22 @@ def get_or_create_link(doctype: str, field_name: str, value: str):
         return None
 
 
-def process_dynamic_url(route_path: str, request_data: dict) -> str:
+def process_dynamic_url(route_path: str, request_data) -> str:
     import re
+    import json
+
+    if isinstance(request_data, str):
+        try:
+            request_data = json.loads(request_data)
+        except json.JSONDecodeError as e:
+            raise ValueError("Invalid JSON string in request_data.") from e
+
     placeholders = re.findall(r"\{(.*?)\}", route_path)
     for placeholder in placeholders:
         if placeholder in request_data:
-            route_path = route_path.replace(f"{{{placeholder}}}", str(request_data.get(placeholder)))
+            route_path = route_path.replace(f"{{{placeholder}}}", str(request_data[placeholder]))
         else:
             raise ValueError(f"Missing required placeholder: '{placeholder}' in request_data.")
+
     return route_path
+

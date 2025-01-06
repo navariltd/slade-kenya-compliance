@@ -344,7 +344,7 @@
   },
   {
    "fieldname": "client_secret",
-   "fieldtype": "Small Text",
+   "fieldtype": "Password",
    "label": "Client Secret",
    "reqd": 1
   },
@@ -360,7 +360,7 @@
   },
   {
    "fieldname": "auth_password",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "Auth Password",
    "reqd": 1
   },
@@ -423,7 +423,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2024-12-13 08:39:23.564296",
+ "modified": "2024-12-19 12:08:44.079142",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari Slade360 eTims Settings",

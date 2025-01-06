@@ -80,7 +80,7 @@ frappe.ui.form.on(itemDoctypName, {
 
       if (
         frm.doc.custom_referenced_imported_item &&
-        !frm.doc.custom_imported_item_submitted &&
+        // !frm.doc.custom_imported_item_submitted &&
         frm.doc.custom_item_classification &&
         frm.doc.custom_taxation_type
       ) {
@@ -88,27 +88,41 @@ frappe.ui.form.on(itemDoctypName, {
           __("Submit Imported Item"),
           function () {
             frappe.call({
-              method:
-                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_imported_item_request",
+              method: "frappe.client.get",
               args: {
-                request_data: {
-                  company_name: companyName,
-                  name: frm.doc.name,
-                  item_sequence: frm.doc.idx,
-                  item_code: frm.doc.custom_item_code_etims,
-                  task_code: frm.doc.custom_imported_item_task_code,
-                  item_classification_code: frm.doc.custom_item_classification,
-                  import_item_status: frm.doc.custom_imported_item_status_code,
-                  hs_code: frm.doc.custom_hs_code,
-                  modified_by: frm.doc.modified_by,
-                  declaration_date: frm.doc.creation,
-                },
+                doctype: "Navari eTims Registered Imported Item",
+                name: frm.doc.custom_referenced_imported_item,
               },
-              callback: (response) => {
-                frappe.msgprint("Request queued. Check later.");
-              },
-              error: (error) => {
-                // Error Handling is Defered to the Server
+              callback: function (response) {
+                if (response && response.message) {
+                  const referenced_item = response.message;
+
+                  frappe.call({
+                    method:
+                      "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_imported_item_request",
+                    args: {
+                      request_data: {
+                        company_name: companyName,
+                        document_name: frm.doc.name,
+                        item_name: frm.doc.item_name,
+                        package: referenced_item.package,
+                        quantity: referenced_item.quantity,
+                        id: referenced_item.name,
+                        declaration_date: referenced_item.declaration_date,
+                        organisation: frm.doc.organisation,
+                        branch: frm.doc.custom_branch,
+                        product: frm.doc.custom_slade_id,
+                      },
+                    },
+                    callback: function (apiResponse) {
+                      if (apiResponse && apiResponse.message) {
+                        frappe.msgprint("Request queued. Check later.");
+                      }
+                    },
+                  });
+                } else {
+                  frappe.msgprint("Unable to fetch referenced item details.");
+                }
               },
             });
           },

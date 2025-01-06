@@ -64,7 +64,7 @@ def validate(doc: Document, method: str) -> None:
 def on_submit(doc: Document, method: str) -> None:
     if doc.is_return == 0 and doc.update_stock == 1:
         # TODO: Handle cases when item tax templates have not been picked
-        company_name = doc.company
+        company_name = doc.company or frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name")
         payload = payload = build_purchase_invoice_payload(doc, company_name)
         process_request(
             payload,
@@ -142,7 +142,7 @@ def build_purchase_invoice_payload(doc: Document, company_name: str) -> dict:
         "total_tax_amount": round(doc.total_taxes_and_charges, 2),
         "supplier_name": doc.supplier_name,
         "organisation": doc.custom_slade_organisation,
-    }
+    } 
 
 
     return payload
