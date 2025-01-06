@@ -11,7 +11,7 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_notice_search",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.perform_notice_search",
             args: {
               request_data: {
                 document_name: frm.doc.name,
@@ -33,7 +33,7 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.refresh_code_lists",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_code_lists",
             args: {
               request_data: {
                 document_name: frm.doc.name,
@@ -55,7 +55,7 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.search_organisations_request",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.search_organisations_request",
             args: {
               request_data: {
                 document_name: frm.doc.name,
@@ -77,7 +77,7 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_item_classification_codes",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.get_item_classification_codes",
             args: {
               request_data: {
                 document_name: frm.doc.name,

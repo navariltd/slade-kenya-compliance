@@ -1,6 +1,5 @@
 import asyncio
 import json
-from datetime import datetime
 from functools import partial
 from secrets import token_hex
 
@@ -9,35 +8,26 @@ import aiohttp
 import frappe
 import frappe.defaults
 from frappe.model.document import Document
-from frappe.utils.dateutils import add_to_date
 
 from ..doctype.doctype_names_mapping import (
     SETTINGS_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
     COUNTRIES_DOCTYPE_NAME,
-    IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
-    ITEM_TYPE_DOCTYPE_NAME,
-    NOTICES_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
-    PRODUCT_TYPE_DOCTYPE_NAME,
-    REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
     REGISTERED_PURCHASES_DOCTYPE_NAME,
-    REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM,
-    REGISTERED_STOCK_MOVEMENTS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
 )
 from ..utils import (
-    build_datetime_from_string,
     build_headers,
-    build_slade_headers,
     get_link_value,
-    get_slade_server_url,
     get_route_path,
     get_server_url,
     make_get_request,
+    build_slade_headers,
+    get_slade_server_url,
     process_dynamic_url,
     split_user_email,
 )
@@ -51,7 +41,6 @@ from .remote_response_status_handlers import (
     item_composition_submission_on_success,
     item_registration_on_success,
     item_search_on_success, 
-    notices_search_on_success,
     on_error,
     purchase_search_on_success,
     search_branch_request_on_success,
@@ -61,21 +50,13 @@ from .remote_response_status_handlers import (
     user_details_submission_on_success,
     initialize_device_submission_on_success,
 )
-from ..background_tasks.tasks import (
-    update_countries,
-    update_currencies,
-    update_item_classification_codes,
-    update_organisations,
-    update_payment_methods,
-    update_packaging_units,
-    update_taxation_type,
-    update_unit_of_quantity,
-    update_branches,
-    update_departments,
-)
+
 
 from .api_builder import Slade360EndpointsBuilder
-from .remote_response_status_handlers import notices_search_on_success, on_slade_error
+
+endpoints_builder = Slade360EndpointsBuilder()
+from .api_builder import Slade360EndpointsBuilder
+from .remote_response_status_handlers import on_slade_error
 
 endpoints_builder = Slade360EndpointsBuilder()
 
@@ -409,55 +390,6 @@ def send_imported_item_request(request_data: str) -> None:
         request_data, "ImportItemSearchReq", imported_item_submission_on_success, method="POST", doctype="Item"
     )
     
-
-@frappe.whitelist()
-def perform_notice_search(request_data: str) -> str:
-    """Function to perform notice search."""
-    message = process_request(
-        request_data, "NoticeSearchReq", notices_search_on_success
-    )
-    return message
-
-
-@frappe.whitelist()
-def refresh_code_lists(request_data: str) -> str:
-    """Refresh code lists based on request data."""
-    tasks = [
-        ("CurrencyCountrySearchReq", update_countries),
-        ("CurrencySearchReq", update_currencies),
-        ("PackagingUnitSearchReq", update_packaging_units),
-        ("UOMSearchReq", update_unit_of_quantity),
-        ("TaxSearchReq", update_taxation_type),
-        ("PaymentMtdSearchReq", update_payment_methods),
-    ]
-
-    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
-
-    return " ".join(messages)
-
-
-@frappe.whitelist()
-def search_organisations_request(request_data: str) -> str:
-    """Refresh code lists based on request data."""
-    tasks = [
-        ("OrgSearchReq", update_organisations),
-        ("BhfSearchReq", update_branches),
-        ("DeptSearchReq", update_departments),
-    ]
-
-    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
-
-    return " ".join(messages)
-
-
-@frappe.whitelist()
-def get_item_classification_codes(request_data: str) -> str:
-    """Function to get item classification codes."""
-    message = process_request(
-        request_data, "ItemClsSearchReq", update_item_classification_codes
-    )
-    return message
-
 
 @frappe.whitelist()
 def perform_stock_movement_search(request_data: str) -> None:

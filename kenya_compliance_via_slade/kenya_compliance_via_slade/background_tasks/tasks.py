@@ -5,25 +5,69 @@ import frappe.defaults
 from frappe.model.document import Document
 
 from ..apis.api_builder import EndpointsBuilder
-from ..apis.remote_response_status_handlers import on_error
 from ..doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
-    # ORGANISATION_UNIT_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     PAYMENT_TYPE_DOCTYPE_NAME,
-    SETTINGS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
 )
 from ..overrides.server.stock_ledger_entry import on_update
-from ..utils import (
-    build_headers,
-    get_route_path,
-    get_server_url,
-)
+from ..apis.apis import process_request
+
+from ..apis.remote_response_status_handlers import notices_search_on_success
 
 endpoints_builder = EndpointsBuilder()
+
+@frappe.whitelist()
+def perform_notice_search(request_data: str) -> str:
+    """Function to perform notice search."""
+    message = process_request(
+        request_data, "NoticeSearchReq", notices_search_on_success
+    )
+    return message
+
+
+@frappe.whitelist()
+def refresh_code_lists(request_data: str) -> str:
+    """Refresh code lists based on request data."""
+    tasks = [
+        ("CurrencyCountrySearchReq", update_countries),
+        ("CurrencySearchReq", update_currencies),
+        ("PackagingUnitSearchReq", update_packaging_units),
+        ("UOMSearchReq", update_unit_of_quantity),
+        ("TaxSearchReq", update_taxation_type),
+        ("PaymentMtdSearchReq", update_payment_methods),
+    ]
+
+    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
+
+    return " ".join(messages)
+
+
+@frappe.whitelist()
+def search_organisations_request(request_data: str) -> str:
+    """Refresh code lists based on request data."""
+    tasks = [
+        ("OrgSearchReq", update_organisations),
+        ("BhfSearchReq", update_branches),
+        ("DeptSearchReq", update_departments),
+    ]
+
+    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
+
+    return " ".join(messages)
+
+
+@frappe.whitelist()
+def get_item_classification_codes(request_data: str) -> str:
+    """Function to get item classification codes."""
+    message = process_request(
+        request_data, "ItemClsSearchReq", update_item_classification_codes
+    )
+    return message
+
 
 
 def refresh_notices() -> None:

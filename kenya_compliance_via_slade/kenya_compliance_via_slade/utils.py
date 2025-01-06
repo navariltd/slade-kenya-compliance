@@ -1,5 +1,6 @@
 """Utility functions"""
 
+import json
 import re
 from base64 import b64encode
 from datetime import datetime, timedelta
@@ -15,7 +16,6 @@ from aiohttp import ClientTimeout
 
 import frappe
 from frappe.model.document import Document
-from erpnext.controllers.taxes_and_totals import get_itemised_tax_breakup_data
 
 from .doctype.doctype_names_mapping import (
     ENVIRONMENT_SPECIFICATION_DOCTYPE_NAME,
@@ -24,6 +24,7 @@ from .doctype.doctype_names_mapping import (
     SETTINGS_DOCTYPE_NAME,
 )
 from .logger import etims_logger
+
 
 
 def is_valid_kra_pin(pin: str) -> bool:
@@ -400,210 +401,10 @@ def build_invoice_payload(
         "invoice_date": str(invoice.posting_date),
         "currency": frappe.get_value("Currency", invoice.currency, "slade_id"),
         "source_organisation_unit": invoice.custom_slade_organisation,
-        "sales_type": "cash",
-        # "amount": round(invoice.grand_total, 2),
-        
-        # "updated_by_name": invoice.modified_by,
-        # "parent_document_number": invoice.return_against,
-        # "active_pricelist": invoice.selling_price_list,
-        # "invoice_amount_balance": round(invoice.outstanding_amount, 2),
-        # "paid_invoice_amount": round(invoice.grand_total - invoice.outstanding_amount, 2),
-        # "total_amount_paid": round(invoice.grand_total - invoice.outstanding_amount, 2),
-        # "tax_exclusive_amount": round(invoice.net_total, 2),
-        # "pricelist": invoice.selling_price_list,
-        # "payments": invoice.payments or [],
-        # "payment_runs": [], 
-        # "sales_invoice_tax_table": {
-        #     "A":  taxation_type.get("A", {}).get("tax_rate", 0),
-        #     "B":  taxation_type.get("B", {}).get("tax_rate", 0),
-        #     "C":  taxation_type.get("C", {}).get("tax_rate", 0),
-        #     "D":  taxation_type.get("D", {}).get("tax_rate", 0),
-        #     "E":  taxation_type.get("E", {}).get("tax_rate", 0),
-        # },
-        # "total_gross_amount": round(invoice.base_total, 2),
-        # "total_vat": round(invoice.total_taxes_and_charges, 2),
-        # "total_items_discount": round(invoice.discount_amount, 2),
-        # "total_tax": round(invoice.total_taxes_and_charges, 2),
-        # "total_net_amount": round(invoice.net_total, 2),
-        # "active": invoice.docstatus == 1,
-        # "document_number": invoice.name,
-        # "source_document": invoice.return_against,
-        # "reference_number": invoice.po_no,
-        # "parent_document": invoice.return_against,
-        # "payment_term": invoice.payment_terms_template,  
+        "sales_type": "cash", 
     }
 
     return payload
-
-    # payload = {
-    #     "invcNo": get_invoice_number(invoice_name),
-    #     "orgInvcNo": (
-    #         0
-    #         if invoice_type_identifier == "S"
-    #         else frappe.get_doc(
-    #             "Sales Invoice", invoice.return_against
-    #         ).custom_submission_sequence_number
-    #     ),
-    #     "trdInvcNo": invoice_name,
-    #     "custTin": invoice.tax_id if invoice.tax_id else None,
-    #     "custNm": None,
-    #     "rcptTyCd": invoice_type_identifier if invoice_type_identifier == "S" else "R",
-    #     "pmtTyCd": invoice.custom_payment_type_code,
-    #     "salesSttsCd": invoice.custom_transaction_progress_code,
-    #     "cfmDt": validated_date,
-    #     "salesDt": sales_date,
-    #     "stockRlsDt": validated_date,
-    #     "cnclReqDt": None,
-    #     "cnclDt": None,
-    #     "rfdDt": None,
-    #     "rfdRsnCd": None,
-    #     "totItemCnt": len(items_list),
-    #     "taxRtA": taxation_type.get("A", {}).get("tax_rate", 0),
-    #     "taxRtB": taxation_type.get("B", {}).get("tax_rate", 0),
-    #     "taxRtC": taxation_type.get("C", {}).get("tax_rate", 0),
-    #     "taxRtD": taxation_type.get("D", {}).get("tax_rate", 0),
-    #     "taxRtE": taxation_type.get("E", {}).get("tax_rate", 0),
-    #     "taxAmtA": taxation_type.get("A", {}).get("tax_amount", 0),
-    #     "taxAmtB": taxation_type.get("B", {}).get("tax_amount", 0),
-    #     "taxAmtC": taxation_type.get("C", {}).get("tax_amount", 0),
-    #     "taxAmtD": taxation_type.get("D", {}).get("tax_amount", 0),
-    #     "taxAmtE": taxation_type.get("E", {}).get("tax_amount", 0),
-    #     "taxblAmtA": taxation_type.get("A", {}).get("taxable_amount", 0),
-    #     "taxblAmtB": taxation_type.get("B", {}).get("taxable_amount", 0),
-    #     "taxblAmtC": taxation_type.get("C", {}).get("taxable_amount", 0),
-    #     "taxblAmtD": taxation_type.get("D", {}).get("taxable_amount", 0),
-    #     "taxblAmtE": taxation_type.get("E", {}).get("taxable_amount", 0),
-    #     "totTaxblAmt": round(invoice.base_net_total, 2),
-    #     "totTaxAmt": round(invoice.total_taxes_and_charges, 2),
-    #     "totAmt": round(invoice.grand_total, 2),
-    #     "prchrAcptcYn": "Y",
-    #     "remark": None,
-    #     "regrId": split_user_email(invoice.owner),
-    #     "regrNm": invoice.owner,
-    #     "modrId": split_user_email(invoice.modified_by),
-    #     "modrNm": invoice.modified_by,
-    #     "receipt": {
-    #         "custTin": invoice.tax_id if invoice.tax_id else None,
-    #         "custMblNo": None,
-    #         "rptNo": 1,
-    #         "rcptPbctDt": validated_date,
-    #         "trdeNm": "",
-    #         "adrs": "",
-    #         "topMsg": "ERPNext",
-    #         "btmMsg": "",
-    #         "prchrAcptcYn": "Y",
-    #     },
-    #     "itemList": items_list,
-    # }
-
-    # return payload
-
-
-# def build_invoice_payload(
-#     invoice: Document, invoice_type_identifier: Literal["S", "C"], company_name: str
-# ) -> dict[str, str | int]:
-#     taxation_type = get_taxation_types(invoice)
-#     # frappe.throw(str(taxation_type))
-
-#     """Converts relevant invoice data to a JSON payload
-
-#     Args:
-#         invoice (Document): The Invoice record to generate data from
-#         invoice_type_identifier (Literal[&quot;S&quot;, &quot;C&quot;]): The
-#         Invoice type identifer. S for Sales Invoice, C for Credit Notes
-#         company_name (str): The company name used to fetch the valid settings doctype record
-
-#     Returns:
-#         dict[str, str | int]: The payload
-#     """
-#     post_time = invoice.posting_time
-
-#     if isinstance(post_time, timedelta):
-#         # handles instances when the posting_time is not a string
-#         # especially when doing bulk submissions
-#         post_time = str(post_time)
-
-#     # TODO: Check why posting time is always invoice submit time
-#     posting_date = build_datetime_from_string(
-#         f"{invoice.posting_date} {post_time[:8].replace('.', '')}",
-#         format="%Y-%m-%d %H:%M:%S",
-#     )
-
-#     validated_date = posting_date.strftime("%Y%m%d%H%M%S")
-#     sales_date = posting_date.strftime("%Y%m%d")
-
-#     items_list = get_invoice_items_list(invoice)
-
-#     invoice_name=invoice.name
-#     if invoice.amended_from is not None:
-#         invoice_name=clean_invc_no(invoice_name)
-#     payload = {
-#         # FIXME: Use document's naming series to get invcNo and not etims_serial_number field
-#         # FIXME: The document's number series should be based off of the branch. Switching branches should reset the number series
-#         # "invcNo": frappe.db.get_value(
-#         #     "Sales Invoice", {"name": invoice.name}, ["etims_serial_number"]
-#         # ),
-#         "invcNo":get_invoice_number(invoice_name),
-#         "orgInvcNo": (
-#             0
-#             if invoice_type_identifier == "S"
-#             else frappe.get_doc(
-#                 "Sales Invoice", invoice.return_against
-#             ).custom_submission_sequence_number
-#         ),
-#         "trdInvcNo": invoice_name,
-#         "custTin": invoice.tax_id if invoice.tax_id else None,
-#         "custNm": None,
-#         "rcptTyCd": invoice_type_identifier if invoice_type_identifier == "S" else "R",
-#         "pmtTyCd": invoice.custom_payment_type_code,
-#         "salesSttsCd": invoice.custom_transaction_progress_code,
-#         "cfmDt": validated_date,
-#         "salesDt": sales_date,
-#         "stockRlsDt": validated_date,
-#         "cnclReqDt": None,
-#         "cnclDt": None,
-#         "rfdDt": None,
-#         "rfdRsnCd": None,
-#         "totItemCnt": len(items_list),
-#         "taxblAmtA": invoice.custom_taxbl_amount_a,
-#         "taxblAmtB": invoice.custom_taxbl_amount_b,
-#         "taxblAmtC": invoice.custom_taxbl_amount_c,
-#         "taxblAmtD": invoice.custom_taxbl_amount_d,
-#         "taxblAmtE": invoice.custom_taxbl_amount_e,
-#         "taxRtA": 0,
-#         "taxRtB": 16 if invoice.custom_tax_b else 0,
-#         "taxRtC": 0,
-#         "taxRtD": 0,
-#         "taxRtE": 8 if invoice.custom_tax_e else 0,
-#         "taxAmtA": invoice.custom_tax_a,
-#         "taxAmtB": invoice.custom_tax_b,
-#         "taxAmtC": invoice.custom_tax_c,
-#         "taxAmtD": invoice.custom_tax_d,
-#         "taxAmtE": invoice.custom_tax_e,
-#         "totTaxblAmt": round(invoice.base_net_total, 2),
-#         "totTaxAmt": round(invoice.total_taxes_and_charges, 2),
-#         "totAmt": round(invoice.grand_total, 2),
-#         "prchrAcptcYn": "Y",
-#         "remark": None,
-#         "regrId": split_user_email(invoice.owner),
-#         "regrNm": invoice.owner,
-#         "modrId": split_user_email(invoice.modified_by),
-#         "modrNm": invoice.modified_by,
-#         "receipt": {
-#             "custTin": invoice.tax_id if invoice.tax_id else None,
-#             "custMblNo": None,
-#             "rptNo": 1,
-#             "rcptPbctDt": validated_date,
-#             "trdeNm": "",
-#             "adrs": "",
-#             "topMsg": "ERPNext",
-#             "btmMsg": "",
-#             "prchrAcptcYn": "Y",
-#         },
-#         "itemList": items_list,
-#     }
-#     # frappe.throw(str(payload))
-#     return payload
 
 
 def get_invoice_items_list(invoice: Document) -> list[dict[str, str | int | None]]:
@@ -634,34 +435,6 @@ def get_invoice_items_list(invoice: Document) -> list[dict[str, str | int | None
                 "quantity": abs(item.qty),
             }
         )
-
-        # items_list.append(
-        #     {
-        #         "itemSeq": item.idx,
-        #         "itemCd": item.custom_item_code_etims,
-        #         "itemClsCd": item.custom_item_classification,
-        #         "itemNm": item.item_name,
-        #         "bcd": item.barcode,
-        #         "pkgUnitCd": item.custom_packaging_unit_code,
-        #         "pkg": 1,
-        #         "qtyUnitCd": item.custom_unit_of_quantity_code,
-        #         "qty": abs(item.qty),
-        #         "prc": round(item.base_rate, 2),
-        #         "splyAmt": round(item.base_amount, 2),
-        #         "dcRt": round(item.discount_percentage, 2) or 0,
-        #         "dcAmt": round(item.discount_amount, 2) or 0,
-        #         "isrccCd": None,
-        #         "isrccNm": None,
-        #         "isrcRt": None,
-        #         "isrcAmt": None,
-        #         "taxTyCd": item.custom_taxation_type_code,
-        #         "taxblAmt": round(item.net_amount, 2),  # taxable_amount,
-        #         # "taxAmt": tax_amount,
-        #         "taxAmt": round(item.custom_tax_amount, 2),
-        #         "totAmt": round(item.net_amount + item.custom_tax_amount, 2),
-        #         # "totAmt": (taxable_amount + tax_amount),
-        #     }
-        # )
 
     return items_list
 
