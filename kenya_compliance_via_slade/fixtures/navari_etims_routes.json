@@ -3,7 +3,7 @@
   "company": "Theluji",
   "docstatus": 0,
   "doctype": "Navari eTims Routes",
-  "modified": "2024-12-19 13:08:18.597627",
+  "modified": "2024-12-20 08:26:57.218222",
   "name": "Theluji - VSCU Slade 360",
   "routes_table": [
    {
@@ -41,6 +41,15 @@
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/etims_currencies/get_currencies",
     "url_path_function": "CurrencyCountrySearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "Theluji - VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/financial_accounts/paymentmethods/",
+    "url_path_function": "PaymentMtdSearchReq"
    },
    {
     "description": null,
@@ -230,6 +239,42 @@
     "parenttype": "Navari eTims Routes",
     "url_path": "/me",
     "url_path_function": "BhfUserSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "Theluji - VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/etims_imports/{id}/send_import_item_to_etims/",
+    "url_path_function": "ImportItemUpdateReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "Theluji - VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/business_partners/customers",
+    "url_path_function": "CustomersSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "Theluji - VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/business_partners/customers/{id}",
+    "url_path_function": "CustomerSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "Theluji - VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/purchases/{id}",
+    "url_path_function": "TrnsPurchaseSearchReq"
    }
   ],
   "vendor": "VSCU Slade 360"
