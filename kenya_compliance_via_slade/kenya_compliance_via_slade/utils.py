@@ -242,12 +242,12 @@ def get_server_url(company_name: str, vendor: str, branch_id: str = "00") -> str
 
 def get_slade_server_url(company_name: str, branch_id: str = "00") -> str | None:
     settings = frappe.db.get_value(
-        "Navari Slade360 eTims Settings",
+        SETTINGS_DOCTYPE_NAME,
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
         ["server_url"],
         as_dict=True,
     ) or frappe.db.get_value(
-        "Navari Slade360 eTims Settings",
+        SETTINGS_DOCTYPE_NAME,
         {"company": company_name, "is_active": 1},
         ["server_url"],
         as_dict=True,
@@ -292,12 +292,12 @@ def build_slade_headers(
         dict[str, str] | None: The headers including the refreshed token or None if failed.
     """
     settings = frappe.db.get_value(
-        "Navari Slade360 eTims Settings",
+        SETTINGS_DOCTYPE_NAME,
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
         ["access_token", "token_expiry", "name"],
         as_dict=True,
     ) or  frappe.db.get_value(
-        "Navari Slade360 eTims Settings",
+        SETTINGS_DOCTYPE_NAME,
         {"company": company_name, "is_active": 1},
         ["access_token", "token_expiry", "name"],
         as_dict=True,
@@ -867,6 +867,7 @@ def authenticate_and_get_token(
         "client_id": client_id,
         "client_secret": client_secret,
     }
+    print(payload)
     encoded_payload = urlencode(payload)
 
     headers = {
@@ -901,7 +902,7 @@ def authenticate_and_get_token(
 
 @frappe.whitelist()
 def update_navari_settings_with_token(docname):
-    settings_doc = frappe.get_doc("Navari Slade360 eTims Settings", docname)
+    settings_doc = frappe.get_doc(SETTINGS_DOCTYPE_NAME, docname)
     auth_server_url = settings_doc.auth_server_url
     username = settings_doc.auth_username
     client_id = settings_doc.client_id    

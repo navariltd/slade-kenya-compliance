@@ -15,6 +15,7 @@
   "autocreate_branch_dimension",
   "settings_section",
   "server_url",
+  "auth_server_url",
   "company",
   "tin",
   "column_break_mmvk",
@@ -46,7 +47,23 @@
   "purchases_purchase_type",
   "column_break_mxxv",
   "purchases_receipt_type",
-  "purchases_purchase_status"
+  "purchases_purchase_status",
+  "auth_details_tab",
+  "client_id",
+  "client_secret",
+  "column_break_ekvx",
+  "auth_username",
+  "auth_password",
+  "column_break_cgts",
+  "etims_user",
+  "workstation",
+  "section_break_eqay",
+  "access_token",
+  "column_break_clyl",
+  "refresh_token",
+  "column_break_uosd",
+  "token_expiry",
+  "expires_in"
  ],
  "fields": [
   {
@@ -63,7 +80,7 @@
    "no_copy": 1
   },
   {
-   "default": "https://etims-api-sbx.kra.go.ke/etims-api",
+   "default": "https://api.erp.release.slade360edi.com",
    "description": "KRA E-Tims Server URL. Don't fill if you're not sure what to input.",
    "fieldname": "server_url",
    "fieldtype": "Data",
@@ -311,6 +328,99 @@
    "label": "API Provider",
    "options": "\nOSCU KRA\nVSCU Slade 360\nPergamon",
    "reqd": 1
+  },
+  {
+   "fieldname": "auth_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Auth Details"
+  },
+  {
+   "fieldname": "client_id",
+   "fieldtype": "Data",
+   "label": "Client ID",
+   "reqd": 1
+  },
+  {
+   "fieldname": "client_secret",
+   "fieldtype": "Password",
+   "label": "Client Secret",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_ekvx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "auth_username",
+   "fieldtype": "Data",
+   "label": "Auth Username",
+   "reqd": 1
+  },
+  {
+   "fieldname": "auth_password",
+   "fieldtype": "Password",
+   "label": "Auth Password",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_cgts",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "access_token",
+   "fieldtype": "Data",
+   "label": "Access Token",
+   "read_only": 1
+  },
+  {
+   "fieldname": "refresh_token",
+   "fieldtype": "Data",
+   "label": "Refresh Token",
+   "read_only": 1
+  },
+  {
+   "fieldname": "expires_in",
+   "fieldtype": "Data",
+   "label": "Expires In",
+   "read_only": 1
+  },
+  {
+   "fieldname": "token_expiry",
+   "fieldtype": "Datetime",
+   "label": "Token Expiry"
+  },
+  {
+   "fieldname": "section_break_eqay",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_clyl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_uosd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "etims_user",
+   "fieldtype": "Link",
+   "label": "eTims User",
+   "options": "Navari eTims User"
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "label": "Workstation",
+   "options": "Navari KRA eTims Workstation"
+  },
+  {
+   "default": "https://accounts.multitenant.slade360.co.ke",
+   "description": "KRA E-Tims Auth Server URL. Don't fill if you're not sure what to input.",
+   "fieldname": "auth_server_url",
+   "fieldtype": "Data",
+   "label": "Auth Server URL",
+   "options": "URL",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -321,7 +431,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2024-12-13 08:39:25.837404",
+ "modified": "2025-01-06 15:53:18.365354",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",

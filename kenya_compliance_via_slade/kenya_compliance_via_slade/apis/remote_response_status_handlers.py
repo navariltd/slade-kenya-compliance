@@ -12,7 +12,7 @@ from ..doctype.doctype_names_mapping import (
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
     ITEM_TYPE_DOCTYPE_NAME,
     NOTICES_DOCTYPE_NAME,
-    ORGANISATION_UNIT_DOCTYPE_NAME,
+    WORKSTATION_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     PRODUCT_TYPE_DOCTYPE_NAME,
     REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
@@ -666,9 +666,9 @@ def imported_items_search_on_success(response: dict, document_name: str):
                 "branch": get_or_create_link(
                     "Branch", "slade_id", item.get("branch")
                 ),
-                "organisation": get_or_create_link(
-                    ORGANISATION_UNIT_DOCTYPE_NAME, "slade_id", item.get("organisation")
-                ),
+                # "organisation": get_or_create_link(
+                #     ORGANISATION_UNIT_DOCTYPE_NAME, "slade_id", item.get("organisation")
+                # ),
                 "gross_weight": item.get("gross_weight"),
                 "net_weight": item.get("net_weight"),
                 "suppliers_name": item.get("supplier_name"),
@@ -756,7 +756,7 @@ def search_branch_request_on_success(response: dict, document_name: str) -> None
             doc = frappe.new_doc("Branch")
 
         finally:
-            doc.branch = branch["id"]
+            doc.branch = branch["name"]
             doc.slade_id = branch["id"]
             doc.custom_etims_device_serial_no = branch["etims_device_serial_no"]            
             doc.custom_branch_code = branch["etims_branch_id"]

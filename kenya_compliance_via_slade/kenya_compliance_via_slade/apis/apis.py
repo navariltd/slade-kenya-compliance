@@ -70,6 +70,8 @@ from ..background_tasks.tasks import (
     update_packaging_units,
     update_taxation_type,
     update_unit_of_quantity,
+    update_branches,
+    update_departments,
 )
 
 from .api_builder import Slade360EndpointsBuilder
@@ -439,8 +441,8 @@ def search_organisations_request(request_data: str) -> str:
     """Refresh code lists based on request data."""
     tasks = [
         ("OrgSearchReq", update_organisations),
-        ("BhfSearchReq", update_organisations),
-        ("DeptSearchReq", update_organisations),
+        ("BhfSearchReq", update_branches),
+        ("DeptSearchReq", update_departments),
     ]
 
     messages = [process_request(request_data, task[0], task[1]) for task in tasks]

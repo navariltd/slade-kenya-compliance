@@ -14,8 +14,9 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
               "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_notice_search",
             args: {
               request_data: {
-                name: frm.doc.name,
+                document_name: frm.doc.name,
                 company_name: companyName,
+                branch_id: frm.doc.bhfid,
               },
             },
             callback: (response) => {},
@@ -32,11 +33,34 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_code_lists",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.refresh_code_lists",
             args: {
               request_data: {
-                name: frm.doc.name,
+                document_name: frm.doc.name,
                 company_name: companyName,
+                branch_id: frm.doc.bhfid,
+              },
+            },
+            callback: (response) => {},
+            error: (error) => {
+              // Error Handling is Defered to the Server
+            },
+          });
+        },
+        __("eTims Actions")
+      );
+
+      frm.add_custom_button(
+        __("Get Organisation Units"),
+        function () {
+          frappe.call({
+            method:
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.search_organisations_request",
+            args: {
+              request_data: {
+                document_name: frm.doc.name,
+                company_name: companyName,
+                branch_id: frm.doc.bhfid,
               },
             },
             callback: (response) => {},
@@ -53,8 +77,15 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         function () {
           frappe.call({
             method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.get_item_classification_codes",
-            args: {},
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_item_classification_codes",
+            args: {
+              request_data: {
+                document_name: frm.doc.name,
+                company_name: companyName,
+                branch_id: frm.doc.bhfid,
+              },
+            },
+
             callback: (response) => {},
             error: (error) => {
               // Error Handling is Defered to the Server
@@ -64,12 +95,60 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         __("eTims Actions")
       );
 
+      frm.add_custom_button(
+        __("Initialize device"),
+        function () {
+          frappe.call({
+            method: "frappe.client.get_value",
+            args: {
+              doctype: "Branch",
+              fieldname: "custom_branch_code",
+              filters: { name: frm.doc.bhfid },
+            },
+            callback: function (res) {
+              if (res.message) {
+                const custom_branch_code = res.message.custom_branch_code;
+
+                frappe.call({
+                  method:
+                    "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.initialize_device",
+                  args: {
+                    request_data: {
+                      document_name: frm.doc.name,
+                      etims_branch_id: custom_branch_code,
+                      username: frm.doc.auth_username,
+                      password: frm.doc.auth_password,
+                      vscu_url: frm.doc.server_url,
+                      etims_web_address:
+                        "https://etims-api-sbx.kra.go.ke/etims-api",
+                      organisation_tax_pin: frm.doc.tin,
+                      etims_device_serial_no: frm.doc.dvcsrlno,
+                      company_name: companyName,
+                      branch_id: frm.doc.bhfid,
+                    },
+                  },
+                  callback: (response) => {
+                    // console.log(response);
+                  },
+                  error: (error) => {
+                    // Error handling
+                  },
+                });
+              } else {
+                frappe.msgprint(__("Failed to fetch slade_id for the branch."));
+              }
+            },
+          });
+        },
+        __("eTims Actions")
+      );
+
       // frm.add_custom_button(
-      //   __('Get Stock Movements'),
+      //   __("Get Stock Movements"),
       //   function () {
       //     frappe.call({
       //       method:
-      //         'kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_stock_movement_search',
+      //         "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_stock_movement_search",
       //       args: {
       //         request_data: {
       //           name: frm.doc.name,
@@ -83,25 +162,38 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
       //       },
       //     });
       //   },
-      //   __('eTims Actions'),
+      //   __("eTims Actions")
       // );
     }
 
     frm.add_custom_button(
-      __("Ping Server"),
+      __("Get Auth Token"),
       function () {
         frappe.call({
           method:
-            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.ping_server",
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.utils.update_navari_settings_with_token",
           args: {
-            request_data: {
-              server_url: frm.doc.server_url,
-            },
+            docname: frm.doc.name,
           },
         });
       },
       __("eTims Actions")
     );
+
+    // frm.add_custom_button(
+    //   __("Ping Server"),
+    //   function () {
+    //     frappe.call({
+    //       method: "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.ping_server",
+    //       args: {
+    //         request_data: {
+    //           server_url: frm.doc.server_url,
+    //         },
+    //       },
+    //     });
+    //   },
+    //   __("eTims Actions")
+    // );
 
     frm.set_query("bhfid", function () {
       return {
