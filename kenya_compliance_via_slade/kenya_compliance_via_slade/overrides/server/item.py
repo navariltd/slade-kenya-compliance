@@ -23,7 +23,8 @@ def before_insert(doc: Document, method: str) -> None:
 
     item_registration_data = {
         "name": doc.name,
-        "company_name": frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name"),
+        "company_name": frappe.defaults.get_user_default("Company")
+        or frappe.get_value("Company", {}, "name"),
         "itemCd": doc.custom_item_code_etims,
         "itemClsCd": doc.custom_item_classification,
         "itemTyCd": doc.custom_product_type,
@@ -98,7 +99,7 @@ def validate(doc: Document, method: str) -> None:
             doc.set("taxes", [])
             for template in relevant_tax_templates:
                 doc.append("taxes", {"item_tax_template": template.name})
-                
+
     required_fields = [
         doc.custom_etims_country_of_origin_code,
         doc.custom_product_type,
@@ -106,9 +107,9 @@ def validate(doc: Document, method: str) -> None:
         doc.custom_unit_of_quantity_code,
         doc.custom_item_classification,
     ]
-    
+
     if any(not field for field in required_fields):
-        return 
+        return
 
     new_prefix = f"{doc.custom_etims_country_of_origin_code}{doc.custom_product_type}{doc.custom_packaging_unit_code}{doc.custom_unit_of_quantity_code}"
 
@@ -120,7 +121,7 @@ def validate(doc: Document, method: str) -> None:
         # If there is no existing code, generate a new suffix
         last_code = frappe.db.sql(
             """
-            SELECT custom_item_code_etims 
+            SELECT custom_item_code_etims
             FROM `tabItem`
             WHERE custom_item_classification = %s
             ORDER BY CAST(SUBSTRING(custom_item_code_etims, -7) AS UNSIGNED) DESC
@@ -141,9 +142,8 @@ def validate(doc: Document, method: str) -> None:
     doc.custom_item_code_etims = f"{new_prefix}{existing_suffix}"
 
 
-
 @frappe.whitelist()
-def prevent_item_deletion(doc, method):
-    # if doc.custom_item_registered == 1:  # Assuming 1 means registered, adjust as needed
-    #     frappe.throw(_("Cannot delete registered items"))
+def prevent_item_deletion(doc: dict) -> None:
+    if doc.custom_item_registered == 1:  # Assuming 1 means registered, adjust as needed
+        frappe.throw(_("Cannot delete registered items"))
     pass

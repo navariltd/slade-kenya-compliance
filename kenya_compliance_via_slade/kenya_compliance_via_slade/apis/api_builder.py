@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Literal
+from typing import Callable, Literal, Optional, Union
 from urllib import parse
 
 import requests
@@ -10,9 +10,7 @@ from frappe.integrations.utils import create_request_log
 from frappe.model.document import Document
 
 from ..logger import etims_logger
-from ..utils import (
-    update_navari_settings_with_token,
-)
+from ..utils import update_navari_settings_with_token
 
 
 class BaseEndpointsBuilder:
@@ -69,7 +67,6 @@ class ErrorObserver:
                 notifier.error,
                 title="Fatal Error",
             )
-
 
 
 class EndpointsBuilder(BaseEndpointsBuilder):
@@ -150,7 +147,7 @@ class EndpointsBuilder(BaseEndpointsBuilder):
     ) -> None:
         self._error_callback_handler = callback
 
-    def refresh_token(self, document_name) -> str:
+    def refresh_token(self, document_name: str) -> str:
         """Fetch a new token and update the headers."""
         try:
             settings = update_navari_settings_with_token(document_name)
@@ -161,7 +158,7 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                 return new_token
             else:
                 frappe.throw(
-                    f"Failed to refresh token",
+                    "Failed to refresh token",
                     frappe.AuthenticationError,
                 )
         except requests.exceptions.RequestException as error:
@@ -196,7 +193,7 @@ class EndpointsBuilder(BaseEndpointsBuilder):
             self.integration_request = create_request_log(
                 data=self._payload,
                 request_description=self._request_description,
-                is_remote_request=True,  
+                is_remote_request=True,
                 service_name="Slade360",
                 request_headers=self._headers,
                 url=self._url,
@@ -240,7 +237,9 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                 error = (
                     response_data
                     if isinstance(response_data, str)
-                    else response_data.get("error") or response_data.get("detail") or str(response_data)
+                    else response_data.get("error")
+                    or response_data.get("detail")
+                    or str(response_data)
                 )
                 update_integration_request(
                     self.integration_request.name,
@@ -260,16 +259,20 @@ class EndpointsBuilder(BaseEndpointsBuilder):
             self.notify()
 
 
-def get_response_data(response):
-    content_type = response.headers.get('Content-Type', '').lower()
+def get_response_data(response: requests.Response) -> Optional[Union[dict, str, bytes]]:
+    content_type = response.headers.get("Content-Type", "").lower()
 
-    if 'application/json' in content_type:
+    if "application/json" in content_type:
         return response.json()
-    elif 'text/plain' in content_type or 'text/html' in content_type:
+    elif "text/plain" in content_type or "text/html" in content_type:
         return response.text if response.text.strip() else None
-    elif 'application/xml' in content_type or 'text/xml' in content_type:
+    elif "application/xml" in content_type or "text/xml" in content_type:
         return response.text if response.text.strip() else None
-    elif 'application/octet-stream' in content_type or 'application/pdf' in content_type or 'application/zip' in content_type:
+    elif (
+        "application/octet-stream" in content_type
+        or "application/pdf" in content_type
+        or "application/zip" in content_type
+    ):
         return response.content
 
     return None

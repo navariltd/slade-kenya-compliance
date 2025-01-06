@@ -6,4 +6,4 @@ from frappe.tests.utils import FrappeTestCase
 
 
 class TestNavariKRAeTimsWorkstation(FrappeTestCase):
-	pass
+    pass

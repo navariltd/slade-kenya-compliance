@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import deprecation
-from requests.utils import requote_uri
 
 import frappe
 
@@ -12,7 +11,6 @@ from ..doctype.doctype_names_mapping import (
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
     ITEM_TYPE_DOCTYPE_NAME,
     NOTICES_DOCTYPE_NAME,
-    WORKSTATION_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     PRODUCT_TYPE_DOCTYPE_NAME,
     REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
@@ -24,11 +22,7 @@ from ..doctype.doctype_names_mapping import (
     USER_DOCTYPE_NAME,
 )
 from ..handlers import handle_errors, handle_slade_errors
-from ..utils import (
-    get_link_value,
-    get_or_create_link,
-    get_qr_code,
-)
+from ..utils import get_link_value, get_or_create_link
 
 
 def on_error(
@@ -99,7 +93,7 @@ def customer_search_on_success(
             "custom_is_validated": 1,
         },
     )
-    
+
 
 def item_registration_on_success(response: dict, document_name: str) -> None:
     updates = {
@@ -136,9 +130,11 @@ def user_details_submission_on_success(response: dict, document_name: str) -> No
         USER_DOCTYPE_NAME,
         document_name,
         {
-            "submitted_successfully_to_etims": 1 if response.get("sent_to_etims") else 0, 
+            "submitted_successfully_to_etims": (
+                1 if response.get("sent_to_etims") else 0
+            ),
             "slade_id": response.get("id"),
-            "sent_to_slade": 1
+            "sent_to_slade": 1,
         },
     )
 
@@ -149,15 +145,17 @@ def user_details_fetch_on_success(response: dict, document_name: str) -> None:
 
     existing_user = frappe.db.exists("User", {"email": email})
     if not existing_user:
-        user = frappe.get_doc({
-            "doctype": "User",
-            "email": email,
-            "first_name": result.get("first_name"),
-            "last_name": result.get("last_name"),
-            "full_name": result.get("full_name"),
-            "enabled": 1,
-            "roles": [{"role": "System Manager"}]
-        })
+        user = frappe.get_doc(
+            {
+                "doctype": "User",
+                "email": email,
+                "first_name": result.get("first_name"),
+                "last_name": result.get("last_name"),
+                "full_name": result.get("full_name"),
+                "enabled": 1,
+                "roles": [{"role": "System Manager"}],
+            }
+        )
         user.insert(ignore_permissions=True)
     else:
         user = frappe.get_doc("User", existing_user)
@@ -183,10 +181,7 @@ def user_details_fetch_on_success(response: dict, document_name: str) -> None:
 
     existing_doc = frappe.db.exists("Navari eTims User", {"email": email})
     if not existing_doc:
-        new_doc = frappe.get_doc({
-            "doctype": "Navari eTims User",
-            **data  
-        })
+        new_doc = frappe.get_doc({"doctype": "Navari eTims User", **data})
         new_doc.insert(ignore_permissions=True)
     else:
         frappe.db.set_value("Navari eTims User", existing_doc, data)
@@ -236,20 +231,20 @@ def sales_information_submission_on_success(
         document_name=document_name,
         invoice_type=invoice_type,
         invoice_slade_id=response.get("id"),
-        queue="long",  
+        queue="long",
     )
+
 
 @frappe.whitelist()
 def process_invoice_items(
-    document_name: str,
-    invoice_type: str,
-    invoice_slade_id: str
+    document_name: str, invoice_type: str, invoice_slade_id: str
 ) -> None:
     """
     Retrieves the specific invoice, extracts all items, and sends each
     item separately.
     """
     from .apis import process_request
+
     invoice = frappe.get_doc(invoice_type, document_name)
 
     if not invoice:
@@ -262,20 +257,23 @@ def process_invoice_items(
 
     for item in items:
         payload = {
-            "product": get_link_value("Item", "name", item.get("item_code"), "custom_slade_id"),
+            "product": get_link_value(
+                "Item", "name", item.get("item_code"), "custom_slade_id"
+            ),
             "quantity": item.get("qty"),
             "new_price": item.get("rate"),
             "amount": item.get("amount"),
             "sales_invoice": invoice_slade_id,
-            "document_name": item.get("name")
+            "document_name": item.get("name"),
         }
         additional_context = {
             "invoice_type": items_table_doctype,
         }
+
         process_request(
             payload,
             "SalesLineSaveReq",
-            lambda response, document_name: sales_item_submission_on_success(
+            lambda response, document_name, additional_context=additional_context: sales_item_submission_on_success(
                 response,
                 document_name,
                 **additional_context,
@@ -286,23 +284,22 @@ def process_invoice_items(
     process_sales_transition(document_name, invoice_type, invoice_slade_id)
 
 
-def process_sales_transition(document_name: str, invoice_type: str, invoice_slade_id: str) -> None:
+def process_sales_transition(
+    document_name: str, invoice_type: str, invoice_slade_id: str
+) -> None:
     from .apis import process_request
 
-    def handle_transition_success(response, document_name):
+    def handle_transition_success(response: dict, document_name: str) -> None:
         # process_sales_sign(document_name, invoice_type, invoice_slade_id)
         frappe.enqueue(
             "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.remote_response_status_handlers.process_sales_sign",
             document_name=document_name,
             invoice_type=invoice_type,
             invoice_slade_id=response.get("id"),
-            queue="long",  
+            queue="long",
         )
 
-    payload = {
-        "invoice_id": invoice_slade_id,
-        "document_name": document_name
-    }
+    payload = {"invoice_id": invoice_slade_id, "document_name": document_name}
 
     process_request(
         payload,
@@ -313,22 +310,23 @@ def process_sales_transition(document_name: str, invoice_type: str, invoice_slad
     )
 
 
-def process_sales_sign(document_name: str, invoice_type: str, invoice_slade_id: str) -> None:
+def process_sales_sign(
+    document_name: str, invoice_type: str, invoice_slade_id: str
+) -> None:
     from .apis import process_request
 
-    payload = {
-        "invoice_id": invoice_slade_id,
-        "document_name": document_name
-    }
+    payload = {"invoice_id": invoice_slade_id, "document_name": document_name}
 
     process_request(
         payload,
         "SalesSignInvReq",
-        lambda response: frappe.msgprint(f"Invoice {document_name} successfully processed and signed."),
+        lambda response: frappe.msgprint(
+            f"Invoice {document_name} successfully processed and signed."
+        ),
         method="POST",
         doctype=invoice_type,
     )
-      
+
 
 def sales_item_submission_on_success(
     response: dict,
@@ -366,13 +364,17 @@ def stock_mvt_submission_on_success(response: dict, document_name: str) -> None:
 
 
 def purchase_search_on_success(response: dict, document_name: str) -> None:
-    sales_list = response.get("results", []) if isinstance(response, dict) else response if isinstance(response, list) else [response]
+    sales_list = (
+        response.get("results", [])
+        if isinstance(response, dict)
+        else response if isinstance(response, list) else [response]
+    )
     for sale in sales_list:
         registered_purchase = create_purchase_from_search_details(sale)
         frappe.enqueue(
             "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.remote_response_status_handlers.fetch_purchase_items",
             registered_purchase=registered_purchase,
-            queue="long",  
+            queue="long",
         )
 
 
@@ -381,7 +383,7 @@ def fetch_purchase_items(registered_purchase: str) -> None:
 
     payload = {
         "purchase_invoice": registered_purchase,
-        "document_name": registered_purchase
+        "document_name": registered_purchase,
     }
 
     process_request(
@@ -392,19 +394,21 @@ def fetch_purchase_items(registered_purchase: str) -> None:
         doctype=REGISTERED_PURCHASES_DOCTYPE_NAME,
     )
 
+
 def parse_datetime(date_str: str, format: str = "%Y-%m-%dT%H:%M:%S%z") -> str:
     if not date_str:
-        return 
+        return
     try:
-        if "T" in date_str:  
+        if "T" in date_str:
             parsed_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S%z")
-        else: 
+        else:
             parsed_date = datetime.strptime(date_str, "%Y-%m-%d")
-        return parsed_date.strftime("%Y-%m-%d %H:%M:%S") 
-    except Exception as e:
-        frappe.log_error(f"Invalid datetime format: {date_str}", title="Datetime Parsing Error")
+        return parsed_date.strftime("%Y-%m-%d %H:%M:%S")
+    except Exception:
+        frappe.log_error(
+            f"Invalid datetime format: {date_str}", title="Datetime Parsing Error"
+        )
         return None
-
 
 
 def create_purchase_from_search_details(fetched_purchase: dict) -> str:
@@ -412,9 +416,7 @@ def create_purchase_from_search_details(fetched_purchase: dict) -> str:
     Create and submit a new registered purchase document using details from fetched_purchase.
     """
     existing_doc = frappe.get_value(
-        REGISTERED_PURCHASES_DOCTYPE_NAME, 
-        {"slade_id": fetched_purchase["id"]}, 
-        "name"
+        REGISTERED_PURCHASES_DOCTYPE_NAME, {"slade_id": fetched_purchase["id"]}, "name"
     )
 
     if existing_doc:
@@ -424,7 +426,7 @@ def create_purchase_from_search_details(fetched_purchase: dict) -> str:
 
     doc.flags.ignore_permissions = True
     doc.flags.ignore_validate_update_after_submit = True
-    doc.slade_id =  fetched_purchase["id"]
+    doc.slade_id = fetched_purchase["id"]
 
     doc.supplier_name = fetched_purchase["supplier_name"]
     doc.supplier_pin = fetched_purchase["supplier_pin"]
@@ -434,9 +436,9 @@ def create_purchase_from_search_details(fetched_purchase: dict) -> str:
     doc.receipt_type_code = fetched_purchase["receipt_type_code"]
     if fetched_purchase.get("payment_type_code"):
         doc.payment_type_code = frappe.get_doc(
-            "Navari KRA eTims Payment Type", 
-            {"code": fetched_purchase["payment_type_code"]}, 
-            ["name"]
+            "Navari KRA eTims Payment Type",
+            {"code": fetched_purchase["payment_type_code"]},
+            ["name"],
         ).name
 
     doc.validated_date = parse_datetime(fetched_purchase["validated_date"])
@@ -475,7 +477,9 @@ def create_purchase_from_search_details(fetched_purchase: dict) -> str:
     try:
         doc.submit()
     except frappe.exceptions.DuplicateEntryError:
-        frappe.log_error(title="Duplicate entries", message=f"Duplicate for document: {doc.name}")
+        frappe.log_error(
+            title="Duplicate entries", message=f"Duplicate for document: {doc.name}"
+        )
 
     return doc.name
 
@@ -485,12 +489,16 @@ def create_and_link_purchase_item(response: dict, document_name: str) -> None:
     parent_record = frappe.get_doc(REGISTERED_PURCHASES_DOCTYPE_NAME, document_name)
     parent_record.flags.ignore_permissions = True
     parent_record.flags.ignore_validate_update_after_submit = True
-    
+
     for item in item_list:
-        existing_item = frappe.get_all(REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM, filters={"slade_id": item["id"]})
-        
+        existing_item = frappe.get_all(
+            REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM, filters={"slade_id": item["id"]}
+        )
+
         if existing_item:
-            registered_item = frappe.get_doc(REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM, item["id"])
+            registered_item = frappe.get_doc(
+                REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM, item["id"]
+            )
             registered_item.flags.ignore_permissions = True
             registered_item.flags.ignore_validate_update_after_submit = True
         else:
@@ -502,9 +510,13 @@ def create_and_link_purchase_item(response: dict, document_name: str) -> None:
         registered_item.is_mapped = 1 if item["is_mapped"] else 0
         registered_item.product_name = item["product_name"]
         registered_item.product_code = item["product_code"]
-        registered_item.item_code = item["item_code"]  
-        registered_item.item_classification_code_data = item["item_classification_code"]  
-        registered_item.item_classification_code = get_or_create_link(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "itemclscd", item["item_classification_code"] )
+        registered_item.item_code = item["item_code"]
+        registered_item.item_classification_code_data = item["item_classification_code"]
+        registered_item.item_classification_code = get_or_create_link(
+            ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+            "itemclscd",
+            item["item_classification_code"],
+        )
         registered_item.item_sequence = item["item_sequence_number"]
         registered_item.barcode = item["barcode"]
         registered_item.package = item["package"]
@@ -522,7 +534,7 @@ def create_and_link_purchase_item(response: dict, document_name: str) -> None:
         registered_item.save()
 
         parent_record.append("items", registered_item)
-        
+
     parent_record.save()
 
 
@@ -621,7 +633,7 @@ def stock_mvt_search_on_success(response: dict, document_name: str) -> None:
         doc.save()
 
 
-def imported_items_search_on_success(response: dict, document_name: str):
+def imported_items_search_on_success(response: dict, document_name: str) -> None:
     items = response.get("results", [])
     batch_size = 20
     counter = 0
@@ -646,7 +658,9 @@ def imported_items_search_on_success(response: dict, document_name: str):
                 "declaration_number": item.get("declaration_number"),
                 "imported_item_status_code": item.get("import_item_status_code"),
                 "imported_item_status": get_link_value(
-                    IMPORTED_ITEMS_STATUS_DOCTYPE_NAME, "code", item.get("import_item_status_code")
+                    IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
+                    "code",
+                    item.get("import_item_status_code"),
                 ),
                 "hs_code": item.get("hs_code"),
                 "origin_nation_code": get_link_value(
@@ -661,11 +675,11 @@ def imported_items_search_on_success(response: dict, document_name: str):
                 ),
                 "quantity": item.get("quantity"),
                 "quantity_unit_code": get_or_create_link(
-                    UNIT_OF_QUANTITY_DOCTYPE_NAME, "code", item.get("quantity_unit_code")
+                    UNIT_OF_QUANTITY_DOCTYPE_NAME,
+                    "code",
+                    item.get("quantity_unit_code"),
                 ),
-                "branch": get_or_create_link(
-                    "Branch", "slade_id", item.get("branch")
-                ),
+                "branch": get_or_create_link("Branch", "slade_id", item.get("branch")),
                 # "organisation": get_or_create_link(
                 #     ORGANISATION_UNIT_DOCTYPE_NAME, "slade_id", item.get("organisation")
                 # ),
@@ -673,36 +687,52 @@ def imported_items_search_on_success(response: dict, document_name: str):
                 "net_weight": item.get("net_weight"),
                 "suppliers_name": item.get("supplier_name"),
                 "agent_name": item.get("agent_name"),
-                "invoice_foreign_currency_amount": item.get("invoice_foreign_currency_amount"),
+                "invoice_foreign_currency_amount": item.get(
+                    "invoice_foreign_currency_amount"
+                ),
                 "invoice_foreign_currency": item.get("invoice_foreign_currency_code"),
-                "invoice_foreign_currency_rate": item.get("invoice_foreign_currency_exchange"),
+                "invoice_foreign_currency_rate": item.get(
+                    "invoice_foreign_currency_exchange"
+                ),
                 "slade_id": item_id,
-                "sent_to_etims": 1 if item.get("sent_to_etims") else 0
+                "sent_to_etims": 1 if item.get("sent_to_etims") else 0,
             }
 
             if existing_item:
-                item_doc = frappe.get_doc(REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME, existing_item)
+                item_doc = frappe.get_doc(
+                    REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME, existing_item
+                )
                 item_doc.update(request_data)
                 item_doc.flags.ignore_mandatory = True
                 item_doc.save(ignore_permissions=True)
             else:
-                item_doc = frappe.get_doc({"doctype": REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME, **request_data})
-                item_doc.insert(ignore_permissions=True, ignore_mandatory=True, ignore_if_duplicate=True)
+                item_doc = frappe.get_doc(
+                    {"doctype": REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME, **request_data}
+                )
+                item_doc.insert(
+                    ignore_permissions=True,
+                    ignore_mandatory=True,
+                    ignore_if_duplicate=True,
+                )
 
             if item.get("product"):
-                product_name = get_link_value("Item", "custom_slade_id", item.get("product"))
+                product_name = get_link_value(
+                    "Item", "custom_slade_id", item.get("product")
+                )
                 product = frappe.get_doc("Item", product_name)
                 product.custom_referenced_imported_item = item_doc.name
-                product.custom_imported_item_task_code =  item_doc.task_code
-                product.custom_hs_code =  item_doc.hs_code
-                product.custom_branch =  item_doc.branch
-                product.custom_organisation =  item_doc.organisation
-                product.custom_imported_item_submitted =  item_doc.sent_to_etims
-                product.custom_imported_item_status =  item_doc.imported_item_status
-                product.custom_imported_item_status_code =  item_doc.imported_item_status_code
+                product.custom_imported_item_task_code = item_doc.task_code
+                product.custom_hs_code = item_doc.hs_code
+                product.custom_branch = item_doc.branch
+                product.custom_organisation = item_doc.organisation
+                product.custom_imported_item_submitted = item_doc.sent_to_etims
+                product.custom_imported_item_status = item_doc.imported_item_status
+                product.custom_imported_item_status_code = (
+                    item_doc.imported_item_status_code
+                )
                 product.flags.ignore_mandatory = True
                 product.save()
-                
+
             counter += 1
             if counter % batch_size == 0:
                 frappe.db.commit()
@@ -712,7 +742,6 @@ def imported_items_search_on_success(response: dict, document_name: str):
                 title="Imported Item Sync Error",
                 message=f"Error while processing item with ID {item.get('id')}: {str(e)}",
             )
-            
 
     if counter % batch_size != 0:
         frappe.db.commit()
@@ -722,11 +751,17 @@ def imported_items_search_on_success(response: dict, document_name: str):
     )
 
 
-def parse_date(date_str):
+def parse_date(date_str: str) -> None:
     formats = [
-        "%d%m%Y", "%Y-%m-%d", "%d-%m-%Y", "%m/%d/%Y", 
-        "%d/%m/%Y", "%Y/%m/%d", "%B %d, %Y", 
-        "%b %d, %Y", "%Y.%m.%d"
+        "%d%m%Y",
+        "%Y-%m-%d",
+        "%d-%m-%Y",
+        "%m/%d/%Y",
+        "%d/%m/%Y",
+        "%Y/%m/%d",
+        "%B %d, %Y",
+        "%b %d, %Y",
+        "%Y.%m.%d",
     ]
     for fmt in formats:
         try:
@@ -758,7 +793,7 @@ def search_branch_request_on_success(response: dict, document_name: str) -> None
         finally:
             doc.branch = branch["name"]
             doc.slade_id = branch["id"]
-            doc.custom_etims_device_serial_no = branch["etims_device_serial_no"]            
+            doc.custom_etims_device_serial_no = branch["etims_device_serial_no"]
             doc.custom_branch_code = branch["etims_branch_id"]
             doc.custom_pin = branch["organisation_tax_pin"]
             doc.custom_branch_name = branch["name"]
@@ -776,7 +811,7 @@ def search_branch_request_on_success(response: dict, document_name: str) -> None
             doc.save()
 
 
-def item_search_on_success(response: dict, document_name: str):
+def item_search_on_success(response: dict, document_name: str) -> None:
     items = response.get("results", [])
     batch_size = 20
     counter = 0
@@ -784,8 +819,10 @@ def item_search_on_success(response: dict, document_name: str):
     for item_data in items:
         try:
             slade_id = item_data.get("id")
-            existing_item = frappe.db.get_value("Item", {"custom_slade_id": slade_id}, "name", order_by="creation desc")
-            
+            existing_item = frappe.db.get_value(
+                "Item", {"custom_slade_id": slade_id}, "name", order_by="creation desc"
+            )
+
             request_data = {
                 "item_name": item_data.get("name"),
                 "item_code": item_data.get("name"),
@@ -801,16 +838,40 @@ def item_search_on_success(response: dict, document_name: str):
                 "product_type": item_data.get("product_type"),
                 "product_type_code": item_data.get("product_type"),
                 "preferred_name": item_data.get("preferred_name"),
-                "custom_etims_country_of_origin_code": item_data.get("country_of_origin"),
+                "custom_etims_country_of_origin_code": item_data.get(
+                    "country_of_origin"
+                ),
                 "valuation_rate": round(item_data.get("selling_price", 0.0), 2),
                 "last_purchase_rate": round(item_data.get("purchasing_price", 0.0), 2),
-                "custom_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "slade_id", item_data.get("scu_item_classification")),
-                "custom_etims_country_of_origin": get_link_value(COUNTRIES_DOCTYPE_NAME, "code", item_data.get("country_of_origin")),
-                "custom_packaging_unit": get_link_value(PACKAGING_UNIT_DOCTYPE_NAME, "slade_id", item_data.get("packaging_unit")),
-                "custom_unit_of_quantity": get_link_value(UNIT_OF_QUANTITY_DOCTYPE_NAME, "slade_id", item_data.get("quantity_unit")),
-                "custom_item_type": get_link_value(ITEM_TYPE_DOCTYPE_NAME, "name", item_data.get("item_type")),
-                "custom_taxation_type": get_link_value(TAXATION_TYPE_DOCTYPE_NAME, "slade_id", item_data.get("sale_taxes")[0]),
-                "custom_product_type": get_link_value(PRODUCT_TYPE_DOCTYPE_NAME, "code", item_data.get("product_type")),
+                "custom_item_classification": get_link_value(
+                    ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+                    "slade_id",
+                    item_data.get("scu_item_classification"),
+                ),
+                "custom_etims_country_of_origin": get_link_value(
+                    COUNTRIES_DOCTYPE_NAME, "code", item_data.get("country_of_origin")
+                ),
+                "custom_packaging_unit": get_link_value(
+                    PACKAGING_UNIT_DOCTYPE_NAME,
+                    "slade_id",
+                    item_data.get("packaging_unit"),
+                ),
+                "custom_unit_of_quantity": get_link_value(
+                    UNIT_OF_QUANTITY_DOCTYPE_NAME,
+                    "slade_id",
+                    item_data.get("quantity_unit"),
+                ),
+                "custom_item_type": get_link_value(
+                    ITEM_TYPE_DOCTYPE_NAME, "name", item_data.get("item_type")
+                ),
+                "custom_taxation_type": get_link_value(
+                    TAXATION_TYPE_DOCTYPE_NAME,
+                    "slade_id",
+                    item_data.get("sale_taxes")[0],
+                ),
+                "custom_product_type": get_link_value(
+                    PRODUCT_TYPE_DOCTYPE_NAME, "code", item_data.get("product_type")
+                ),
             }
 
             if existing_item:
@@ -821,7 +882,11 @@ def item_search_on_success(response: dict, document_name: str):
             else:
                 request_data["item_group"] = "All Item Groups"
                 new_item = frappe.get_doc({"doctype": "Item", **request_data})
-                new_item.insert(ignore_permissions=True, ignore_mandatory=True, ignore_if_duplicate=True)
+                new_item.insert(
+                    ignore_permissions=True,
+                    ignore_mandatory=True,
+                    ignore_if_duplicate=True,
+                )
 
             counter += 1
             if counter % batch_size == 0:
@@ -837,9 +902,7 @@ def item_search_on_success(response: dict, document_name: str):
         frappe.db.commit()
 
 
-def initialize_device_submission_on_success(
-    response: dict, document_name: str
-) -> None:
+def initialize_device_submission_on_success(response: dict, document_name: str) -> None:
     pass
 
 
@@ -848,27 +911,32 @@ def customers_search_on_success(response: dict, document_name: str) -> None:
     if isinstance(data, dict):
         data = [data]
     for customer in data:
-            existing_customer = frappe.db.exists("Customer", {"slade_id": customer["id"]})
-            data = {
-                "slade_id": customer["id"],
-                "customer_name": customer["partner_name"],
-                "email_id": customer["email_address"],
-                "mobile_no": customer["phone_number"],
-                "tax_id": customer.get("customer_tax_pin"),
-                "organisation": customer.get("organisation"),
-                "currency": customer.get("currency"),
-                "primary_address": customer.get("physical_address"),
-                "active": 1 if customer.get("active") else 0,
-                "custom_details_submitted_successfully": 1,
-                "customer_type": customer.get("customer_type").title() if customer.get("customer_type") in ["Company", "Individual", "Partnership"] else "Individual",
-            }
+        existing_customer = frappe.db.exists("Customer", {"slade_id": customer["id"]})
+        data = {
+            "slade_id": customer["id"],
+            "customer_name": customer["partner_name"],
+            "email_id": customer["email_address"],
+            "mobile_no": customer["phone_number"],
+            "tax_id": customer.get("customer_tax_pin"),
+            "organisation": customer.get("organisation"),
+            "currency": customer.get("currency"),
+            "primary_address": customer.get("physical_address"),
+            "active": 1 if customer.get("active") else 0,
+            "custom_details_submitted_successfully": 1,
+            "customer_type": (
+                customer.get("customer_type").title()
+                if customer.get("customer_type")
+                in ["Company", "Individual", "Partnership"]
+                else "Individual"
+            ),
+        }
 
-            if existing_customer and customer.get("is_customer"):
-                doc = frappe.get_doc("Customer", existing_customer)
-                doc.update(data)
-                doc.save(ignore_permissions=True)
-            else:
-                doc = frappe.new_doc("Customer")
-                doc.update(data)
-                doc.insert(ignore_permissions=True)
-            frappe.db.commit()
+        if existing_customer and customer.get("is_customer"):
+            doc = frappe.get_doc("Customer", existing_customer)
+            doc.update(data)
+            doc.save(ignore_permissions=True)
+        else:
+            doc = frappe.new_doc("Customer")
+            doc.update(data)
+            doc.insert(ignore_permissions=True)
+        frappe.db.commit()

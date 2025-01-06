@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Callable
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import frappe
@@ -7,7 +7,7 @@ from frappe.tests.utils import FrappeTestCase
 from .api_builder import EndpointsBuilder
 
 
-def patched_update_request_date(*args, **kwargs) -> Any:
+def patched_update_request_date(*args, **kwargs) -> Callable:
     return lambda *args, **kwargs: (args, kwargs)
 
 

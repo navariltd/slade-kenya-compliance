@@ -1,6 +1,5 @@
 """Utility functions"""
 
-import json
 import re
 from base64 import b64encode
 from datetime import datetime, timedelta
@@ -24,7 +23,6 @@ from .doctype.doctype_names_mapping import (
     SETTINGS_DOCTYPE_NAME,
 )
 from .logger import etims_logger
-
 
 
 def is_valid_kra_pin(pin: str) -> bool:
@@ -251,10 +249,7 @@ def get_server_url(company_name: str, branch_id: str = "00") -> str | None:
     return
 
 
-
-def build_headers(
-    company_name: str, branch_id: str = "00"
-) -> dict[str, str] | None:
+def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | None:
     """
     Build headers for Slade360 API requests.
     Checks for token validity and refreshes the token if expired.
@@ -271,7 +266,7 @@ def build_headers(
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
         ["access_token", "token_expiry", "name"],
         as_dict=True,
-    ) or  frappe.db.get_value(
+    ) or frappe.db.get_value(
         SETTINGS_DOCTYPE_NAME,
         {"company": company_name, "is_active": 1},
         ["access_token", "token_expiry", "name"],
@@ -298,7 +293,7 @@ def build_headers(
                 )
 
             access_token = new_settings.access_token
-            
+
         logged_user = frappe.session.user
         user_data = frappe.db.get_value(
             "Navari eTims User",
@@ -308,13 +303,13 @@ def build_headers(
         )
 
         workstation = user_data.get("workstation") if user_data else None
-        
+
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-        
+
         if workstation:
             headers["X-Workstation"] = workstation
 
@@ -346,7 +341,7 @@ def build_invoice_payload(
     invoice: Document, invoice_type_identifier: Literal["S", "C"], company_name: str
 ) -> dict[str, str | int | float]:
     # Retrieve taxation data for the invoice
-    taxation_type = get_taxation_types(invoice)
+    get_taxation_types(invoice)
     # frappe.throw(str(taxation_type))
     """Converts relevant invoice data to a JSON payload
 
@@ -362,20 +357,19 @@ def build_invoice_payload(
     invoice_name = invoice.name
     if invoice.amended_from:
         invoice_name = clean_invc_no(invoice_name)
-        
+
     payload = {
         # "made_by": invoice.owner,
         "document_name": invoice.name,
         "branch_id": invoice.branch,
         "company_name": company_name,
-        
         "description": invoice.remarks or "New",
-        "payment_method": invoice.custom_payment_type,   
+        "payment_method": invoice.custom_payment_type,
         "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
         "invoice_date": str(invoice.posting_date),
         "currency": frappe.get_value("Currency", invoice.currency, "slade_id"),
         "source_organisation_unit": invoice.custom_slade_organisation,
-        "sales_type": "cash", 
+        "sales_type": "cash",
     }
 
     return payload
@@ -402,7 +396,7 @@ def get_invoice_items_list(invoice: Document) -> list[dict[str, str | int | None
         # actual_tax_amount = item_taxes[index][tax_head]["tax_amount"]
 
         # tax_amount = round(actual_tax_amount, 2)
-        
+
         items_list.append(
             {
                 "product": item.item_code,
@@ -446,7 +440,9 @@ def get_curr_env_etims_settings(
         return settings
 
 
-def get_most_recent_sales_number(company_name: str, vendor="OSCU KRA") -> int | None:
+def get_most_recent_sales_number(
+    company_name: str, vendor: str = "OSCU KRA"
+) -> int | None:
     settings = get_curr_env_etims_settings(company_name, vendor)
 
     if settings:
@@ -546,7 +542,7 @@ def before_save_(doc: "Document", method: str | None = None) -> None:
     calculate_tax(doc)
 
 
-def get_invoice_number(invoice_name):
+def get_invoice_number(invoice_name: str) -> int:
     """
     Extracts the numeric portion from the invoice naming series.
 
@@ -566,13 +562,13 @@ def get_invoice_number(invoice_name):
 """For cancelled and amended invoices"""
 
 
-def clean_invc_no(invoice_name):
+def clean_invc_no(invoice_name: str) -> str:
     if "-" in invoice_name:
         invoice_name = "-".join(invoice_name.split("-")[:-1])
     return invoice_name
 
 
-def get_taxation_types(doc):
+def get_taxation_types(doc: dict) -> dict:
     taxation_totals = {}
 
     # Loop through each item in the Sales Invoice
@@ -648,13 +644,13 @@ def authenticate_and_get_token(
 
 
 @frappe.whitelist()
-def update_navari_settings_with_token(docname):
+def update_navari_settings_with_token(docname: str) -> str:
     settings_doc = frappe.get_doc(SETTINGS_DOCTYPE_NAME, docname)
     auth_server_url = settings_doc.auth_server_url
     username = settings_doc.auth_username
-    client_id = settings_doc.client_id    
-    password = settings_doc.get_password('auth_password')
-    client_secret = settings_doc.get_password('client_secret')
+    client_id = settings_doc.client_id
+    password = settings_doc.get_password("auth_password")
+    client_secret = settings_doc.get_password("client_secret")
 
     token_details = authenticate_and_get_token(
         auth_server_url, username, password, client_id, client_secret
@@ -671,8 +667,9 @@ def update_navari_settings_with_token(docname):
     return settings_doc
 
 
-
-def get_link_value(doctype: str, field_name: str, value: str, return_field : str = "name"):
+def get_link_value(
+    doctype: str, field_name: str, value: str, return_field: str = "name"
+) -> str:
     try:
         return frappe.db.get_value(doctype, {field_name: value}, return_field)
     except Exception as e:
@@ -681,20 +678,26 @@ def get_link_value(doctype: str, field_name: str, value: str, return_field : str
             message=f"Error while fetching link for {doctype} with {field_name}={value}: {str(e)}",
         )
         return None
-    
 
-def get_or_create_link(doctype: str, field_name: str, value: str):
+
+def get_or_create_link(doctype: str, field_name: str, value: str) -> str:
     if not value:
         return None
-    
+
     try:
         link_name = frappe.db.get_value(doctype, {field_name: value}, "name")
         if not link_name:
-            link_name = frappe.get_doc({
-                "doctype": doctype,
-                field_name: value,
-                "code": value,
-            }).insert(ignore_permissions=True, ignore_mandatory=True).name
+            link_name = (
+                frappe.get_doc(
+                    {
+                        "doctype": doctype,
+                        field_name: value,
+                        "code": value,
+                    }
+                )
+                .insert(ignore_permissions=True, ignore_mandatory=True)
+                .name
+            )
             frappe.db.commit()
         return link_name
     except Exception as e:
@@ -705,9 +708,9 @@ def get_or_create_link(doctype: str, field_name: str, value: str):
         return None
 
 
-def process_dynamic_url(route_path: str, request_data) -> str:
-    import re
+def process_dynamic_url(route_path: str, request_data: dict | str) -> str:
     import json
+    import re
 
     if isinstance(request_data, str):
         try:
@@ -718,9 +721,12 @@ def process_dynamic_url(route_path: str, request_data) -> str:
     placeholders = re.findall(r"\{(.*?)\}", route_path)
     for placeholder in placeholders:
         if placeholder in request_data:
-            route_path = route_path.replace(f"{{{placeholder}}}", str(request_data[placeholder]))
+            route_path = route_path.replace(
+                f"{{{placeholder}}}", str(request_data[placeholder])
+            )
         else:
-            raise ValueError(f"Missing required placeholder: '{placeholder}' in request_data.")
+            raise ValueError(
+                f"Missing required placeholder: '{placeholder}' in request_data."
+            )
 
     return route_path
-

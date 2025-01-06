@@ -245,7 +245,9 @@ doc_events = {
     # 		"on_trash": "method"
     # 	}
     "Sales Invoice": {
-        "before_save": ["kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"],
+        "before_save": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"
+        ],
         "on_submit": [
             "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.sales_invoice.on_submit"
         ],
@@ -257,7 +259,9 @@ doc_events = {
         ],
     },
     "Purchase Invoice": {
-        "before_save": ["kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"],
+        "before_save": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"
+        ],
         "on_submit": [
             "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.purchase_invoice.on_submit"
         ],

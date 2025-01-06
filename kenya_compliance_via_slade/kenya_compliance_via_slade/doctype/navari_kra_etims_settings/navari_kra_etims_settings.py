@@ -8,9 +8,9 @@ from frappe.model.document import Document
 
 class NavariKRAeTimsSettings(Document):
     """ETims Integration Settings doctype"""
-    def validate(self):
+
+    def validate(self) -> None:
         if self.is_active == 1:
-            print(self)
             existing_doc = frappe.db.exists(
                 "Navari Slade360 eTims Settings",
                 {
@@ -25,4 +25,3 @@ class NavariKRAeTimsSettings(Document):
                 frappe.throw(
                     f"Only one active setting is allowed for bhfid '{self.bhfid}' and company '{self.company}'."
                 )
-
