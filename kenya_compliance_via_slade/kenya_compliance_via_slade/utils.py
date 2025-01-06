@@ -230,18 +230,7 @@ def get_current_environment_state(
     return environment
 
 
-def get_server_url(company_name: str, vendor: str, branch_id: str = "00") -> str | None:
-    settings = get_curr_env_etims_settings(company_name, vendor, branch_id)
-
-    if settings:
-        server_url = settings.get("server_url")
-
-        return server_url
-
-    return
-
-
-def get_slade_server_url(company_name: str, branch_id: str = "00") -> str | None:
+def get_server_url(company_name: str, branch_id: str = "00") -> str | None:
     settings = frappe.db.get_value(
         SETTINGS_DOCTYPE_NAME,
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
@@ -262,23 +251,8 @@ def get_slade_server_url(company_name: str, branch_id: str = "00") -> str | None
     return
 
 
+
 def build_headers(
-    company_name: str, vendor: str, branch_id: str = "00"
-) -> dict[str, str] | None:
-    settings = get_curr_env_etims_settings(company_name, vendor, branch_id=branch_id)
-
-    if settings:
-        headers = {
-            "tin": settings.get("tin"),
-            "bhfId": settings.get("bhfid"),
-            "cmcKey": settings.get("communication_key"),
-            "Content-Type": "application/json",
-        }
-
-        return headers
-
-
-def build_slade_headers(
     company_name: str, branch_id: str = "00"
 ) -> dict[str, str] | None:
     """

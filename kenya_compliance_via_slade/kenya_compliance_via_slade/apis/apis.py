@@ -26,8 +26,6 @@ from ..utils import (
     get_route_path,
     get_server_url,
     make_get_request,
-    build_slade_headers,
-    get_slade_server_url,
     process_dynamic_url,
     split_user_email,
 )
@@ -52,13 +50,10 @@ from .remote_response_status_handlers import (
 )
 
 
-from .api_builder import Slade360EndpointsBuilder
-
-endpoints_builder = Slade360EndpointsBuilder()
-from .api_builder import Slade360EndpointsBuilder
+from .api_builder import EndpointsBuilder
+endpoints_builder = EndpointsBuilder()
 from .remote_response_status_handlers import on_slade_error
 
-endpoints_builder = Slade360EndpointsBuilder()
 
 
 def process_request(request_data: str | dict, route_key: str, handler_function, method: str = "GET", doctype=SETTINGS_DOCTYPE_NAME) -> str:
@@ -71,8 +66,8 @@ def process_request(request_data: str | dict, route_key: str, handler_function, 
     branch_id = data.get("branch_id") or "00"
     document_name = data.get("document_name", None)
 
-    headers = build_slade_headers(company_name, branch_id)
-    server_url = get_slade_server_url(company_name, branch_id)
+    headers = build_headers(company_name, branch_id)
+    server_url = get_server_url(company_name, branch_id)
     route_path, _ = get_route_path(route_key, "VSCU Slade 360")
     
     route_path = process_dynamic_url(route_path, request_data)
