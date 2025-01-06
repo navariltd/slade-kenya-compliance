@@ -15,7 +15,6 @@ from aiohttp import ClientTimeout
 
 import frappe
 from frappe.model.document import Document
-from erpnext.controllers.taxes_and_totals import get_itemised_tax_breakup_data
 
 from .doctype.doctype_names_mapping import (
     ENVIRONMENT_SPECIFICATION_DOCTYPE_NAME,
@@ -229,25 +228,14 @@ def get_current_environment_state(
     return environment
 
 
-def get_server_url(company_name: str, vendor: str, branch_id: str = "00") -> str | None:
-    settings = get_curr_env_etims_settings(company_name, vendor, branch_id)
-
-    if settings:
-        server_url = settings.get("server_url")
-
-        return server_url
-
-    return
-
-
-def get_slade_server_url(company_name: str, branch_id: str = "00") -> str | None:
+def get_server_url(company_name: str, branch_id: str = "00") -> str | None:
     settings = frappe.db.get_value(
-        "Navari Slade360 eTims Settings",
+        SETTINGS_DOCTYPE_NAME,
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
         ["server_url"],
         as_dict=True,
     ) or frappe.db.get_value(
-        "Navari Slade360 eTims Settings",
+        SETTINGS_DOCTYPE_NAME,
         {"company": company_name, "is_active": 1},
         ["server_url"],
         as_dict=True,
@@ -261,25 +249,7 @@ def get_slade_server_url(company_name: str, branch_id: str = "00") -> str | None
     return
 
 
-def build_headers(
-    company_name: str, vendor: str, branch_id: str = "00"
-) -> dict[str, str] | None:
-    settings = get_curr_env_etims_settings(company_name, vendor, branch_id=branch_id)
-
-    if settings:
-        headers = {
-            "tin": settings.get("tin"),
-            "bhfId": settings.get("bhfid"),
-            "cmcKey": settings.get("communication_key"),
-            "Content-Type": "application/json",
-        }
-
-        return headers
-
-
-def build_slade_headers(
-    company_name: str, branch_id: str = "00"
-) -> dict[str, str] | None:
+def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | None:
     """
     Build headers for Slade360 API requests.
     Checks for token validity and refreshes the token if expired.
@@ -292,12 +262,12 @@ def build_slade_headers(
         dict[str, str] | None: The headers including the refreshed token or None if failed.
     """
     settings = frappe.db.get_value(
-        "Navari Slade360 eTims Settings",
+        SETTINGS_DOCTYPE_NAME,
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
         ["access_token", "token_expiry", "name"],
         as_dict=True,
-    ) or  frappe.db.get_value(
-        "Navari Slade360 eTims Settings",
+    ) or frappe.db.get_value(
+        SETTINGS_DOCTYPE_NAME,
         {"company": company_name, "is_active": 1},
         ["access_token", "token_expiry", "name"],
         as_dict=True,
@@ -323,7 +293,7 @@ def build_slade_headers(
                 )
 
             access_token = new_settings.access_token
-            
+
         logged_user = frappe.session.user
         user_data = frappe.db.get_value(
             "Navari eTims User",
@@ -333,13 +303,13 @@ def build_slade_headers(
         )
 
         workstation = user_data.get("workstation") if user_data else None
-        
+
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-        
+
         if workstation:
             headers["X-Workstation"] = workstation
 
@@ -371,7 +341,7 @@ def build_invoice_payload(
     invoice: Document, invoice_type_identifier: Literal["S", "C"], company_name: str
 ) -> dict[str, str | int | float]:
     # Retrieve taxation data for the invoice
-    taxation_type = get_taxation_types(invoice)
+    get_taxation_types(invoice)
     # frappe.throw(str(taxation_type))
     """Converts relevant invoice data to a JSON payload
 
@@ -387,223 +357,22 @@ def build_invoice_payload(
     invoice_name = invoice.name
     if invoice.amended_from:
         invoice_name = clean_invc_no(invoice_name)
-        
+
     payload = {
         # "made_by": invoice.owner,
         "document_name": invoice.name,
         "branch_id": invoice.branch,
         "company_name": company_name,
-        
         "description": invoice.remarks or "New",
-        "payment_method": invoice.custom_payment_type,   
+        "payment_method": invoice.custom_payment_type,
         "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
         "invoice_date": str(invoice.posting_date),
         "currency": frappe.get_value("Currency", invoice.currency, "slade_id"),
         "source_organisation_unit": invoice.custom_slade_organisation,
         "sales_type": "cash",
-        # "amount": round(invoice.grand_total, 2),
-        
-        # "updated_by_name": invoice.modified_by,
-        # "parent_document_number": invoice.return_against,
-        # "active_pricelist": invoice.selling_price_list,
-        # "invoice_amount_balance": round(invoice.outstanding_amount, 2),
-        # "paid_invoice_amount": round(invoice.grand_total - invoice.outstanding_amount, 2),
-        # "total_amount_paid": round(invoice.grand_total - invoice.outstanding_amount, 2),
-        # "tax_exclusive_amount": round(invoice.net_total, 2),
-        # "pricelist": invoice.selling_price_list,
-        # "payments": invoice.payments or [],
-        # "payment_runs": [], 
-        # "sales_invoice_tax_table": {
-        #     "A":  taxation_type.get("A", {}).get("tax_rate", 0),
-        #     "B":  taxation_type.get("B", {}).get("tax_rate", 0),
-        #     "C":  taxation_type.get("C", {}).get("tax_rate", 0),
-        #     "D":  taxation_type.get("D", {}).get("tax_rate", 0),
-        #     "E":  taxation_type.get("E", {}).get("tax_rate", 0),
-        # },
-        # "total_gross_amount": round(invoice.base_total, 2),
-        # "total_vat": round(invoice.total_taxes_and_charges, 2),
-        # "total_items_discount": round(invoice.discount_amount, 2),
-        # "total_tax": round(invoice.total_taxes_and_charges, 2),
-        # "total_net_amount": round(invoice.net_total, 2),
-        # "active": invoice.docstatus == 1,
-        # "document_number": invoice.name,
-        # "source_document": invoice.return_against,
-        # "reference_number": invoice.po_no,
-        # "parent_document": invoice.return_against,
-        # "payment_term": invoice.payment_terms_template,  
     }
 
     return payload
-
-    # payload = {
-    #     "invcNo": get_invoice_number(invoice_name),
-    #     "orgInvcNo": (
-    #         0
-    #         if invoice_type_identifier == "S"
-    #         else frappe.get_doc(
-    #             "Sales Invoice", invoice.return_against
-    #         ).custom_submission_sequence_number
-    #     ),
-    #     "trdInvcNo": invoice_name,
-    #     "custTin": invoice.tax_id if invoice.tax_id else None,
-    #     "custNm": None,
-    #     "rcptTyCd": invoice_type_identifier if invoice_type_identifier == "S" else "R",
-    #     "pmtTyCd": invoice.custom_payment_type_code,
-    #     "salesSttsCd": invoice.custom_transaction_progress_code,
-    #     "cfmDt": validated_date,
-    #     "salesDt": sales_date,
-    #     "stockRlsDt": validated_date,
-    #     "cnclReqDt": None,
-    #     "cnclDt": None,
-    #     "rfdDt": None,
-    #     "rfdRsnCd": None,
-    #     "totItemCnt": len(items_list),
-    #     "taxRtA": taxation_type.get("A", {}).get("tax_rate", 0),
-    #     "taxRtB": taxation_type.get("B", {}).get("tax_rate", 0),
-    #     "taxRtC": taxation_type.get("C", {}).get("tax_rate", 0),
-    #     "taxRtD": taxation_type.get("D", {}).get("tax_rate", 0),
-    #     "taxRtE": taxation_type.get("E", {}).get("tax_rate", 0),
-    #     "taxAmtA": taxation_type.get("A", {}).get("tax_amount", 0),
-    #     "taxAmtB": taxation_type.get("B", {}).get("tax_amount", 0),
-    #     "taxAmtC": taxation_type.get("C", {}).get("tax_amount", 0),
-    #     "taxAmtD": taxation_type.get("D", {}).get("tax_amount", 0),
-    #     "taxAmtE": taxation_type.get("E", {}).get("tax_amount", 0),
-    #     "taxblAmtA": taxation_type.get("A", {}).get("taxable_amount", 0),
-    #     "taxblAmtB": taxation_type.get("B", {}).get("taxable_amount", 0),
-    #     "taxblAmtC": taxation_type.get("C", {}).get("taxable_amount", 0),
-    #     "taxblAmtD": taxation_type.get("D", {}).get("taxable_amount", 0),
-    #     "taxblAmtE": taxation_type.get("E", {}).get("taxable_amount", 0),
-    #     "totTaxblAmt": round(invoice.base_net_total, 2),
-    #     "totTaxAmt": round(invoice.total_taxes_and_charges, 2),
-    #     "totAmt": round(invoice.grand_total, 2),
-    #     "prchrAcptcYn": "Y",
-    #     "remark": None,
-    #     "regrId": split_user_email(invoice.owner),
-    #     "regrNm": invoice.owner,
-    #     "modrId": split_user_email(invoice.modified_by),
-    #     "modrNm": invoice.modified_by,
-    #     "receipt": {
-    #         "custTin": invoice.tax_id if invoice.tax_id else None,
-    #         "custMblNo": None,
-    #         "rptNo": 1,
-    #         "rcptPbctDt": validated_date,
-    #         "trdeNm": "",
-    #         "adrs": "",
-    #         "topMsg": "ERPNext",
-    #         "btmMsg": "",
-    #         "prchrAcptcYn": "Y",
-    #     },
-    #     "itemList": items_list,
-    # }
-
-    # return payload
-
-
-# def build_invoice_payload(
-#     invoice: Document, invoice_type_identifier: Literal["S", "C"], company_name: str
-# ) -> dict[str, str | int]:
-#     taxation_type = get_taxation_types(invoice)
-#     # frappe.throw(str(taxation_type))
-
-#     """Converts relevant invoice data to a JSON payload
-
-#     Args:
-#         invoice (Document): The Invoice record to generate data from
-#         invoice_type_identifier (Literal[&quot;S&quot;, &quot;C&quot;]): The
-#         Invoice type identifer. S for Sales Invoice, C for Credit Notes
-#         company_name (str): The company name used to fetch the valid settings doctype record
-
-#     Returns:
-#         dict[str, str | int]: The payload
-#     """
-#     post_time = invoice.posting_time
-
-#     if isinstance(post_time, timedelta):
-#         # handles instances when the posting_time is not a string
-#         # especially when doing bulk submissions
-#         post_time = str(post_time)
-
-#     # TODO: Check why posting time is always invoice submit time
-#     posting_date = build_datetime_from_string(
-#         f"{invoice.posting_date} {post_time[:8].replace('.', '')}",
-#         format="%Y-%m-%d %H:%M:%S",
-#     )
-
-#     validated_date = posting_date.strftime("%Y%m%d%H%M%S")
-#     sales_date = posting_date.strftime("%Y%m%d")
-
-#     items_list = get_invoice_items_list(invoice)
-
-#     invoice_name=invoice.name
-#     if invoice.amended_from is not None:
-#         invoice_name=clean_invc_no(invoice_name)
-#     payload = {
-#         # FIXME: Use document's naming series to get invcNo and not etims_serial_number field
-#         # FIXME: The document's number series should be based off of the branch. Switching branches should reset the number series
-#         # "invcNo": frappe.db.get_value(
-#         #     "Sales Invoice", {"name": invoice.name}, ["etims_serial_number"]
-#         # ),
-#         "invcNo":get_invoice_number(invoice_name),
-#         "orgInvcNo": (
-#             0
-#             if invoice_type_identifier == "S"
-#             else frappe.get_doc(
-#                 "Sales Invoice", invoice.return_against
-#             ).custom_submission_sequence_number
-#         ),
-#         "trdInvcNo": invoice_name,
-#         "custTin": invoice.tax_id if invoice.tax_id else None,
-#         "custNm": None,
-#         "rcptTyCd": invoice_type_identifier if invoice_type_identifier == "S" else "R",
-#         "pmtTyCd": invoice.custom_payment_type_code,
-#         "salesSttsCd": invoice.custom_transaction_progress_code,
-#         "cfmDt": validated_date,
-#         "salesDt": sales_date,
-#         "stockRlsDt": validated_date,
-#         "cnclReqDt": None,
-#         "cnclDt": None,
-#         "rfdDt": None,
-#         "rfdRsnCd": None,
-#         "totItemCnt": len(items_list),
-#         "taxblAmtA": invoice.custom_taxbl_amount_a,
-#         "taxblAmtB": invoice.custom_taxbl_amount_b,
-#         "taxblAmtC": invoice.custom_taxbl_amount_c,
-#         "taxblAmtD": invoice.custom_taxbl_amount_d,
-#         "taxblAmtE": invoice.custom_taxbl_amount_e,
-#         "taxRtA": 0,
-#         "taxRtB": 16 if invoice.custom_tax_b else 0,
-#         "taxRtC": 0,
-#         "taxRtD": 0,
-#         "taxRtE": 8 if invoice.custom_tax_e else 0,
-#         "taxAmtA": invoice.custom_tax_a,
-#         "taxAmtB": invoice.custom_tax_b,
-#         "taxAmtC": invoice.custom_tax_c,
-#         "taxAmtD": invoice.custom_tax_d,
-#         "taxAmtE": invoice.custom_tax_e,
-#         "totTaxblAmt": round(invoice.base_net_total, 2),
-#         "totTaxAmt": round(invoice.total_taxes_and_charges, 2),
-#         "totAmt": round(invoice.grand_total, 2),
-#         "prchrAcptcYn": "Y",
-#         "remark": None,
-#         "regrId": split_user_email(invoice.owner),
-#         "regrNm": invoice.owner,
-#         "modrId": split_user_email(invoice.modified_by),
-#         "modrNm": invoice.modified_by,
-#         "receipt": {
-#             "custTin": invoice.tax_id if invoice.tax_id else None,
-#             "custMblNo": None,
-#             "rptNo": 1,
-#             "rcptPbctDt": validated_date,
-#             "trdeNm": "",
-#             "adrs": "",
-#             "topMsg": "ERPNext",
-#             "btmMsg": "",
-#             "prchrAcptcYn": "Y",
-#         },
-#         "itemList": items_list,
-#     }
-#     # frappe.throw(str(payload))
-#     return payload
 
 
 def get_invoice_items_list(invoice: Document) -> list[dict[str, str | int | None]]:
@@ -627,41 +396,13 @@ def get_invoice_items_list(invoice: Document) -> list[dict[str, str | int | None
         # actual_tax_amount = item_taxes[index][tax_head]["tax_amount"]
 
         # tax_amount = round(actual_tax_amount, 2)
-        
+
         items_list.append(
             {
                 "product": item.item_code,
                 "quantity": abs(item.qty),
             }
         )
-
-        # items_list.append(
-        #     {
-        #         "itemSeq": item.idx,
-        #         "itemCd": item.custom_item_code_etims,
-        #         "itemClsCd": item.custom_item_classification,
-        #         "itemNm": item.item_name,
-        #         "bcd": item.barcode,
-        #         "pkgUnitCd": item.custom_packaging_unit_code,
-        #         "pkg": 1,
-        #         "qtyUnitCd": item.custom_unit_of_quantity_code,
-        #         "qty": abs(item.qty),
-        #         "prc": round(item.base_rate, 2),
-        #         "splyAmt": round(item.base_amount, 2),
-        #         "dcRt": round(item.discount_percentage, 2) or 0,
-        #         "dcAmt": round(item.discount_amount, 2) or 0,
-        #         "isrccCd": None,
-        #         "isrccNm": None,
-        #         "isrcRt": None,
-        #         "isrcAmt": None,
-        #         "taxTyCd": item.custom_taxation_type_code,
-        #         "taxblAmt": round(item.net_amount, 2),  # taxable_amount,
-        #         # "taxAmt": tax_amount,
-        #         "taxAmt": round(item.custom_tax_amount, 2),
-        #         "totAmt": round(item.net_amount + item.custom_tax_amount, 2),
-        #         # "totAmt": (taxable_amount + tax_amount),
-        #     }
-        # )
 
     return items_list
 
@@ -699,7 +440,9 @@ def get_curr_env_etims_settings(
         return settings
 
 
-def get_most_recent_sales_number(company_name: str, vendor="OSCU KRA") -> int | None:
+def get_most_recent_sales_number(
+    company_name: str, vendor: str = "OSCU KRA"
+) -> int | None:
     settings = get_curr_env_etims_settings(company_name, vendor)
 
     if settings:
@@ -799,7 +542,7 @@ def before_save_(doc: "Document", method: str | None = None) -> None:
     calculate_tax(doc)
 
 
-def get_invoice_number(invoice_name):
+def get_invoice_number(invoice_name: str) -> int:
     """
     Extracts the numeric portion from the invoice naming series.
 
@@ -819,13 +562,13 @@ def get_invoice_number(invoice_name):
 """For cancelled and amended invoices"""
 
 
-def clean_invc_no(invoice_name):
+def clean_invc_no(invoice_name: str) -> str:
     if "-" in invoice_name:
         invoice_name = "-".join(invoice_name.split("-")[:-1])
     return invoice_name
 
 
-def get_taxation_types(doc):
+def get_taxation_types(doc: dict) -> dict:
     taxation_totals = {}
 
     # Loop through each item in the Sales Invoice
@@ -867,6 +610,7 @@ def authenticate_and_get_token(
         "client_id": client_id,
         "client_secret": client_secret,
     }
+    print(payload)
     encoded_payload = urlencode(payload)
 
     headers = {
@@ -900,13 +644,13 @@ def authenticate_and_get_token(
 
 
 @frappe.whitelist()
-def update_navari_settings_with_token(docname):
-    settings_doc = frappe.get_doc("Navari Slade360 eTims Settings", docname)
+def update_navari_settings_with_token(docname: str) -> str:
+    settings_doc = frappe.get_doc(SETTINGS_DOCTYPE_NAME, docname)
     auth_server_url = settings_doc.auth_server_url
     username = settings_doc.auth_username
-    client_id = settings_doc.client_id    
-    password = settings_doc.get_password('auth_password')
-    client_secret = settings_doc.get_password('client_secret')
+    client_id = settings_doc.client_id
+    password = settings_doc.get_password("auth_password")
+    client_secret = settings_doc.get_password("client_secret")
 
     token_details = authenticate_and_get_token(
         auth_server_url, username, password, client_id, client_secret
@@ -923,8 +667,9 @@ def update_navari_settings_with_token(docname):
     return settings_doc
 
 
-
-def get_link_value(doctype: str, field_name: str, value: str, return_field : str = "name"):
+def get_link_value(
+    doctype: str, field_name: str, value: str, return_field: str = "name"
+) -> str:
     try:
         return frappe.db.get_value(doctype, {field_name: value}, return_field)
     except Exception as e:
@@ -933,20 +678,26 @@ def get_link_value(doctype: str, field_name: str, value: str, return_field : str
             message=f"Error while fetching link for {doctype} with {field_name}={value}: {str(e)}",
         )
         return None
-    
 
-def get_or_create_link(doctype: str, field_name: str, value: str):
+
+def get_or_create_link(doctype: str, field_name: str, value: str) -> str:
     if not value:
         return None
-    
+
     try:
         link_name = frappe.db.get_value(doctype, {field_name: value}, "name")
         if not link_name:
-            link_name = frappe.get_doc({
-                "doctype": doctype,
-                field_name: value,
-                "code": value,
-            }).insert(ignore_permissions=True, ignore_mandatory=True).name
+            link_name = (
+                frappe.get_doc(
+                    {
+                        "doctype": doctype,
+                        field_name: value,
+                        "code": value,
+                    }
+                )
+                .insert(ignore_permissions=True, ignore_mandatory=True)
+                .name
+            )
             frappe.db.commit()
         return link_name
     except Exception as e:
@@ -957,9 +708,9 @@ def get_or_create_link(doctype: str, field_name: str, value: str):
         return None
 
 
-def process_dynamic_url(route_path: str, request_data) -> str:
-    import re
+def process_dynamic_url(route_path: str, request_data: dict | str) -> str:
     import json
+    import re
 
     if isinstance(request_data, str):
         try:
@@ -970,9 +721,12 @@ def process_dynamic_url(route_path: str, request_data) -> str:
     placeholders = re.findall(r"\{(.*?)\}", route_path)
     for placeholder in placeholders:
         if placeholder in request_data:
-            route_path = route_path.replace(f"{{{placeholder}}}", str(request_data[placeholder]))
+            route_path = route_path.replace(
+                f"{{{placeholder}}}", str(request_data[placeholder])
+            )
         else:
-            raise ValueError(f"Missing required placeholder: '{placeholder}' in request_data.")
+            raise ValueError(
+                f"Missing required placeholder: '{placeholder}' in request_data."
+            )
 
     return route_path
-

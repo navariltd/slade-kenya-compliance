@@ -1,35 +1,26 @@
 from collections import defaultdict
-from functools import partial
 
 import frappe
 from frappe.model.document import Document
+
 from erpnext.controllers.taxes_and_totals import get_itemised_tax_breakup_data
 
 from ...apis.api_builder import EndpointsBuilder
 from ...apis.apis import process_request
 from ...apis.remote_response_status_handlers import (
-    on_error,
     purchase_invoice_submission_on_success,
 )
-from ...utils import (
-    build_headers,
-    extract_document_series_number,
-    get_route_path,
-    get_server_url,
-    get_taxation_types,
-    quantize_number,
-    split_user_email,
-)
+from ...utils import extract_document_series_number, get_taxation_types, quantize_number
 
 endpoints_builder = EndpointsBuilder()
 
 
 def validate(doc: Document, method: str) -> None:
-    item_taxes = get_itemised_tax_breakup_data(doc)
+    get_itemised_tax_breakup_data(doc)
     if not doc.branch:
         frappe.throw("Please ensure the branch is set before submitting the document")
-    taxes_breakdown = defaultdict(list)
-    taxable_breakdown = defaultdict(list)
+    defaultdict(list)
+    defaultdict(list)
     if not doc.taxes:
         vat_acct = frappe.get_value(
             "Account", {"account_type": "Tax", "tax_rate": "16"}, ["name"], as_dict=True
@@ -64,7 +55,11 @@ def validate(doc: Document, method: str) -> None:
 def on_submit(doc: Document, method: str) -> None:
     if doc.is_return == 0 and doc.update_stock == 1:
         # TODO: Handle cases when item tax templates have not been picked
-        company_name = doc.company or frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name")
+        company_name = (
+            doc.company
+            or frappe.defaults.get_user_default("Company")
+            or frappe.get_value("Company", {}, "name")
+        )
         payload = payload = build_purchase_invoice_payload(doc, company_name)
         process_request(
             payload,
@@ -73,11 +68,11 @@ def on_submit(doc: Document, method: str) -> None:
             method="POST",
             doctype="Purchase Invoice",
         )
-        
+
 
 def build_purchase_invoice_payload(doc: Document, company_name: str) -> dict:
-    series_no = extract_document_series_number(doc)
-    items_list = get_items_details(doc)
+    extract_document_series_number(doc)
+    get_items_details(doc)
     taxation_type = get_taxation_types(doc)
 
     # payload = {
@@ -124,26 +119,25 @@ def build_purchase_invoice_payload(doc: Document, company_name: str) -> dict:
     #     "modrId": split_user_email(doc.modified_by),
     #     "itemList": items_list,
     # }
-    
+
     payload = {
         "made_by": doc.owner,
         "document_name": doc.name,
-        "branch": doc.branch, 
+        "branch": doc.branch,
         "company_name": company_name,
         "can_send_to_etims": True,
         "updated_by_name": doc.modified_by,
         "paid_invoice_amount": round(doc.grand_total - doc.outstanding_amount, 2),
         "total_amount": round(doc.grand_total, 2),
-        "taxable_rate_A":  taxation_type.get("A", {}).get("tax_rate", 0),
-        "taxable_rate_B":  taxation_type.get("B", {}).get("tax_rate", 0),
-        "taxable_rate_C":  taxation_type.get("C", {}).get("tax_rate", 0),
-        "taxable_rate_D":  taxation_type.get("D", {}).get("tax_rate", 0),
+        "taxable_rate_A": taxation_type.get("A", {}).get("tax_rate", 0),
+        "taxable_rate_B": taxation_type.get("B", {}).get("tax_rate", 0),
+        "taxable_rate_C": taxation_type.get("C", {}).get("tax_rate", 0),
+        "taxable_rate_D": taxation_type.get("D", {}).get("tax_rate", 0),
         "total_taxable_amount": round(doc.base_total, 2),
         "total_tax_amount": round(doc.total_taxes_and_charges, 2),
         "supplier_name": doc.supplier_name,
         "organisation": doc.custom_slade_organisation,
-    } 
-
+    }
 
     return payload
 

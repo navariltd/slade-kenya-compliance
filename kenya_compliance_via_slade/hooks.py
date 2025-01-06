@@ -245,7 +245,9 @@ doc_events = {
     # 		"on_trash": "method"
     # 	}
     "Sales Invoice": {
-        "before_save": ["kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"],
+        "before_save": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"
+        ],
         "on_submit": [
             "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.sales_invoice.on_submit"
         ],
@@ -257,7 +259,9 @@ doc_events = {
         ],
     },
     "Purchase Invoice": {
-        "before_save": ["kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"],
+        "before_save": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.utils.before_save_"
+        ],
         "on_submit": [
             "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.purchase_invoice.on_submit"
         ],
@@ -297,6 +301,7 @@ scheduler_events = {
     # 	],
     "monthly": [
         "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_code_lists",
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.search_organisations_request",
         "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.get_item_classification_codes",
     ],
 }

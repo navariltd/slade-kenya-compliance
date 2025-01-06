@@ -5,25 +5,68 @@ import frappe.defaults
 from frappe.model.document import Document
 
 from ..apis.api_builder import EndpointsBuilder
-from ..apis.remote_response_status_handlers import on_error
+from ..apis.apis import process_request
+from ..apis.remote_response_status_handlers import notices_search_on_success
 from ..doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
-    ORGANISATION_UNIT_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     PAYMENT_TYPE_DOCTYPE_NAME,
-    SETTINGS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
 )
 from ..overrides.server.stock_ledger_entry import on_update
-from ..utils import (
-    build_headers,
-    get_route_path,
-    get_server_url,
-)
 
 endpoints_builder = EndpointsBuilder()
+
+
+@frappe.whitelist()
+def perform_notice_search(request_data: str) -> str:
+    """Function to perform notice search."""
+    message = process_request(
+        request_data, "NoticeSearchReq", notices_search_on_success
+    )
+    return message
+
+
+@frappe.whitelist()
+def refresh_code_lists(request_data: str) -> str:
+    """Refresh code lists based on request data."""
+    tasks = [
+        ("CurrencyCountrySearchReq", update_countries),
+        ("CurrencySearchReq", update_currencies),
+        ("PackagingUnitSearchReq", update_packaging_units),
+        ("UOMSearchReq", update_unit_of_quantity),
+        ("TaxSearchReq", update_taxation_type),
+        ("PaymentMtdSearchReq", update_payment_methods),
+    ]
+
+    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
+
+    return " ".join(messages)
+
+
+@frappe.whitelist()
+def search_organisations_request(request_data: str) -> str:
+    """Refresh code lists based on request data."""
+    tasks = [
+        ("OrgSearchReq", update_organisations),
+        ("BhfSearchReq", update_branches),
+        ("DeptSearchReq", update_departments),
+    ]
+
+    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
+
+    return " ".join(messages)
+
+
+@frappe.whitelist()
+def get_item_classification_codes(request_data: str) -> str:
+    """Function to get item classification codes."""
+    message = process_request(
+        request_data, "ItemClsSearchReq", update_item_classification_codes
+    )
+    return message
 
 
 def refresh_notices() -> None:
@@ -180,6 +223,19 @@ def update_documents(
         for field, value in field_mapping.items():
             if callable(value):
                 setattr(doc, field, value(record))
+            elif isinstance(value, dict):
+                linked_doctype = value.get("doctype")
+                link_field = value.get("link_field")
+                link_filter_field = value.get("filter_field", "custom_slade_id")
+                link_extract_field = value.get("extract_field", "name")
+                link_filter_value = record.get(link_field)
+                if linked_doctype and link_filter_value:
+                    linked_value = frappe.db.get_value(
+                        linked_doctype,
+                        {link_filter_field: link_filter_value},
+                        link_extract_field,
+                    )
+                    setattr(doc, field, linked_value or "")
             else:
                 setattr(doc, field, record.get(value, ""))
 
@@ -208,7 +264,7 @@ def update_packaging_units(data: dict, document_name: str) -> None:
         "code_description": "description",
     }
     update_documents(data, PACKAGING_UNIT_DOCTYPE_NAME, field_mapping)
-    
+
 
 def update_payment_methods(data: dict, document_name: str) -> None:
     field_mapping = {
@@ -222,11 +278,10 @@ def update_payment_methods(data: dict, document_name: str) -> None:
         "active": lambda x: 1 if x.get("active") else 0,
         "code_name": "name",
         "description": "description",
-        "organisation": "organisation",
-        "account": "account"
+        "account": "account",
     }
     update_documents(data, PAYMENT_TYPE_DOCTYPE_NAME, field_mapping, filter_field="id")
-    
+
 
 def update_currencies(data: dict, document_name: str) -> None:
     field_mapping = {
@@ -267,10 +322,12 @@ def update_taxation_type(data: dict, document_name: str) -> None:
             else taxation_type["name"]
         )
         try:
-            doc_name = frappe.db.get_value(TAXATION_TYPE_DOCTYPE_NAME, {"cd": code}, "name")
+            doc_name = frappe.db.get_value(
+                TAXATION_TYPE_DOCTYPE_NAME, {"cd": code}, "name"
+            )
             doc = frappe.get_doc(TAXATION_TYPE_DOCTYPE_NAME, doc_name)
 
-        except Exception as e:
+        except Exception:
             doc = frappe.new_doc(TAXATION_TYPE_DOCTYPE_NAME)
 
         finally:
@@ -289,12 +346,14 @@ def update_taxation_type(data: dict, document_name: str) -> None:
 def update_countries(data: list, document_name: str) -> None:
     doc: Document | None = None
     for code, details in data.items():
-        try:
-            country_name = details.get("name", "").strip().lower()
-            doc = frappe.get_doc(
-                COUNTRIES_DOCTYPE_NAME, {"name": ["like", country_name]}
-            )
-        except:
+        country_name = details.get("name", "").strip().lower()
+        existing_doc = frappe.get_value(
+            COUNTRIES_DOCTYPE_NAME, {"name": ["like", country_name]}
+        )
+
+        if existing_doc:
+            doc = frappe.get_doc(COUNTRIES_DOCTYPE_NAME, existing_doc)
+        else:
             doc = frappe.new_doc(COUNTRIES_DOCTYPE_NAME)
 
         doc.code = code
@@ -309,56 +368,99 @@ def update_countries(data: list, document_name: str) -> None:
 
 
 def update_organisations(data: dict, document_name: str) -> None:
-    doc_list = data if isinstance(data, list) else data.get("results", data)
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON string: {data}")
+
+    # Limiting to first 5 records temporarily; remove slicing [:5] later
+    doc_list = data if isinstance(data, list) else data.get("results", data)[:5]
+
     for record in doc_list:
-        create_org_parent_if_missing(record)
+        if isinstance(record, str):
+            continue
+
+        filter_value = record.get("organisation_name")
+        company_name = frappe.db.get_value(
+            "Company", {"company_name": filter_value}, "name"
+        )
+
+        if company_name:
+            doc = frappe.get_doc("Company", company_name)
+        else:
+            doc = frappe.new_doc("Company")
+            doc.default_currency = "KES"
+
+            doc.company_name = record.get("organisation_name", "Default Company")
+            doc.default_country = record.get("default_country", "Kenya")
+            doc.company_description = record.get(
+                "description", "No description provided."
+            )
+            doc.email = record.get("email_address", "no-email@default.com")
+            doc.phone_no = record.get("phone_number", "000-000-0000")
+            generated_abbr = "".join(
+                [word[0] for word in doc.company_name.split()]
+            ).upper()[:5]
+            existing_abbr = frappe.db.exists("Company", {"abbr": generated_abbr})
+
+            if existing_abbr:
+                counter = 1
+                unique_abbr = generated_abbr
+                while frappe.db.exists("Company", {"abbr": unique_abbr}):
+                    unique_abbr = f"{generated_abbr}{counter}"
+                    counter += 1
+                doc.abbr = unique_abbr
+            else:
+                doc.abbr = generated_abbr
+
+        doc.custom_slade_id = record.get("id", "")
+        doc.tax_id = record.get("organisation_tax_pin", "")
+        doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
+
+        doc.save()
+
+    frappe.db.commit()
+
+
+def update_branches(data: dict, document_name: str) -> None:
     field_mapping = {
-        "slade_id": "id",
-        "active": lambda x: 1 if x.get("active") else 0,
-        "phone_number": "phone_number",
-        "default_store": lambda x: x.get("default_store").get("id") if isinstance(x.get("default_store"), dict) else x.get("default_store"),
-        "organisation_tax_pin": "organisation_tax_pin",
-        "is_etims_verified": lambda x: 1 if x.get("is_etims_verified") else 0,
-        "org_name": "name",
-        "description": "description",
-        "email_address": "email_address",
-        "physical_address": "physical_address",
-        "postal_address": "postal_address",
-        "web_address": "web_address",
-        "orgunit_type": "orgunit_type",
-        "default_country": "default_country",
-        "etims_branch_id": "etims_branch_id",
-        "county_name": "county_name",
-        "sub_county_name": "sub_county_name",
-        "tax_locality_name": "tax_locality_name",
-        "location_description": "location_description",
-        "manager_name": "manager_name",
-        "is_headquater": lambda x: 1 if x.get("is_headquater") else 0,
-        "username": "username",
-        "password": "password",
-        "use_cluster_doc_details": lambda x: 1 if x.get("use_cluster_doc_details") else 0,
-        "parent_navari_slade360_organisation": "parent"
+        "custom_slade_id": "id",
+        "tax_id": "organisation_tax_pin",
+        "branch": "name",
+        "custom_etims_device_serial_no": "etims_device_serial_no",
+        "custom_branch_code": "etims_branch_id",
+        "custom_pin": "organisation_tax_pin",
+        "custom_branch_name": "name",
+        "custom_county_name": "county_name",
+        "custom_tax_locality_name": "tax_locality_name",
+        "custom_sub_county_name": "sub_county_name",
+        "custom_manager_name": "manager_name",
+        "custom_location_description": "location_description",
+        "custom_is_head_office": lambda x: 1 if x.get("is_headquater") else 0,
+        "company": {
+            "doctype": "Company",
+            "link_field": "organisation",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "custom_is_etims_branch": lambda x: 1 if x.get("branch_status") else 0,
+        "custom_is_etims_verified": lambda x: 1 if x.get("is_etims_verified") else 0,
     }
-    update_documents(data, ORGANISATION_UNIT_DOCTYPE_NAME, field_mapping, filter_field="id")
+    update_documents(data, "Branch", field_mapping, filter_field="id")
 
 
-def create_org_parent_if_missing(data: dict) -> None:
-    parent_id = data.get("parent", None)
-    
-    if not parent_id or not isinstance(parent_id, str) or len(parent_id.strip()) == 0:
-        return
-    
-    parent_exists = frappe.db.exists(ORGANISATION_UNIT_DOCTYPE_NAME, {"slade_id": parent_id})
-    if not parent_exists:
-        frappe.get_doc({
-            "doctype": ORGANISATION_UNIT_DOCTYPE_NAME,
-            "slade_id": parent_id,
-            "org_name": data.get("parent_name", ""),
-            "phone_number": data.get("parent_phone_number", ""),
-            "is_group": 1,
-        }).insert(ignore_permissions=True)
-    else:
-        parent_doc = frappe.get_doc(ORGANISATION_UNIT_DOCTYPE_NAME, {"slade_id": parent_id})
-        if parent_doc.is_group != 1:
-            parent_doc.is_group = 1  
-            parent_doc.save(ignore_permissions=True)
+def update_departments(data: dict, document_name: str) -> None:
+    field_mapping = {
+        "custom_slade_id": "id",
+        "tax_id": "organisation_tax_pin",
+        "department_name": "name",
+        "company": {
+            "doctype": "Company",
+            "link_field": "organisation",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "is_etims_verified": lambda x: 1 if x.get("is_etims_verified") else 0,
+    }
+    update_documents(data, "Department", field_mapping, filter_field="id")

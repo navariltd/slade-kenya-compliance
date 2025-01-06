@@ -1,24 +1,14 @@
-from collections import defaultdict
-from functools import partial
 from typing import Literal
 
 import frappe
 from frappe.model.document import Document
-from erpnext.controllers.taxes_and_totals import get_itemised_tax_breakup_data
 
 from ...apis.api_builder import EndpointsBuilder
+from ...apis.apis import process_request
 from ...apis.remote_response_status_handlers import (
-    on_error,
     sales_information_submission_on_success,
 )
-from ...apis.apis import process_request
-from ...utils import (
-    build_headers,
-    build_invoice_payload,
-    get_curr_env_etims_settings,
-    get_route_path,
-    get_server_url,
-)
+from ...utils import build_invoice_payload
 
 endpoints_builder = EndpointsBuilder()
 
@@ -33,7 +23,11 @@ def generic_invoices_on_submit_override(
         invoice_type (Literal[&quot;Sales Invoice&quot;, &quot;POS Invoice&quot;]):
         The Type of the invoice. Either Sales, or POS
     """
-    company_name = doc.company or frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name")
+    company_name = (
+        doc.company
+        or frappe.defaults.get_user_default("Company")
+        or frappe.get_value("Company", {}, "name")
+    )
 
     invoice_identifier = "C" if doc.is_return else "S"
     payload = build_invoice_payload(doc, invoice_identifier, company_name)
@@ -52,11 +46,8 @@ def generic_invoices_on_submit_override(
         doctype=invoice_type,
     )
 
-    
-    
     # if headers and server_url and route_path:
-    #     url = f"{server_url}{route_path}" 
-
+    #     url = f"{server_url}{route_path}"
 
     #     endpoints_builder.headers = headers
     #     endpoints_builder.url = url

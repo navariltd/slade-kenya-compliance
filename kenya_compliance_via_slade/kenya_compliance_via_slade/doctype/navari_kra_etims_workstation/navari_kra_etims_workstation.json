@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "field:slade_id",
- "creation": "2024-12-14 09:51:08.714625",
+ "creation": "2025-01-06 12:42:21.273500",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -34,57 +34,41 @@
   "section_break_mvnn",
   "description",
   "column_break_fkrl",
-  "location_description",
-  "section_break_u5en",
-  "lft",
-  "rgt",
-  "is_group",
-  "old_parent",
-  "parent_navari_slade360_organisation"
+  "location_description"
  ],
  "fields": [
   {
-   "fieldname": "section_break_u5en",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "lft",
-   "fieldtype": "Int",
-   "hidden": 1,
-   "label": "Left",
-   "no_copy": 1,
-   "read_only": 1
-  },
-  {
-   "fieldname": "rgt",
-   "fieldtype": "Int",
-   "hidden": 1,
-   "label": "Right",
-   "no_copy": 1,
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "is_group",
-   "fieldtype": "Check",
-   "label": "Is Group"
-  },
-  {
-   "fieldname": "old_parent",
-   "fieldtype": "Link",
-   "label": "Old Parent",
-   "options": "Navari Slade360 Organisation"
-  },
-  {
-   "fieldname": "parent_navari_slade360_organisation",
-   "fieldtype": "Link",
-   "ignore_user_permissions": 1,
-   "label": "Parent Navari Slade360 Organisation",
-   "options": "Navari Slade360 Organisation"
-  },
-  {
    "fieldname": "section_break_mgte",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "slade_id",
+   "fieldtype": "Data",
+   "label": "Slade ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "org_name",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Org Name"
+  },
+  {
+   "fieldname": "orgunit_type",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Orgunit Type"
+  },
+  {
+   "fieldname": "manager_name",
+   "fieldtype": "Data",
+   "label": "Manager Name"
   },
   {
    "fieldname": "phone_number",
@@ -101,13 +85,9 @@
    "label": "Default Store"
   },
   {
-   "fieldname": "org_name",
+   "fieldname": "default_country",
    "fieldtype": "Data",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Org Name"
+   "label": "Default Country"
   },
   {
    "fieldname": "column_break_stkg",
@@ -127,25 +107,6 @@
    "fieldname": "postal_address",
    "fieldtype": "Data",
    "label": "Postal Address"
-  },
-  {
-   "fieldname": "manager_name",
-   "fieldtype": "Data",
-   "label": "Manager Name"
-  },
-  {
-   "fieldname": "orgunit_type",
-   "fieldtype": "Data",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Orgunit Type"
-  },
-  {
-   "fieldname": "default_country",
-   "fieldtype": "Data",
-   "label": "Default Country"
   },
   {
    "fieldname": "web_address",
@@ -182,6 +143,16 @@
    "label": "Etims Branch ID"
   },
   {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "label": "Username"
+  },
+  {
+   "fieldname": "password",
+   "fieldtype": "Data",
+   "label": "Password"
+  },
+  {
    "default": "0",
    "fieldname": "is_etims_verified",
    "fieldtype": "Check",
@@ -200,21 +171,6 @@
    "label": "Is Headquater"
   },
   {
-   "fieldname": "description",
-   "fieldtype": "Small Text",
-   "label": "Description"
-  },
-  {
-   "fieldname": "username",
-   "fieldtype": "Data",
-   "label": "Username"
-  },
-  {
-   "fieldname": "password",
-   "fieldtype": "Data",
-   "label": "Password"
-  },
-  {
    "default": "0",
    "fieldname": "use_cluster_doc_details",
    "fieldtype": "Check",
@@ -225,6 +181,11 @@
    "fieldtype": "Section Break"
   },
   {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
    "fieldname": "column_break_fkrl",
    "fieldtype": "Column Break"
   },
@@ -232,21 +193,14 @@
    "fieldname": "location_description",
    "fieldtype": "Small Text",
    "label": "Location Description"
-  },
-  {
-   "fieldname": "slade_id",
-   "fieldtype": "Data",
-   "label": "Slade ID",
-   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
- "is_tree": 1,
  "links": [],
- "modified": "2024-12-19 20:33:18.747413",
+ "modified": "2025-01-06 12:42:38.505521",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
- "name": "Navari Slade360 Organisation",
+ "name": "Navari KRA eTims Workstation",
  "naming_rule": "By fieldname",
  "nsm_parent_field": "parent_navari_slade360_organisation",
  "owner": "Administrator",
@@ -265,6 +219,7 @@
   }
  ],
  "search_fields": "org_name,email_address,phone_number",
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

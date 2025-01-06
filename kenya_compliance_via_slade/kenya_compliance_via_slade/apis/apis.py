@@ -1,46 +1,35 @@
 import asyncio
 import json
-from datetime import datetime
 from functools import partial
 from secrets import token_hex
+from typing import Callable
 
 import aiohttp
 
 import frappe
 import frappe.defaults
 from frappe.model.document import Document
-from frappe.utils.dateutils import add_to_date
 
 from ..doctype.doctype_names_mapping import (
-    SETTINGS_DOCTYPE_NAME,
-    USER_DOCTYPE_NAME,
     COUNTRIES_DOCTYPE_NAME,
-    IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
-    ITEM_TYPE_DOCTYPE_NAME,
-    NOTICES_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
-    PRODUCT_TYPE_DOCTYPE_NAME,
-    REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
     REGISTERED_PURCHASES_DOCTYPE_NAME,
-    REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM,
-    REGISTERED_STOCK_MOVEMENTS_DOCTYPE_NAME,
+    SETTINGS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
 )
 from ..utils import (
-    build_datetime_from_string,
     build_headers,
-    build_slade_headers,
     get_link_value,
-    get_slade_server_url,
     get_route_path,
     get_server_url,
     make_get_request,
     process_dynamic_url,
     split_user_email,
 )
+from .api_builder import EndpointsBuilder
 from .remote_response_status_handlers import (
     customer_branch_details_submission_on_success,
     customer_insurance_details_submission_on_success,
@@ -48,10 +37,10 @@ from .remote_response_status_handlers import (
     customers_search_on_success,
     imported_item_submission_on_success,
     imported_items_search_on_success,
+    initialize_device_submission_on_success,
     item_composition_submission_on_success,
     item_registration_on_success,
-    item_search_on_success, 
-    notices_search_on_success,
+    item_search_on_success,
     on_error,
     purchase_search_on_success,
     search_branch_request_on_success,
@@ -59,39 +48,36 @@ from .remote_response_status_handlers import (
     submit_inventory_on_success,
     user_details_fetch_on_success,
     user_details_submission_on_success,
-    initialize_device_submission_on_success,
-)
-from ..background_tasks.tasks import (
-    update_countries,
-    update_currencies,
-    update_item_classification_codes,
-    update_organisations,
-    update_payment_methods,
-    update_packaging_units,
-    update_taxation_type,
-    update_unit_of_quantity,
 )
 
-from .api_builder import Slade360EndpointsBuilder
-from .remote_response_status_handlers import notices_search_on_success, on_slade_error
-
-endpoints_builder = Slade360EndpointsBuilder()
+endpoints_builder = EndpointsBuilder()
+from .remote_response_status_handlers import on_slade_error
 
 
-def process_request(request_data: str | dict, route_key: str, handler_function, method: str = "GET", doctype=SETTINGS_DOCTYPE_NAME) -> str:
+def process_request(
+    request_data: str | dict,
+    route_key: str,
+    handler_function: Callable,
+    method: str = "GET",
+    doctype: str = SETTINGS_DOCTYPE_NAME,
+) -> str:
     """Reusable function to process requests with common logic."""
     if isinstance(request_data, str):
         data = json.loads(request_data)
     elif isinstance(request_data, dict):
         data = request_data
-    company_name = data.get("company_name") or frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name")
+    company_name = (
+        data.get("company_name")
+        or frappe.defaults.get_user_default("Company")
+        or frappe.get_value("Company", {}, "name")
+    )
     branch_id = data.get("branch_id") or "00"
     document_name = data.get("document_name", None)
 
-    headers = build_slade_headers(company_name, branch_id)
-    server_url = get_slade_server_url(company_name, branch_id)
+    headers = build_headers(company_name, branch_id)
+    server_url = get_server_url(company_name, branch_id)
     route_path, _ = get_route_path(route_key, "VSCU Slade 360")
-    
+
     route_path = process_dynamic_url(route_path, request_data)
 
     if method == "GET":
@@ -106,7 +92,7 @@ def process_request(request_data: str | dict, route_key: str, handler_function, 
         endpoints_builder.headers = headers
         endpoints_builder.url = url
         endpoints_builder.payload = data
-        endpoints_builder.request_description = route_key 
+        endpoints_builder.request_description = route_key
         endpoints_builder.method = method
         endpoints_builder.success_callback = handler_function
         endpoints_builder.error_callback = on_slade_error
@@ -134,7 +120,7 @@ def bulk_submit_sales_invoices(docs_list: str) -> None:
         for invoice in all_sales_invoices:
             if record == invoice.name:
                 doc = frappe.get_doc("Sales Invoice", record, for_update=False)
-                on_submit(doc, method=None) 
+                on_submit(doc, method=None)
 
 
 @frappe.whitelist()
@@ -143,7 +129,7 @@ def bulk_register_item(docs_list: str) -> None:
 
     for record in data:
         is_registered = frappe.db.get_value("Item", record, "custom_item_registered")
-        if is_registered == 0:  
+        if is_registered == 0:
             item_name = frappe.db.get_value("Item", record, "name")
             perform_item_registration(item_name=str(item_name))
             print(f"Registered item: {record}")
@@ -159,33 +145,59 @@ def perform_customer_search(request_data: str) -> None:
         request_data (str): Data received from the client
     """
     return process_request(
-            request_data, "CustSearchReq", customer_search_on_success, method="POST", doctype="Customer"
-        )
-    
+        request_data,
+        "CustSearchReq",
+        customer_search_on_success,
+        method="POST",
+        doctype="Customer",
+    )
+
 
 @frappe.whitelist()
 def perform_item_registration(item_name: str) -> dict | None:
     item = frappe.get_doc("Item", item_name)
-    tax = get_link_value(TAXATION_TYPE_DOCTYPE_NAME, "cd", item.get("custom_taxation_type"), "slade_id")
+    tax = get_link_value(
+        TAXATION_TYPE_DOCTYPE_NAME, "cd", item.get("custom_taxation_type"), "slade_id"
+    )
     sent_to_slade = item.get("custom_sent_to_slade", False)
     custom_slade_id = item.get("custom_slade_id", None)
 
     request_data = {
         "name": item.get("item_name"),
-        "document_name": item.get("name"),        
+        "document_name": item.get("name"),
         "description": item.get("description"),
         "can_be_sold": True if item.get("is_sales_item") == 1 else False,
         "can_be_purchased": True if item.get("is_purchase_item") == 1 else False,
         "company_name": frappe.defaults.get_user_default("Company"),
         "code": item.get("item_code"),
         "scu_item_code": item.get("custom_item_code_etims"),
-        "scu_item_classification": get_link_value(ITEM_CLASSIFICATIONS_DOCTYPE_NAME, "itemclscd", item.get("custom_item_classification"), "slade_id"),
+        "scu_item_classification": get_link_value(
+            ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+            "itemclscd",
+            item.get("custom_item_classification"),
+            "slade_id",
+        ),
         "product_type": item.get("custom_product_type"),
         "item_type": item.get("custom_item_type"),
         "preferred_name": item.get("item_name"),
-        "country_of_origin": get_link_value(COUNTRIES_DOCTYPE_NAME, "code", item.get("custom_etims_country_of_origin_code"), "slade_id"),
-        "packaging_unit": get_link_value(PACKAGING_UNIT_DOCTYPE_NAME, "code", item.get("custom_packaging_unit"), "slade_id"),
-        "quantity_unit": get_link_value(UNIT_OF_QUANTITY_DOCTYPE_NAME, "code", item.get("custom_unit_of_quantity"), "slade_id"),
+        "country_of_origin": get_link_value(
+            COUNTRIES_DOCTYPE_NAME,
+            "code",
+            item.get("custom_etims_country_of_origin_code"),
+            "slade_id",
+        ),
+        "packaging_unit": get_link_value(
+            PACKAGING_UNIT_DOCTYPE_NAME,
+            "code",
+            item.get("custom_packaging_unit"),
+            "slade_id",
+        ),
+        "quantity_unit": get_link_value(
+            UNIT_OF_QUANTITY_DOCTYPE_NAME,
+            "code",
+            item.get("custom_unit_of_quantity"),
+            "slade_id",
+        ),
         "sale_taxes": [tax],
         "selling_price": round(item.get("valuation_rate", 0), 2),
         "purchasing_price": round(item.get("last_purchase_rate", 0), 2),
@@ -194,16 +206,24 @@ def perform_item_registration(item_name: str) -> dict | None:
     }
 
     if sent_to_slade and custom_slade_id:
-        request_data["id"] = custom_slade_id  
+        request_data["id"] = custom_slade_id
         process_request(
-            request_data, "ItemSaveReq", item_registration_on_success, method="PATCH", doctype="Item"
+            request_data,
+            "ItemSaveReq",
+            item_registration_on_success,
+            method="PATCH",
+            doctype="Item",
         )
     else:
         process_request(
-            request_data, "ItemSaveReq", item_registration_on_success, method="POST", doctype="Item"
+            request_data,
+            "ItemSaveReq",
+            item_registration_on_success,
+            method="POST",
+            doctype="Item",
         )
 
-  
+
 @frappe.whitelist()
 def send_insurance_details(request_data: str) -> None:
     data: dict = json.loads(request_data)
@@ -248,7 +268,9 @@ def send_insurance_details(request_data: str) -> None:
 def send_branch_customer_details(request_data: str) -> None:
     data = json.loads(request_data)
     phone_number = data.get("phone_number", "").replace(" ", "").strip()
-    data["phone_number"] = "+254" + phone_number[-9:] if len(phone_number) >= 9 else None
+    data["phone_number"] = (
+        "+254" + phone_number[-9:] if len(phone_number) >= 9 else None
+    )
 
     currency_name = data.get("currency")
     if "doctype" in data:
@@ -259,35 +281,62 @@ def send_branch_customer_details(request_data: str) -> None:
     if currency_name:
         data["currency"] = frappe.get_value("Currency", currency_name, "slade_id")
 
-    return process_request(json.dumps(data), "BhfCustSaveReq", customer_branch_details_submission_on_success, method="POST", doctype=doctype)
+    return process_request(
+        json.dumps(data),
+        "BhfCustSaveReq",
+        customer_branch_details_submission_on_success,
+        method="POST",
+        doctype=doctype,
+    )
 
 
 @frappe.whitelist()
 def search_customers_request(request_data: str) -> None:
-    return process_request(request_data, "CustomersSearchReq", customers_search_on_success)
-
+    return process_request(
+        request_data, "CustomersSearchReq", customers_search_on_success
+    )
 
 
 @frappe.whitelist()
 def get_customer_details(request_data: str) -> None:
-    return process_request(request_data, "CustomerSearchReq", customers_search_on_success)
+    return process_request(
+        request_data, "CustomerSearchReq", customers_search_on_success
+    )
 
 
 @frappe.whitelist()
 def get_my_user_details(request_data: str) -> None:
-    return process_request(request_data, "BhfUserSearchReq", user_details_fetch_on_success, method="GET", doctype=USER_DOCTYPE_NAME)
-    
+    return process_request(
+        request_data,
+        "BhfUserSearchReq",
+        user_details_fetch_on_success,
+        method="GET",
+        doctype=USER_DOCTYPE_NAME,
+    )
+
 
 @frappe.whitelist()
 def get_branch_user_details(request_data: str) -> None:
-    return process_request(request_data, "BhfUserSaveReq", user_details_fetch_on_success, method="GET", doctype=USER_DOCTYPE_NAME)
-    
+    return process_request(
+        request_data,
+        "BhfUserSaveReq",
+        user_details_fetch_on_success,
+        method="GET",
+        doctype=USER_DOCTYPE_NAME,
+    )
+
 
 @frappe.whitelist()
 def save_branch_user_details(request_data: str) -> None:
-    return process_request(request_data, "BhfUserSaveReq", user_details_submission_on_success, method="POST", doctype=USER_DOCTYPE_NAME)
-    
-    
+    return process_request(
+        request_data,
+        "BhfUserSaveReq",
+        user_details_submission_on_success,
+        method="POST",
+        doctype=USER_DOCTYPE_NAME,
+    )
+
+
 @frappe.whitelist()
 def create_branch_user() -> None:
     # TODO: Implement auto-creation through background tasks
@@ -317,10 +366,14 @@ def perform_item_search(request_data: str) -> None:
         request_data, "ItemSearchReq", item_search_on_success, doctype="Item"
     )
 
+
 @frappe.whitelist()
 def perform_import_item_search(request_data: str) -> None:
     process_request(
-        request_data, "ImportItemSearchReq", imported_items_search_on_success, doctype="Item"
+        request_data,
+        "ImportItemSearchReq",
+        imported_items_search_on_success,
+        doctype="Item",
     )
 
 
@@ -342,16 +395,22 @@ def perform_import_item_search_all_branches() -> None:
 @frappe.whitelist()
 def perform_purchases_search(request_data: str) -> None:
     process_request(
-        request_data, "TrnsPurchaseSalesReq", purchase_search_on_success, doctype=REGISTERED_PURCHASES_DOCTYPE_NAME
+        request_data,
+        "TrnsPurchaseSalesReq",
+        purchase_search_on_success,
+        doctype=REGISTERED_PURCHASES_DOCTYPE_NAME,
     )
-   
-    
+
+
 @frappe.whitelist()
 def perform_purchase_search(request_data: str) -> None:
     process_request(
-        request_data, "TrnsPurchaseSearchReq", purchase_search_on_success, doctype=REGISTERED_PURCHASES_DOCTYPE_NAME
+        request_data,
+        "TrnsPurchaseSearchReq",
+        purchase_search_on_success,
+        doctype=REGISTERED_PURCHASES_DOCTYPE_NAME,
     )
-    
+
 
 @frappe.whitelist()
 def submit_inventory(request_data: str) -> None:
@@ -404,63 +463,18 @@ def search_branch_request(request_data: str) -> None:
 @frappe.whitelist()
 def send_imported_item_request(request_data: str) -> None:
     process_request(
-        request_data, "ImportItemSearchReq", imported_item_submission_on_success, method="POST", doctype="Item"
+        request_data,
+        "ImportItemSearchReq",
+        imported_item_submission_on_success,
+        method="POST",
+        doctype="Item",
     )
-    
-
-@frappe.whitelist()
-def perform_notice_search(request_data: str) -> str:
-    """Function to perform notice search."""
-    message = process_request(
-        request_data, "NoticeSearchReq", notices_search_on_success
-    )
-    return message
-
-
-@frappe.whitelist()
-def refresh_code_lists(request_data: str) -> str:
-    """Refresh code lists based on request data."""
-    tasks = [
-        ("CurrencyCountrySearchReq", update_countries),
-        ("CurrencySearchReq", update_currencies),
-        ("PackagingUnitSearchReq", update_packaging_units),
-        ("UOMSearchReq", update_unit_of_quantity),
-        ("TaxSearchReq", update_taxation_type),
-        ("PaymentMtdSearchReq", update_payment_methods),
-    ]
-
-    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
-
-    return " ".join(messages)
-
-
-@frappe.whitelist()
-def search_organisations_request(request_data: str) -> str:
-    """Refresh code lists based on request data."""
-    tasks = [
-        ("OrgSearchReq", update_organisations),
-        ("BhfSearchReq", update_organisations),
-        ("DeptSearchReq", update_organisations),
-    ]
-
-    messages = [process_request(request_data, task[0], task[1]) for task in tasks]
-
-    return " ".join(messages)
-
-
-@frappe.whitelist()
-def get_item_classification_codes(request_data: str) -> str:
-    """Function to get item classification codes."""
-    message = process_request(
-        request_data, "ItemClsSearchReq", update_item_classification_codes
-    )
-    return message
 
 
 @frappe.whitelist()
 def perform_stock_movement_search(request_data: str) -> None:
     data: dict = json.loads(request_data)
-   
+
     company_name = data["company_name"]
 
     headers = build_headers(company_name, data["branch_id"])
@@ -602,7 +616,7 @@ def create_item(item: dict | frappe._dict) -> Document:
     new_item.item_code = item["item_code"]
     new_item.item_name = item["item_name"]
     new_item.item_group = "All Item Groups"
-    if "item_classification_code" in item: 
+    if "item_classification_code" in item:
         new_item.custom_item_classification = item["item_classification_code"]
     new_item.custom_packaging_unit = item["packaging_unit_code"]
     new_item.custom_unit_of_quantity = (
@@ -631,7 +645,6 @@ def create_item(item: dict | frappe._dict) -> Document:
     if "imported_item" in item:
         new_item.is_stock_item = 1
         new_item.custom_referenced_imported_item = item["imported_item"]
-        
 
     new_item.insert(ignore_mandatory=True, ignore_if_duplicate=True)
 
@@ -641,10 +654,12 @@ def create_item(item: dict | frappe._dict) -> Document:
 @frappe.whitelist()
 def create_purchase_invoice_from_request(request_data: str) -> None:
     data = json.loads(request_data)
-    
+
     if not data.get("company_name"):
-        data["company_name"] = frappe.defaults.get_user_default("Company") or frappe.get_value("Company", {}, "name")
-        
+        data["company_name"] = frappe.defaults.get_user_default(
+            "Company"
+        ) or frappe.get_value("Company", {}, "name")
+
     # Check if supplier exists
     supplier = None
     if not frappe.db.exists("Supplier", data["supplier_name"], cache=False):
@@ -660,22 +675,24 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
         if received_item["item_name"] not in all_existing_items:
             created_item = create_item(received_item)
             all_items.append(created_item)
-            
+
     set_warehouse = frappe.get_value(
         "Warehouse",
         {"custom_branch": data["branch"]},
         ["name"],
         as_dict=True,
     )
-    
+
     if not set_warehouse:
-        set_warehouse = frappe.get_value("Warehouse", {"is_group": 0}, "name")  # use first warehouse match if not available for the branch
+        set_warehouse = frappe.get_value(
+            "Warehouse", {"is_group": 0}, "name"
+        )  # use first warehouse match if not available for the branch
 
     # Create the Purchase Invoice
     purchase_invoice = frappe.new_doc("Purchase Invoice")
     purchase_invoice.supplier = supplier or data["supplier_name"]
     purchase_invoice.supplier = supplier or data["supplier_name"]
-    purchase_invoice.update_stock = 1 
+    purchase_invoice.update_stock = 1
     purchase_invoice.set_warehouse = set_warehouse
     purchase_invoice.branch = data["branch"]
     purchase_invoice.company = data["company_name"]
@@ -723,7 +740,7 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
                 "item_name": item["item_name"],
                 "custom_item_classification": item["item_classification_code"],
             },
-            fields=["name"]  
+            fields=["name"],
         )
         item_code = matching_item[0]["name"]
         purchase_invoice.append(
@@ -812,5 +829,10 @@ def create_stock_entry_from_stock_movement(request_data: str) -> None:
 
 @frappe.whitelist()
 def initialize_device(request_data: str) -> None:
-    return process_request(request_data, "DeviceVerificationReq", initialize_device_submission_on_success, method="POST", doctype=SETTINGS_DOCTYPE_NAME)
-
+    return process_request(
+        request_data,
+        "DeviceVerificationReq",
+        initialize_device_submission_on_success,
+        method="POST",
+        doctype=SETTINGS_DOCTYPE_NAME,
+    )
