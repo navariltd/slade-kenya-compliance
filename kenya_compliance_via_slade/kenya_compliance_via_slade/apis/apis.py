@@ -71,7 +71,9 @@ def process_request(
         or frappe.defaults.get_user_default("Company")
         or frappe.get_value("Company", {}, "name")
     )
-    branch_id = data.get("branch_id") or "00"
+    branch_id = (
+        data.get("branch_id") or frappe.defaults.get_user_default("Branch") or "00"
+    )
     document_name = data.get("document_name", None)
 
     headers = build_headers(company_name, branch_id)
@@ -86,6 +88,7 @@ def process_request(
 
         if "company_name" in data and data["company_name"]:
             data.pop("company_name")
+
     if headers and server_url and route_path:
         url = f"{server_url}{route_path}"
 
@@ -474,6 +477,17 @@ def send_imported_item_request(request_data: str) -> None:
 
 
 @frappe.whitelist()
+def update_imported_item_request(request_data: str) -> None:
+    process_request(
+        request_data,
+        "ImportItemUpdateReq",
+        imported_item_submission_on_success,
+        method="PUT",
+        doctype="Item",
+    )
+
+
+@frappe.whitelist()
 def perform_stock_movement_search(request_data: str) -> None:
     data: dict = json.loads(request_data)
 
@@ -615,7 +629,7 @@ def create_item(item: dict | frappe._dict) -> Document:
 
     new_item = frappe.new_doc("Item")
     new_item.is_stock_item = 0  # Default to 0
-    new_item.item_code = item["item_code"]
+    new_item.item_code = item["product_code"]
     new_item.item_name = item["item_name"]
     new_item.item_group = "All Item Groups"
     if "item_classification_code" in item:
@@ -687,7 +701,7 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
 
     if not set_warehouse:
         set_warehouse = frappe.get_value(
-            "Warehouse", {"is_group": 0}, "name"
+            "Warehouse", {"is_group": 0, "company": data["company_name"]}, "name"
         )  # use first warehouse match if not available for the branch
 
     # Create the Purchase Invoice

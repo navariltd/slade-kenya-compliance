@@ -81,19 +81,19 @@ class EndpointsBuilder(BaseEndpointsBuilder):
         self._request_description: str | None = None
         self._payload: dict | None = None
         self._headers: dict | None = None
-        self._method: Literal["GET", "POST", "PATCH"] | None = None
+        self._method: Literal["GET", "POST", "PATCH", "PUT"] | None = None
         self._success_callback_handler: Callable | None = None
         self._error_callback_handler: Callable | None = None
 
         self.attach(ErrorObserver())
 
     @property
-    def method(self) -> Literal["GET", "POST", "PATCH"] | None:
+    def method(self) -> Literal["GET", "POST", "PATCH", "PUT"] | None:
         """The HTTP method to use for the request."""
         return self._method
 
     @method.setter
-    def method(self, new_method: Literal["GET", "POST", "PATCH"]) -> None:
+    def method(self, new_method: Literal["GET", "POST", "PATCH", "PUT"]) -> None:
         self._method = new_method
 
     @property
@@ -216,6 +216,13 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                 if patch_id:
                     self._url = f"{self._url}/{patch_id}/"
                 response = requests.patch(
+                    self._url, json=self._payload, headers=self._headers
+                )
+            elif self._method == "PUT":
+                put_id = self._payload.pop("id", None)
+                if put_id:
+                    self._url = f"{self._url}/{put_id}/"
+                response = requests.put(
                     self._url, json=self._payload, headers=self._headers
                 )
 
