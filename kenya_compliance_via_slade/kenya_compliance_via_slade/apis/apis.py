@@ -71,7 +71,9 @@ def process_request(
         or frappe.defaults.get_user_default("Company")
         or frappe.get_value("Company", {}, "name")
     )
-    branch_id = data.get("branch_id") or "00"
+    branch_id = (
+        data.get("branch_id") or frappe.defaults.get_user_default("Branch") or "00"
+    )
     document_name = data.get("document_name", None)
 
     headers = build_headers(company_name, branch_id)
@@ -469,6 +471,17 @@ def send_imported_item_request(request_data: str) -> None:
         "ImportItemSearchReq",
         imported_item_submission_on_success,
         method="POST",
+        doctype="Item",
+    )
+
+
+@frappe.whitelist()
+def update_imported_item_request(request_data: str) -> None:
+    process_request(
+        request_data,
+        "ImportItemUpdateReq",
+        imported_item_submission_on_success,
+        method="PUT",
         doctype="Item",
     )
 
