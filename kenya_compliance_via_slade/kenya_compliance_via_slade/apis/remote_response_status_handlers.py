@@ -470,8 +470,10 @@ def create_purchase_from_search_details(fetched_purchase: dict) -> str:
     doc.tax_amount_e = fetched_purchase.get("tax_amount_E", 0.0)
 
     doc.workflow_state = fetched_purchase["workflow_state"]
-    doc.branch = fetched_purchase["branch"]
-    doc.organisation = fetched_purchase["organisation"]
+    doc.branch = (get_link_value("Branch", "slade_id", fetched_purchase["branch"]),)
+    doc.organisation = (
+        get_link_value("Company", "custom_slade_id", fetched_purchase["organisation"]),
+    )
     doc.can_send_to_etims = fetched_purchase["can_send_to_etims"]
 
     try:
@@ -503,6 +505,9 @@ def create_and_link_purchase_item(response: dict, document_name: str) -> None:
             registered_item.flags.ignore_validate_update_after_submit = True
         else:
             registered_item = frappe.new_doc(REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM)
+            registered_item.parent = parent_record.name
+            registered_item.parentfield = "items"
+            registered_item.parenttype = REGISTERED_PURCHASES_DOCTYPE_NAME
 
         registered_item.slade_id = item["id"]
         registered_item.item_name = item["item_name"]

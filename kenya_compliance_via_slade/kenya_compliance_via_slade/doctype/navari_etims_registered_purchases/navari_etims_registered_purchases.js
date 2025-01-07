@@ -5,7 +5,8 @@ const doctypeName = "Navari eTims Registered Purchases";
 frappe.ui.form.on(doctypeName, {
   refresh: function (frm) {
     let companyName = frappe.boot.sysdefaults.company;
-    if (companyName) {
+
+    if (!companyName) {
       frappe.call({
         method: "frappe.client.get_list",
         args: {
