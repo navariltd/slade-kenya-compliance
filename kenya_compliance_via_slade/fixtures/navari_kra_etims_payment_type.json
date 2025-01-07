@@ -16,8 +16,7 @@
   "mobile_money_type": null,
   "modified": "2024-03-11 14:43:53.570035",
   "name": "CASH/CREDIT",
-  "organisation": null,
-  "slade_id": null,
+  "slade_id": "CASH/CREDIT",
   "sort_order": 3
  },
  {
@@ -37,8 +36,7 @@
   "mobile_money_type": null,
   "modified": "2024-03-11 14:44:25.405729",
   "name": "DEBIT&CREDIT CARD",
-  "organisation": null,
-  "slade_id": null,
+  "slade_id": "DEBIT&CREDIT CARD",
   "sort_order": 5
  },
  {
@@ -58,8 +56,7 @@
   "mobile_money_type": null,
   "modified": "2024-03-11 14:45:09.331411",
   "name": "OTHER",
-  "organisation": null,
-  "slade_id": null,
+  "slade_id": "OTHER",
   "sort_order": 7
  },
  {
@@ -79,8 +76,7 @@
   "mobile_money_type": null,
   "modified": "2024-03-11 14:43:40.960905",
   "name": "CREDIT",
-  "organisation": null,
-  "slade_id": null,
+  "slade_id": "CREDIT",
   "sort_order": 2
  },
  {
@@ -100,8 +96,7 @@
   "mobile_money_type": null,
   "modified": "2024-03-11 14:44:50.659496",
   "name": "MOBILE MONEY",
-  "organisation": null,
-  "slade_id": null,
+  "slade_id": "MOBILE MONEY",
   "sort_order": 6
  },
  {
@@ -121,8 +116,7 @@
   "mobile_money_type": null,
   "modified": "2024-03-11 14:44:08.746926",
   "name": "BANK CHECK",
-  "organisation": null,
-  "slade_id": null,
+  "slade_id": "BANK CHECK",
   "sort_order": 4
  },
  {
@@ -142,8 +136,7 @@
   "mobile_money_type": null,
   "modified": "2024-03-11 14:43:28.889289",
   "name": "CASH",
-  "organisation": null,
-  "slade_id": null,
+  "slade_id": "CASH",
   "sort_order": 1
  }
 ]

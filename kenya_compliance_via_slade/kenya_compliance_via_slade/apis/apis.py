@@ -279,7 +279,9 @@ def send_branch_customer_details(request_data: str) -> None:
         doctype = "Customer"
 
     if currency_name:
-        data["currency"] = frappe.get_value("Currency", currency_name, "slade_id")
+        data["currency"] = frappe.get_value(
+            "Currency", currency_name, "custom_slade_id"
+        )
 
     return process_request(
         json.dumps(data),

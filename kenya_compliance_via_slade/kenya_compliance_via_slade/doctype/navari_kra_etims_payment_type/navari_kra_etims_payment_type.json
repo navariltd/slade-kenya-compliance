@@ -14,7 +14,6 @@
   "code_name",
   "code_description",
   "slade_id",
-  "organisation",
   "account",
   "active",
   "column_break_efis",
@@ -77,12 +76,6 @@
    "label": "Account"
   },
   {
-   "fieldname": "organisation",
-   "fieldtype": "Link",
-   "label": "Organisation",
-   "options": "Navari Slade360 Organisation"
-  },
-  {
    "fieldname": "bank_name",
    "fieldtype": "Data",
    "label": "Bank Name"
@@ -126,7 +119,7 @@
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-19 17:59:56.932990",
+ "modified": "2025-01-07 07:45:52.108346",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Payment Type",

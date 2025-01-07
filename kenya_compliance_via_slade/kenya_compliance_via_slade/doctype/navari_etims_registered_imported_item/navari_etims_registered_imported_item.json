@@ -194,7 +194,7 @@
    "fieldname": "organisation",
    "fieldtype": "Link",
    "label": "Organisation",
-   "options": "Navari Slade360 Organisation"
+   "options": "Company"
   },
   {
    "fieldname": "branch",
@@ -219,7 +219,7 @@
    "link_fieldname": "custom_referenced_imported_item"
   }
  ],
- "modified": "2024-12-19 20:55:14.339509",
+ "modified": "2025-01-07 08:44:29.094456",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Registered Imported Item",

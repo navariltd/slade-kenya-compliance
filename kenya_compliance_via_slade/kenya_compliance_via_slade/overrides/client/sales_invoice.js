@@ -11,6 +11,27 @@ frappe.ui.form.on(parentDoctype, {
     if (frm.doc.update_stock === 1) {
       frm.toggle_reqd("set_warehouse", true);
     }
+
+    if (!frm.doc.custom_successfully_submitted) {
+      frm.add_custom_button(
+        __("Send Invoice"),
+        function () {
+          frappe.call({
+            method:
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.sales_invoice.send_invoice_details",
+            args: {
+              name: frm.doc.name,
+            },
+            callback: (response) => {},
+            error: (r) => {
+              // Error Handling is Defered to the Server
+            },
+          });
+        },
+        __("eTims Actions")
+      );
+    }
+
   },
   validate: function (frm) {
     frappe.db.get_value(

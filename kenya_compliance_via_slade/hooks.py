@@ -2,6 +2,7 @@ from .kenya_compliance_via_slade.doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+    ITEM_TYPE_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     PAYMENT_TYPE_DOCTYPE_NAME,
     PRODUCT_TYPE_DOCTYPE_NAME,
@@ -60,13 +61,13 @@ fixtures = [
     {"dt": ROUTES_TABLE_DOCTYPE_NAME},
     {"dt": COUNTRIES_DOCTYPE_NAME},
     {"dt": ITEM_CLASSIFICATIONS_DOCTYPE_NAME},
+    {"dt": ITEM_TYPE_DOCTYPE_NAME},
     {
         "dt": TAXATION_TYPE_DOCTYPE_NAME,
         "filters": [["name", "in", ("A", "B", "C", "D", "E")]],
     },
     {
         "dt": PRODUCT_TYPE_DOCTYPE_NAME,
-        "filters": [["name", "in", (1, 2, 3)]],
     },
     {"dt": PACKAGING_UNIT_DOCTYPE_NAME},
     {"dt": STOCK_MOVEMENT_TYPE_DOCTYPE_NAME},
