@@ -299,7 +299,7 @@
    "fieldname": "organisation",
    "fieldtype": "Link",
    "label": "Organisation",
-   "options": "Navari Slade360 Organisation"
+   "options": "Company"
   }
  ],
  "in_create": 1,
@@ -311,7 +311,7 @@
    "link_fieldname": "custom_source_registered_purchase"
   }
  ],
- "modified": "2024-12-18 19:34:51.999070",
+ "modified": "2025-01-07 10:56:58.196239",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Registered Purchases",

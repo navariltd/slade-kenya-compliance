@@ -285,7 +285,7 @@ def update_payment_methods(data: dict, document_name: str) -> None:
 
 def update_currencies(data: dict, document_name: str) -> None:
     field_mapping = {
-        "slade_id": "id",
+        "custom_slade_id": "id",
         "currency_name": "iso_code",
         "enabled": lambda x: 1 if x.get("active") else 0,
         "custom_conversion_rate": "conversion_rate",

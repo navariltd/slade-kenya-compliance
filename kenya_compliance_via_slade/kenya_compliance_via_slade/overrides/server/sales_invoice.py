@@ -29,3 +29,9 @@ def before_cancel(doc: Document, method: str) -> None:
         frappe.throw(
             "This invoice has already been <b>submitted</b> to eTIMS and cannot be <span style='color:red'>Canceled.</span>.\nIf you need to make adjustments, please create a Debit Note instead."
         )
+
+
+@frappe.whitelist()
+def send_invoice_details(name: str) -> None:
+    doc = frappe.get_doc("Sales Invoice", name)
+    generic_invoices_on_submit_override(doc, "Sales Invoice")

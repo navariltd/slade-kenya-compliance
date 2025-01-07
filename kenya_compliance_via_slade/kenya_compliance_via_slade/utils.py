@@ -18,6 +18,7 @@ from frappe.model.document import Document
 
 from .doctype.doctype_names_mapping import (
     ENVIRONMENT_SPECIFICATION_DOCTYPE_NAME,
+    PAYMENT_TYPE_DOCTYPE_NAME,
     ROUTES_TABLE_CHILD_DOCTYPE_NAME,
     ROUTES_TABLE_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,
@@ -312,6 +313,8 @@ def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | 
 
         if workstation:
             headers["X-Workstation"] = workstation
+        else:
+            headers["X-Workstation"] = "731ddef2-9011-4fbe-8f15-af86a81e9bd7"
 
         return headers
 
@@ -364,11 +367,18 @@ def build_invoice_payload(
         "branch_id": invoice.branch,
         "company_name": company_name,
         "description": invoice.remarks or "New",
-        "payment_method": invoice.custom_payment_type,
+        "payment_method": frappe.get_value(
+            PAYMENT_TYPE_DOCTYPE_NAME, invoice.custom_payment_type, "slade_id"
+        ),
         "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
         "invoice_date": str(invoice.posting_date),
-        "currency": frappe.get_value("Currency", invoice.currency, "slade_id"),
-        "source_organisation_unit": invoice.custom_slade_organisation,
+        "currency": frappe.get_value("Currency", invoice.currency, "custom_slade_id"),
+        "source_organisation_unit": frappe.get_value(
+            "Department", invoice.department, "custom_slade_id"
+        )
+        or "4f2ede94-cb03-4532-9c38-a455470cfe0e",
+        "branch": frappe.get_value("Branch", invoice.branch, "slade_id"),
+        "organisation": frappe.get_value("Company", invoice.company, "custom_slade_id"),
         "sales_type": "cash",
     }
 
