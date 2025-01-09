@@ -666,6 +666,9 @@ def update_navari_settings_with_token(docname: str) -> str:
         auth_server_url, username, password, client_id, client_secret
     )
 
+    if not token_details:
+        return None
+
     settings_doc.access_token = token_details["access_token"]
     settings_doc.refresh_token = token_details["refresh_token"]
     settings_doc.token_expiry = datetime.now() + timedelta(

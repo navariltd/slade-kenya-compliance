@@ -14,8 +14,10 @@ from ..doctype.doctype_names_mapping import (
     PAYMENT_TYPE_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
+    WORKSTATION_DOCTYPE_NAME,
 )
 from ..overrides.server.stock_ledger_entry import on_update
+from ..utils import get_link_value
 
 endpoints_builder = EndpointsBuilder()
 
@@ -53,6 +55,7 @@ def search_organisations_request(request_data: str) -> str:
         ("OrgSearchReq", update_organisations),
         ("BhfSearchReq", update_branches),
         ("DeptSearchReq", update_departments),
+        ("WorkstationSearchReq", update_workstations),
     ]
 
     messages = [process_request(request_data, task[0], task[1]) for task in tasks]
@@ -374,8 +377,7 @@ def update_organisations(data: dict, document_name: str) -> None:
         except json.JSONDecodeError:
             raise ValueError(f"Invalid JSON string: {data}")
 
-    # Limiting to first 5 records temporarily; remove slicing [:5] later
-    doc_list = data if isinstance(data, list) else data.get("results", data)[:5]
+    doc_list = data if isinstance(data, list) else data.get("results", data)[:10]
 
     for record in doc_list:
         if isinstance(record, str):
@@ -390,15 +392,9 @@ def update_organisations(data: dict, document_name: str) -> None:
             doc = frappe.get_doc("Company", company_name)
         else:
             doc = frappe.new_doc("Company")
-            doc.default_currency = "KES"
 
-            doc.company_name = record.get("organisation_name", "Default Company")
-            doc.default_country = record.get("default_country", "Kenya")
-            doc.company_description = record.get(
-                "description", "No description provided."
-            )
-            doc.email = record.get("email_address", "no-email@default.com")
-            doc.phone_no = record.get("phone_number", "000-000-0000")
+            doc.company_name = record.get("organisation_name", "")
+
             generated_abbr = "".join(
                 [word[0] for word in doc.company_name.split()]
             ).upper()[:5]
@@ -414,8 +410,25 @@ def update_organisations(data: dict, document_name: str) -> None:
             else:
                 doc.abbr = generated_abbr
 
-        doc.custom_slade_id = record.get("id", "")
-        doc.tax_id = record.get("organisation_tax_pin", "")
+        if record.get("default_currency"):
+            doc.default_currency = (
+                get_link_value(
+                    "Currency", "custom_slade_id", record.get("default_currency")
+                )
+                or "KES"
+            )
+        if record.get("web_address"):
+            doc.website = record.get("web_address", "")
+        if record.get("phone_number"):
+            doc.phone_no = record.get("phone_number", "")
+        if record.get("description"):
+            doc.company_description = record.get("description", "")
+        if record.get("id"):
+            doc.custom_slade_id = record.get("id", "")
+        if record.get("email_address"):
+            doc.email = record.get("email_address", "")
+        if record.get("tax_payer_pin"):
+            doc.tax_id = record.get("tax_payer_pin", "")
         doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
 
         doc.save()
@@ -425,7 +438,7 @@ def update_organisations(data: dict, document_name: str) -> None:
 
 def update_branches(data: dict, document_name: str) -> None:
     field_mapping = {
-        "custom_slade_id": "id",
+        "slade_id": "id",
         "tax_id": "organisation_tax_pin",
         "branch": "name",
         "custom_etims_device_serial_no": "etims_device_serial_no",
@@ -438,7 +451,7 @@ def update_branches(data: dict, document_name: str) -> None:
         "custom_manager_name": "manager_name",
         "custom_location_description": "location_description",
         "custom_is_head_office": lambda x: 1 if x.get("is_headquater") else 0,
-        "company": {
+        "custom_company": {
             "doctype": "Company",
             "link_field": "organisation",
             "filter_field": "custom_slade_id",
@@ -447,20 +460,81 @@ def update_branches(data: dict, document_name: str) -> None:
         "custom_is_etims_branch": lambda x: 1 if x.get("branch_status") else 0,
         "custom_is_etims_verified": lambda x: 1 if x.get("is_etims_verified") else 0,
     }
-    update_documents(data, "Branch", field_mapping, filter_field="id")
+    update_documents(data, "Branch", field_mapping, filter_field="name")
 
 
 def update_departments(data: dict, document_name: str) -> None:
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON string: {data}")
+
+    doc_list = data if isinstance(data, list) else data.get("results", data)
+
+    for record in doc_list:
+        if isinstance(record, str):
+            continue
+
+        existing_department = frappe.db.get_value(
+            "Department", {"custom_slade_id": record.get("id")}, "name"
+        )
+        if existing_department:
+            doc = frappe.get_doc("Department", existing_department)
+        else:
+            department_name = record.get("name")
+            matching_department = frappe.db.get_value(
+                "Department", {"department_name": department_name}, "name"
+            )
+            if matching_department:
+                branch_name = record.get("parent_name", "")
+                department_name = (
+                    f"{department_name} - {branch_name}"
+                    if branch_name
+                    else department_name
+                )
+
+            doc = frappe.new_doc("Department")
+            doc.department_name = department_name
+
+        if record.get("organisation"):
+            doc.company = (
+                get_link_value("Company", "custom_slade_id", record.get("organisation"))
+                or frappe.defaults.get_user_default("Company")
+                or frappe.get_value("Company", {}, "name")
+            )
+        if record.get("parent"):
+            doc.custom_branch = get_link_value(
+                "Branch", "slade_id", record.get("parent")
+            )
+        if record.get("id"):
+            doc.custom_slade_id = record.get("id", "")
+        doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
+
+        doc.save()
+
+    frappe.db.commit()
+
+
+def update_workstations(data: dict, document_name: str) -> None:
     field_mapping = {
-        "custom_slade_id": "id",
-        "tax_id": "organisation_tax_pin",
-        "department_name": "name",
+        "slade_id": "id",
+        "active": lambda x: 1 if x.get("active") else 0,
+        "workstation": "name",
+        "workstation_type_display": "workstation_type_display",
+        "workstation_type": "workstation_type",
+        "is_billing_point": lambda x: 1 if x.get("is_billing_point") else 0,
         "company": {
             "doctype": "Company",
             "link_field": "organisation",
             "filter_field": "custom_slade_id",
             "extract_field": "name",
         },
-        "is_etims_verified": lambda x: 1 if x.get("is_etims_verified") else 0,
+        "department": {
+            "doctype": "Department",
+            "link_field": "org_unit",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
     }
-    update_documents(data, "Department", field_mapping, filter_field="id")
+    update_documents(data, WORKSTATION_DOCTYPE_NAME, field_mapping, filter_field="id")
