@@ -265,12 +265,12 @@ def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | 
     settings = frappe.db.get_value(
         SETTINGS_DOCTYPE_NAME,
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
-        ["access_token", "token_expiry", "name"],
+        ["access_token", "token_expiry", "name", "workstation"],
         as_dict=True,
     ) or frappe.db.get_value(
         SETTINGS_DOCTYPE_NAME,
         {"company": company_name, "is_active": 1},
-        ["access_token", "token_expiry", "name"],
+        ["access_token", "token_expiry", "name", "workstation"],
         as_dict=True,
     )
 
@@ -303,7 +303,7 @@ def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | 
             as_dict=True,
         )
 
-        workstation = user_data.get("workstation") if user_data else None
+        workstation = settings.get("workstation") or user_data.get("workstation")
 
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -313,8 +313,6 @@ def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | 
 
         if workstation:
             headers["X-Workstation"] = workstation
-        else:
-            headers["X-Workstation"] = "731ddef2-9011-4fbe-8f15-af86a81e9bd7"
 
         return headers
 

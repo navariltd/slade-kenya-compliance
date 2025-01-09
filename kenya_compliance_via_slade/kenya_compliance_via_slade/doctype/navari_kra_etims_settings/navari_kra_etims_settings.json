@@ -408,6 +408,7 @@
    "options": "Navari eTims User"
   },
   {
+   "fetch_from": "etims_user.workstation",
    "fieldname": "workstation",
    "fieldtype": "Link",
    "label": "Workstation",
@@ -431,7 +432,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-01-09 10:02:48.082152",
+ "modified": "2025-01-09 15:06:31.625533",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",

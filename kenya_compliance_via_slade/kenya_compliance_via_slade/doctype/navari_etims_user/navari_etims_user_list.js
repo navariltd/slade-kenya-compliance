@@ -5,7 +5,7 @@ frappe.listview_settings[doctypeName] = {
     const companyName = frappe.boot.sysdefaults.company;
 
     listview.page.add_inner_button(
-      __("Create from Current System Users"),
+      __("Add eTims Users from System Users"),
       function (listview) {
         frappe.call({
           method:
@@ -20,11 +20,12 @@ frappe.listview_settings[doctypeName] = {
             // Error Handling is Defered to the Server
           },
         });
-      }
+      },
+      __("eTims Actions")
     );
 
     listview.page.add_inner_button(
-      __("Fetch my user details"),
+      __("Sync Default eTims User Details"),
       function (listview) {
         frappe.call({
           method:
@@ -39,7 +40,8 @@ frappe.listview_settings[doctypeName] = {
             // Error Handling is Defered to the Server
           },
         });
-      }
+      },
+      __("eTims Actions")
     );
   },
 };

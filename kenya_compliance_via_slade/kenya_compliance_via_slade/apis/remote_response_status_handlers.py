@@ -175,7 +175,9 @@ def user_details_fetch_on_success(response: dict, document_name: str) -> None:
         "users_full_names": result.get("full_name"),
         "email": email,
         "workstation": workstation,
-        "organisation": result.get("organisation_id"),
+        "company": get_link_value(
+            "Company", "custom_slade_id", result.get("organisation_id")
+        ),
         "system_user": user.name,
     }
 
