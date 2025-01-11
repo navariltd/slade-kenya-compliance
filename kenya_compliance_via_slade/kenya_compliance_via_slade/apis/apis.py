@@ -19,6 +19,7 @@ from ..doctype.doctype_names_mapping import (
     SETTINGS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
+    UOM_CATEGORY_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
 )
 from ..utils import (
@@ -53,6 +54,7 @@ from .remote_response_status_handlers import (
 )
 
 endpoints_builder = EndpointsBuilder()
+from ..background_tasks.task_response_handlers import uom_category_search_on_success
 from .remote_response_status_handlers import on_slade_error
 
 
@@ -232,7 +234,7 @@ def perform_item_registration(item_name: str) -> dict | None:
     else:
         process_request(
             request_data,
-            "ItemSaveReq",
+            "ItemsSearchReq",
             item_registration_on_success,
             method="POST",
             doctype="Item",
@@ -886,4 +888,46 @@ def get_invoice_details(request_data: str, invoice_type: str) -> None:
         "TrnsSalesSearchReq",
         update_invoice_info,
         doctype=invoice_type,
+    )
+
+
+@frappe.whitelist()
+def save_uom_category_details(name: str) -> dict | None:
+    item = frappe.get_doc(UOM_CATEGORY_DOCTYPE_NAME, name)
+
+    slade_id = item.get("slade_id", None)
+
+    request_data = {
+        "name": item.get("category_name"),
+        "document_name": item.get("name"),
+        "measure_type": item.get("measure_type"),
+        "active": True if item.get("active") == 1 else False,
+    }
+
+    if slade_id:
+        request_data["id"] = slade_id
+        process_request(
+            request_data,
+            "UOMCategoriesSearchReq",
+            uom_category_search_on_success,
+            method="PATCH",
+            doctype=UOM_CATEGORY_DOCTYPE_NAME,
+        )
+    else:
+        process_request(
+            request_data,
+            "UOMCategoriesSearchReq",
+            uom_category_search_on_success,
+            method="POST",
+            doctype=UOM_CATEGORY_DOCTYPE_NAME,
+        )
+
+
+@frappe.whitelist()
+def sync_uom_category_details(request_data: str) -> None:
+    process_request(
+        request_data,
+        "UOMCategorySearchReq",
+        uom_category_search_on_success,
+        doctype=UOM_CATEGORY_DOCTYPE_NAME,
     )
