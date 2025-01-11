@@ -1,7 +1,7 @@
 // Copyright (c) 2025, Navari Ltd and contributors
 // For license information, please see license.txt
 
-const doctypeName = "Warehouse";
+const doctypeName = "Item Price";
 
 frappe.ui.form.on(doctypeName, {
   refresh: async function (frm) {
@@ -9,14 +9,14 @@ frappe.ui.form.on(doctypeName, {
 
     if (!frm.is_new()) {
       const submit_name = !frm.doc.custom_slade_id
-        ? "Submit Warehouse"
-        : "Update Warehouse";
+        ? "Submit Item Price"
+        : "Update Item Price";
       frm.add_custom_button(
         __(submit_name),
         function () {
           frappe.call({
             method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.save_warehouse_details",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_item_price",
             args: {
               name: frm.doc.name,
             },
@@ -30,20 +30,19 @@ frappe.ui.form.on(doctypeName, {
         },
         __("eTims Actions")
       );
-      const type = frm.doc.is_group ? "warehouse" : "location";
       if (frm.doc.custom_slade_id) {
         frm.add_custom_button(
-          __("Fetch Warehouse Details"),
+          __("Fetch Item Price Details"),
           function () {
             frappe.call({
               method:
-                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.sync_warehouse_details",
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.sync_item_price",
               args: {
                 request_data: {
                   document_name: frm.doc.name,
                   id: frm.doc.custom_slade_id,
+                  company_name: companyName,
                 },
-                type: type,
               },
               callback: (response) => {
                 frappe.msgprint("Request queued. Please check in later.");

@@ -1,22 +1,29 @@
 // Copyright (c) 2025, Navari Ltd and contributors
 // For license information, please see license.txt
 
-const doctypeName = "Warehouse";
+const doctypeName = "Price List";
 
 frappe.ui.form.on(doctypeName, {
   refresh: async function (frm) {
     const companyName = frappe.boot.sysdefaults.company;
+    frm.set_query("custom_warehouse", function () {
+      return {
+        filters: {
+          is_group: 0,
+        },
+      };
+    });
 
     if (!frm.is_new()) {
       const submit_name = !frm.doc.custom_slade_id
-        ? "Submit Warehouse"
-        : "Update Warehouse";
+        ? "Submit Price List"
+        : "Update Price List";
       frm.add_custom_button(
         __(submit_name),
         function () {
           frappe.call({
             method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.save_warehouse_details",
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_pricelist",
             args: {
               name: frm.doc.name,
             },
@@ -30,20 +37,19 @@ frappe.ui.form.on(doctypeName, {
         },
         __("eTims Actions")
       );
-      const type = frm.doc.is_group ? "warehouse" : "location";
       if (frm.doc.custom_slade_id) {
         frm.add_custom_button(
-          __("Fetch Warehouse Details"),
+          __("Fetch Price List Details"),
           function () {
             frappe.call({
               method:
-                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.sync_warehouse_details",
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.sync_pricelist",
               args: {
                 request_data: {
                   document_name: frm.doc.name,
                   id: frm.doc.custom_slade_id,
+                  company_name: companyName,
                 },
-                type: type,
               },
               callback: (response) => {
                 frappe.msgprint("Request queued. Please check in later.");

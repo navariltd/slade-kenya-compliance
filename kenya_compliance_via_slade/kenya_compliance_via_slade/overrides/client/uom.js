@@ -9,7 +9,7 @@ frappe.ui.form.on(doctypeName, {
 
     if (!frm.is_new()) {
       const submit_name = !frm.doc.custom_slade_id
-        ? "Save UOM Details"
+        ? "Submit UOM Details"
         : "Update UOM Details";
       frm.add_custom_button(
         __(submit_name),

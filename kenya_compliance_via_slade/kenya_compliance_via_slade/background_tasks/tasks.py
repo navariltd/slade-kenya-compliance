@@ -6,7 +6,9 @@ from ..apis.apis import process_request
 from ..apis.remote_response_status_handlers import notices_search_on_success
 from ..doctype.doctype_names_mapping import UOM_CATEGORY_DOCTYPE_NAME
 from .task_response_handlers import (
+    itemprice_search_on_success,
     location_search_on_success,
+    pricelist_search_on_success,
     uom_category_search_on_success,
     uom_search_on_success,
     update_branches,
@@ -113,3 +115,25 @@ def fetch_etims_warehouse_list(request_data: str) -> None:
         doctype="Warehouse",
     )
     return warehouses, locations
+
+
+@frappe.whitelist()
+def fetch_etims_pricelists(request_data: str) -> None:
+    pricelists = process_request(
+        request_data,
+        "PriceListsSearchReq",
+        pricelist_search_on_success,
+        doctype="Price List",
+    )
+    return pricelists
+
+
+@frappe.whitelist()
+def fetch_etims_item_prices(request_data: str) -> None:
+    itemprices = process_request(
+        request_data,
+        "ItemPricesSearchReq",
+        itemprice_search_on_success,
+        doctype="Item Price",
+    )
+    return itemprices

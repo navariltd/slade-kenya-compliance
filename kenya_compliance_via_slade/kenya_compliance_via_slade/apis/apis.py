@@ -41,9 +41,11 @@ from .remote_response_status_handlers import (
     imported_items_search_on_success,
     initialize_device_submission_on_success,
     item_composition_submission_on_success,
+    item_price_update_on_success,
     item_registration_on_success,
     item_search_on_success,
     on_error,
+    pricelist_update_on_success,
     purchase_search_on_success,
     search_branch_request_on_success,
     stock_mvt_search_on_success,
@@ -1095,4 +1097,139 @@ def save_warehouse_details(name: str) -> dict | None:
         handler_function=on_success,
         method=method,
         doctype="Warehouse",
+    )
+
+
+@frappe.whitelist()
+def submit_pricelist(name: str) -> dict | None:
+    item = frappe.get_doc("Price List", name)
+    slade_id = item.get("custom_slade_id", None)
+
+    route_key = "PriceListsSearchReq"
+    on_success = pricelist_update_on_success
+
+    # pricelist_type is mandatory for the request and cannot accept both selling and buying
+    pricelist_type = (
+        "selling"
+        if item.get("selling") == 1
+        else "purchases" if item.get("buying") == 1 else "selling"
+    )
+    request_data = {
+        "name": item.get("price_list_name"),
+        "document_name": item.get("name"),
+        "pricelist_status": item.get("custom_pricelist_status"),
+        "pricelist_type": pricelist_type,
+        "organisation": get_link_value(
+            "Company",
+            "name",
+            item.get("custom_company"),
+            "custom_slade_id",
+        ),
+        "active": False if item.get("enabled") == 0 else True,
+    }
+
+    if item.get("custom_warehouse"):
+        request_data["location"] = get_link_value(
+            "Warehouse",
+            "name",
+            item.get("custom_warehouse"),
+            "custom_slade_id",
+        )
+
+    if item.get("custom_effective_from"):
+        request_data["effective_from"] = item.get("custom_effective_from").strftime(
+            "%Y-%m-%d"
+        )
+
+    if item.get("custom_effective_to"):
+        request_data["effective_to"] = item.get("custom_effective_to").strftime(
+            "%Y-%m-%d"
+        )
+
+    if slade_id:
+        request_data["id"] = slade_id
+        method = "PATCH"
+    else:
+        method = "POST"
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        method=method,
+        doctype="Price List",
+    )
+
+
+@frappe.whitelist()
+def sync_pricelist(request_data: str) -> None:
+    process_request(
+        request_data,
+        "PriceListSearchReq",
+        pricelist_update_on_success,
+        doctype="Price List",
+    )
+
+
+@frappe.whitelist()
+def submit_item_price(name: str) -> dict | None:
+    item = frappe.get_doc("Item Price", name)
+    slade_id = item.get("custom_slade_id", None)
+
+    route_key = "ItemPricesSearchReq"
+    on_success = item_price_update_on_success
+
+    request_data = {
+        "name": f"{item.get("item_code")} - {item.get("name")}",
+        "document_name": item.get("name"),
+        "price_inclusive_tax": item.get("price_list_rate"),
+        "organisation": get_link_value(
+            "Company",
+            "name",
+            item.get("custom_company"),
+            "custom_slade_id",
+        ),
+        "product": get_link_value(
+            "Item",
+            "name",
+            item.get("item_code"),
+            "custom_slade_id",
+        ),
+        "currency": get_link_value(
+            "Currency",
+            "name",
+            item.get("currency"),
+            "custom_slade_id",
+        ),
+        "pricelist": get_link_value(
+            "Price List",
+            "name",
+            item.get("price_list"),
+            "custom_slade_id",
+        ),
+        "active": False if item.get("enabled") == 0 else True,
+    }
+
+    if slade_id:
+        request_data["id"] = slade_id
+        method = "PATCH"
+    else:
+        method = "POST"
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        method=method,
+        doctype="Item Price",
+    )
+
+
+@frappe.whitelist()
+def sync_item_price(request_data: str) -> None:
+    process_request(
+        request_data,
+        "ItemPriceSearchReq",
+        item_price_update_on_success,
+        doctype="Item Price",
     )

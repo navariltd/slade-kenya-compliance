@@ -585,3 +585,90 @@ def handle_warehouse_search_on_success(
             continue
 
     frappe.db.commit()
+
+
+def pricelist_search_on_success(response: dict, is_location: bool = False) -> None:
+    if isinstance(response, str):
+        try:
+            response = json.loads(response)
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON string: {response}")
+
+    doc_list = (
+        response if isinstance(response, list) else response.get("results", [response])
+    )
+
+    for record in doc_list:
+        if isinstance(record, str):
+            continue
+
+        existing_pricelist = frappe.db.get_value(
+            "Price List", {"price_list_name": record.get("name")}, "name"
+        )
+        if existing_pricelist:
+            doc = frappe.get_doc("Price List", existing_pricelist)
+        else:
+            doc = frappe.new_doc("Price List")
+
+        doc.custom_slade_id = record.get("id")
+        doc.custom_pricelist_status = record.get("pricelist_status")
+
+        doc.custom_company = get_link_value(
+            "Company", "custom_slade_id", record.get("organisation")
+        )
+
+        doc.custom_warehouse = get_link_value(
+            "Warehouse", "custom_slade_id", record.get("location")
+        )
+
+        doc.price_list_name = record.get("name")
+
+        if record.get("effective_from"):
+            doc.custom_effective_from = frappe.utils.getdate(
+                record.get("effective_from")
+            )
+
+        if record.get("effective_to"):
+            doc.custom_effective_to = frappe.utils.getdate(record.get("effective_to"))
+
+        doc.enabled = 1 if record.get("active") else 0
+        doc.buying = 1 if record.get("pricelist_type") == "sales" else 0
+        doc.selling = 1 if record.get("pricelist_type") == "purchases" else 0
+
+        doc.save()
+
+    frappe.db.commit()
+
+
+def itemprice_search_on_success(response: dict, **kwargs) -> None:
+    field_mapping = {
+        "custom_slade_id": "id",
+        "price_list_rate": "price_inclusive_tax",
+        "custom_factor": "factor",
+        "item_code": {
+            "doctype": "Item",
+            "link_field": "product",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "custom_company": {
+            "doctype": "Company",
+            "link_field": "organisation",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "currency": {
+            "doctype": "Currency",
+            "link_field": "currency",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "price_list": {
+            "doctype": "Price List",
+            "link_field": "pricelist",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "enabled": lambda x: 1 if x.get("active") else 0,
+    }
+    update_documents(response, "Item Price", field_mapping, filter_field="id")
