@@ -247,7 +247,7 @@ def update_documents(
     frappe.db.commit()
 
 
-def update_unit_of_quantity(data: dict, document_name: str) -> None:
+def update_unit_of_quantity(response: dict, **kwargs) -> None:
     field_mapping = {
         "slade_id": "id",
         "code": "code",
@@ -255,10 +255,10 @@ def update_unit_of_quantity(data: dict, document_name: str) -> None:
         "code_name": "name",
         "code_description": "description",
     }
-    update_documents(data, UNIT_OF_QUANTITY_DOCTYPE_NAME, field_mapping)
+    update_documents(response, UNIT_OF_QUANTITY_DOCTYPE_NAME, field_mapping)
 
 
-def update_packaging_units(data: dict, document_name: str) -> None:
+def update_packaging_units(response: dict, **kwargs) -> None:
     field_mapping = {
         "slade_id": "id",
         "code": "code",
@@ -266,10 +266,10 @@ def update_packaging_units(data: dict, document_name: str) -> None:
         "sort_order": "sort_order",
         "code_description": "description",
     }
-    update_documents(data, PACKAGING_UNIT_DOCTYPE_NAME, field_mapping)
+    update_documents(response, PACKAGING_UNIT_DOCTYPE_NAME, field_mapping)
 
 
-def update_payment_methods(data: dict, document_name: str) -> None:
+def update_payment_methods(response: dict, **kwargs) -> None:
     field_mapping = {
         "slade_id": "id",
         "account_details": "account_details",
@@ -283,20 +283,22 @@ def update_payment_methods(data: dict, document_name: str) -> None:
         "description": "description",
         "account": "account",
     }
-    update_documents(data, PAYMENT_TYPE_DOCTYPE_NAME, field_mapping, filter_field="id")
+    update_documents(
+        response, PAYMENT_TYPE_DOCTYPE_NAME, field_mapping, filter_field="id"
+    )
 
 
-def update_currencies(data: dict, document_name: str) -> None:
+def update_currencies(response: dict, **kwargs) -> None:
     field_mapping = {
         "custom_slade_id": "id",
         "currency_name": "iso_code",
         "enabled": lambda x: 1 if x.get("active") else 0,
         "custom_conversion_rate": "conversion_rate",
     }
-    update_documents(data, "Currency", field_mapping, filter_field="iso_code")
+    update_documents(response, "Currency", field_mapping, filter_field="iso_code")
 
 
-def update_item_classification_codes(response: dict | list, document_name: str) -> None:
+def update_item_classification_codes(response: dict | list, **kwargs) -> None:
     field_mapping = {
         "slade_id": "id",
         "itemclscd": "classification_code",
@@ -314,9 +316,9 @@ def update_item_classification_codes(response: dict | list, document_name: str) 
     )
 
 
-def update_taxation_type(data: dict, document_name: str) -> None:
+def update_taxation_type(response: dict, **kwargs) -> None:
     doc: Document | None = None
-    tax_list = data.get("results", [])
+    tax_list = response.get("results", [])
 
     for taxation_type in tax_list:
         code = (
@@ -346,9 +348,9 @@ def update_taxation_type(data: dict, document_name: str) -> None:
     frappe.db.commit()
 
 
-def update_countries(data: list, document_name: str) -> None:
+def update_countries(response: list, **kwargs) -> None:
     doc: Document | None = None
-    for code, details in data.items():
+    for code, details in response.items():
         country_name = details.get("name", "").strip().lower()
         existing_doc = frappe.get_value(
             COUNTRIES_DOCTYPE_NAME, {"name": ["like", country_name]}
@@ -370,14 +372,18 @@ def update_countries(data: list, document_name: str) -> None:
     frappe.db.commit()
 
 
-def update_organisations(data: dict, document_name: str) -> None:
-    if isinstance(data, str):
+def update_organisations(response: dict, **kwargs) -> None:
+    if isinstance(response, str):
         try:
-            data = json.loads(data)
+            response = json.loads(response)
         except json.JSONDecodeError:
-            raise ValueError(f"Invalid JSON string: {data}")
+            raise ValueError(f"Invalid JSON string: {response}")
 
-    doc_list = data if isinstance(data, list) else data.get("results", data)[:10]
+    doc_list = (
+        response
+        if isinstance(response, list)
+        else response.get("results", response)[:10]
+    )
 
     for record in doc_list:
         if isinstance(record, str):
@@ -436,7 +442,7 @@ def update_organisations(data: dict, document_name: str) -> None:
     frappe.db.commit()
 
 
-def update_branches(data: dict, document_name: str) -> None:
+def update_branches(response: dict, **kwargs) -> None:
     field_mapping = {
         "slade_id": "id",
         "tax_id": "organisation_tax_pin",
@@ -460,17 +466,19 @@ def update_branches(data: dict, document_name: str) -> None:
         "custom_is_etims_branch": lambda x: 1 if x.get("branch_status") else 0,
         "custom_is_etims_verified": lambda x: 1 if x.get("is_etims_verified") else 0,
     }
-    update_documents(data, "Branch", field_mapping, filter_field="name")
+    update_documents(response, "Branch", field_mapping, filter_field="name")
 
 
-def update_departments(data: dict, document_name: str) -> None:
-    if isinstance(data, str):
+def update_departments(response: dict, **kwargs) -> None:
+    if isinstance(response, str):
         try:
-            data = json.loads(data)
+            response = json.loads(response)
         except json.JSONDecodeError:
-            raise ValueError(f"Invalid JSON string: {data}")
+            raise ValueError(f"Invalid JSON string: {response}")
 
-    doc_list = data if isinstance(data, list) else data.get("results", data)
+    doc_list = (
+        response if isinstance(response, list) else response.get("results", response)
+    )
 
     for record in doc_list:
         if isinstance(record, str):
@@ -516,7 +524,7 @@ def update_departments(data: dict, document_name: str) -> None:
     frappe.db.commit()
 
 
-def update_workstations(data: dict, document_name: str) -> None:
+def update_workstations(response: dict, **kwargs) -> None:
     field_mapping = {
         "slade_id": "id",
         "active": lambda x: 1 if x.get("active") else 0,
@@ -537,4 +545,6 @@ def update_workstations(data: dict, document_name: str) -> None:
             "extract_field": "name",
         },
     }
-    update_documents(data, WORKSTATION_DOCTYPE_NAME, field_mapping, filter_field="id")
+    update_documents(
+        response, WORKSTATION_DOCTYPE_NAME, field_mapping, filter_field="id"
+    )

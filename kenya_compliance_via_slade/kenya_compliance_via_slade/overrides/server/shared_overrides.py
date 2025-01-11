@@ -37,10 +37,10 @@ def generic_invoices_on_submit_override(
     process_request(
         payload,
         "TrnsSalesSaveWrReq",
-        lambda response, document_name: sales_information_submission_on_success(
-            response,
-            document_name,
+        lambda response, **kwargs: sales_information_submission_on_success(
+            response=response,
             **additional_context,
+            **kwargs,
         ),
         method="POST",
         doctype=invoice_type,

@@ -119,7 +119,7 @@
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-07 07:45:52.108346",
+ "modified": "2025-01-11 08:36:24.359647",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Payment Type",
@@ -140,8 +140,10 @@
   }
  ],
  "search_fields": "code_name, slade_id, code",
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "code_name"
+ "title_field": "code_name",
+ "translated_doctype": 1
 }

@@ -1,6 +1,8 @@
 from datetime import datetime
+from io import BytesIO
 
 import deprecation
+import qrcode
 
 import frappe
 
@@ -95,7 +97,7 @@ def customer_search_on_success(
     )
 
 
-def item_registration_on_success(response: dict, document_name: str) -> None:
+def item_registration_on_success(response: dict, document_name: str, **kwargs) -> None:
     updates = {
         "custom_item_registered": 1 if response.get("sent_to_etims") else 0,
         "custom_slade_id": response.get("id"),
@@ -125,7 +127,9 @@ def customer_branch_details_submission_on_success(
     )
 
 
-def user_details_submission_on_success(response: dict, document_name: str) -> None:
+def user_details_submission_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
     frappe.db.set_value(
         USER_DOCTYPE_NAME,
         document_name,
@@ -139,7 +143,7 @@ def user_details_submission_on_success(response: dict, document_name: str) -> No
     )
 
 
-def user_details_fetch_on_success(response: dict, document_name: str) -> None:
+def user_details_fetch_on_success(response: dict, document_name: str, **kwargs) -> None:
     result = response.get("results", [])[0] if response.get("results") else response
     email = result.get("email")
 
@@ -166,6 +170,12 @@ def user_details_fetch_on_success(response: dict, document_name: str) -> None:
         else None
     )
 
+    branch_id = (
+        result.get("user_workstations")[0]["workstation__org_unit__parent"]
+        if result.get("user_workstations") and len(result.get("user_workstations")) > 0
+        else None
+    )
+
     data = {
         "submitted_successfully_to_etims": 1 if response.get("sent_to_etims") else 0,
         "slade_id": result.get("id"),
@@ -178,6 +188,7 @@ def user_details_fetch_on_success(response: dict, document_name: str) -> None:
         "company": get_link_value(
             "Company", "custom_slade_id", result.get("organisation_id")
         ),
+        "branch": get_link_value("Branch", "slade_id", branch_id),
         "system_user": user.name,
     }
 
@@ -195,15 +206,19 @@ def user_details_fetch_on_success(response: dict, document_name: str) -> None:
     current_version=__version__,
     details="Callback became redundant due to changes in the Item doctype rendering the field obsolete",
 )
-def inventory_submission_on_success(response: dict, document_name: str) -> None:
+def inventory_submission_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
     frappe.db.set_value("Item", document_name, {"custom_inventory_submitted": 1})
 
 
-def imported_item_submission_on_success(response: dict, document_name: str) -> None:
+def imported_item_submission_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
     frappe.db.set_value("Item", document_name, {"custom_imported_item_submitted": 1})
 
 
-def submit_inventory_on_success(response: dict, document_name: str) -> None:
+def submit_inventory_on_success(response: dict, document_name: str, **kwargs) -> None:
     frappe.db.set_value(
         "Stock Ledger Entry",
         document_name,
@@ -212,16 +227,14 @@ def submit_inventory_on_success(response: dict, document_name: str) -> None:
 
 
 def sales_information_submission_on_success(
-    response: dict,
-    document_name: str,
-    invoice_type: str,
+    response: dict, document_name: str, doctype: str, **kwargs
 ) -> None:
     """
     Callback function executed after successfully processing an item.
     Updates the invoice with custom ID and submission status.
     """
     frappe.db.set_value(
-        invoice_type,
+        doctype,
         document_name,
         {
             "custom_slade_id": response.get("id"),
@@ -231,7 +244,7 @@ def sales_information_submission_on_success(
     frappe.enqueue(
         "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.remote_response_status_handlers.process_invoice_items",
         document_name=document_name,
-        invoice_type=invoice_type,
+        doctype=doctype,
         invoice_slade_id=response.get("id"),
         queue="long",
     )
@@ -239,7 +252,7 @@ def sales_information_submission_on_success(
 
 @frappe.whitelist()
 def process_invoice_items(
-    document_name: str, invoice_type: str, invoice_slade_id: str
+    document_name: str, doctype: str, invoice_slade_id: str, **kwargs
 ) -> None:
     """
     Retrieves the specific invoice, extracts all items, and sends each
@@ -247,15 +260,15 @@ def process_invoice_items(
     """
     from .apis import process_request
 
-    invoice = frappe.get_doc(invoice_type, document_name)
+    invoice = frappe.get_doc(doctype, document_name)
 
     if not invoice:
-        frappe.throw(f"{invoice_type} with name {document_name} not found.")
+        frappe.throw(f"{doctype} with name {document_name} not found.")
 
     items = invoice.get("items", [])
-    items_table_doctype = frappe.get_meta(invoice_type).get_field("items").options
+    items_table_doctype = frappe.get_meta(doctype).get_field("items").options
     if not items:
-        frappe.throw(f"No items found for {invoice_type} {document_name}.")
+        frappe.throw(f"No items found for {doctype} {document_name}.")
 
     for item in items:
         payload = {
@@ -268,35 +281,28 @@ def process_invoice_items(
             "sales_invoice": invoice_slade_id,
             "document_name": item.get("name"),
         }
-        additional_context = {
-            "invoice_type": items_table_doctype,
-        }
-
         process_request(
             payload,
             "SalesLineSaveReq",
-            lambda response, document_name, additional_context=additional_context: sales_item_submission_on_success(
-                response,
-                document_name,
-                **additional_context,
-            ),
-            method="POST",
+            sales_item_submission_on_success,
             doctype=items_table_doctype,
+            method="POST",
         )
-    process_sales_transition(document_name, invoice_type, invoice_slade_id)
+
+    process_sales_transition(document_name, doctype, invoice_slade_id)
 
 
 def process_sales_transition(
-    document_name: str, invoice_type: str, invoice_slade_id: str
+    document_name: str, doctype: str, invoice_slade_id: str
 ) -> None:
     from .apis import process_request
 
-    def handle_transition_success(response: dict, document_name: str) -> None:
-        # process_sales_sign(document_name, invoice_type, invoice_slade_id)
+    def handle_transition_success(response: dict, document_name: str, **kwargs) -> None:
+        # process_sales_sign(document_name, doctype, invoice_slade_id)
         frappe.enqueue(
             "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.remote_response_status_handlers.process_sales_sign",
             document_name=document_name,
-            invoice_type=invoice_type,
+            doctype=doctype,
             invoice_slade_id=response.get("id"),
             queue="long",
         )
@@ -308,47 +314,116 @@ def process_sales_transition(
         "SalesTransitionReq",
         handle_transition_success,
         method="PATCH",
-        doctype=invoice_type,
+        doctype=doctype,
     )
 
 
-def process_sales_sign(
-    document_name: str, invoice_type: str, invoice_slade_id: str
-) -> None:
+def process_sales_sign(document_name: str, doctype: str, invoice_slade_id: str) -> None:
     from .apis import process_request
+
+    def handle_invoice_sign_success(
+        response: dict, document_name: str, **kwargs
+    ) -> None:
+        # process_sales_sign(document_name, doctype, invoice_slade_id)
+        frappe.enqueue(
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_invoice_details",
+            request_data={"id": invoice_slade_id, "document_name": document_name},
+            invoice_type=doctype,
+            queue="long",
+        )
 
     payload = {"invoice_id": invoice_slade_id, "document_name": document_name}
 
     process_request(
         payload,
         "SalesSignInvReq",
-        lambda response: frappe.msgprint(
-            f"Invoice {document_name} successfully processed and signed."
-        ),
+        handle_invoice_sign_success,
         method="POST",
-        doctype=invoice_type,
+        doctype=doctype,
     )
 
 
+def update_invoice_info(response: dict, **kwargs) -> None:
+    doctype = kwargs.get("doctype")
+    custom_slade_id = response.get("id")
+    scu_data = response.get("scu_data")
+    if not scu_data:
+        return
+
+    qr_code_url = scu_data.get("qr_code_url")
+    updates = {
+        "custom_slade_id": custom_slade_id,
+        "custom_qr_code_url": qr_code_url,
+        "custom_current_receipt_number": scu_data.get("scu_receipt_number"),
+        "custom_control_unit_date_time": parse_datetime(
+            scu_data.get("scu_receipt_timestamp")
+        ),
+        "custom_receipt_signature": scu_data.get("scu_receipt_signature"),
+        "custom_internal_data": scu_data.get("scu_internal_data"),
+        "custom_scu_id": scu_data.get("scu_id"),
+        "custom_scu_mrc_no": scu_data.get("scu_mrc_number"),
+        "custom_scu_invoice_number": scu_data.get("scu_invoice_number"),
+    }
+
+    # Generate QR Code image if qr_code_url is available
+    if qr_code_url:
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(qr_code_url)
+        qr.make(fit=True)
+
+        # Save QR Code image as binary
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        # Attach the QR code image to the document and get the file URL
+        file_doc = frappe.get_doc(
+            {
+                "doctype": "File",
+                "file_name": f"QR-{custom_slade_id}.png",
+                "is_private": 1,
+                "content": buffer.read(),
+                "attached_to_doctype": doctype,
+                "attached_to_name": custom_slade_id,
+            }
+        )
+        file_doc.save()
+        updates["custom_qr_code"] = file_doc.file_url
+
+    document_name = frappe.db.get_value(
+        doctype, {"custom_slade_id": custom_slade_id}, "name"
+    )
+    if document_name:
+        frappe.db.set_value(doctype, document_name, updates)
+
+
 def sales_item_submission_on_success(
-    response: dict,
-    document_name: str,
-    invoice_type: str,
+    response: dict, document_name: str, doctype: str, **kwargs
 ) -> None:
     updates = {
         "custom_slade_id": response.get("id"),
         "custom_sent_to_slade": 1,
     }
-    frappe.db.set_value(invoice_type, document_name, updates)
+    frappe.db.set_value(doctype, document_name, updates)
 
 
-def item_composition_submission_on_success(response: dict, document_name: str) -> None:
+def item_composition_submission_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
     frappe.db.set_value(
         "BOM", document_name, {"custom_item_composition_submitted_successfully": 1}
     )
 
 
-def purchase_invoice_submission_on_success(response: dict, document_name: str) -> None:
+def purchase_invoice_submission_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
     frappe.db.set_value(
         "Purchase Invoice",
         document_name,
@@ -359,13 +434,15 @@ def purchase_invoice_submission_on_success(response: dict, document_name: str) -
     )
 
 
-def stock_mvt_submission_on_success(response: dict, document_name: str) -> None:
+def stock_mvt_submission_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
     frappe.db.set_value(
         "Stock Ledger Entry", document_name, {"custom_submitted_successfully": 1}
     )
 
 
-def purchase_search_on_success(response: dict, document_name: str) -> None:
+def purchase_search_on_success(response: dict, **kwargs) -> None:
     sales_list = (
         response.get("results", [])
         if isinstance(response, dict)
@@ -488,7 +565,7 @@ def create_purchase_from_search_details(fetched_purchase: dict) -> str:
     return doc.name
 
 
-def create_and_link_purchase_item(response: dict, document_name: str) -> None:
+def create_and_link_purchase_item(response: dict, document_name: str, **kwargs) -> None:
     item_list = response if isinstance(response, list) else response.get("results")
     parent_record = frappe.get_doc(REGISTERED_PURCHASES_DOCTYPE_NAME, document_name)
     parent_record.flags.ignore_permissions = True
@@ -545,7 +622,7 @@ def create_and_link_purchase_item(response: dict, document_name: str) -> None:
     parent_record.save()
 
 
-def notices_search_on_success(response: dict | list, document_name: str) -> None:
+def notices_search_on_success(response: dict | list, **kwargs) -> None:
     notices = response if isinstance(response, list) else response.get("results")
     if isinstance(notices, list):
         for notice in notices:
@@ -595,7 +672,7 @@ def create_notice_if_new(notice: dict) -> None:
         )
 
 
-def stock_mvt_search_on_success(response: dict, document_name: str) -> None:
+def stock_mvt_search_on_success(response: dict, **kwargs) -> None:
     stock_list = response["data"]["stockList"]
 
     for stock in stock_list:
@@ -640,7 +717,7 @@ def stock_mvt_search_on_success(response: dict, document_name: str) -> None:
         doc.save()
 
 
-def imported_items_search_on_success(response: dict, document_name: str) -> None:
+def imported_items_search_on_success(response: dict, **kwargs) -> None:
     items = response.get("results", [])
     batch_size = 20
     counter = 0
@@ -783,7 +860,7 @@ def parse_date(date_str: str) -> None:
     raise ValueError(f"Invalid date format: {date_str}")
 
 
-def search_branch_request_on_success(response: dict, document_name: str) -> None:
+def search_branch_request_on_success(response: dict, **kwargs) -> None:
     for branch in response.get("results", []):
         doc = None
 
@@ -818,7 +895,7 @@ def search_branch_request_on_success(response: dict, document_name: str) -> None
             doc.save()
 
 
-def item_search_on_success(response: dict, document_name: str) -> None:
+def item_search_on_success(response: dict, **kwargs) -> None:
     items = response.get("results", [])
     batch_size = 20
     counter = 0
@@ -909,11 +986,11 @@ def item_search_on_success(response: dict, document_name: str) -> None:
         frappe.db.commit()
 
 
-def initialize_device_submission_on_success(response: dict, document_name: str) -> None:
+def initialize_device_submission_on_success(response: dict, **kwargs) -> None:
     pass
 
 
-def customers_search_on_success(response: dict, document_name: str) -> None:
+def customers_search_on_success(response: dict, **kwargs) -> None:
     data = response.get("results", []) if response.get("results") else response
     if isinstance(data, dict):
         data = [data]

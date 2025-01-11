@@ -46,6 +46,7 @@ from .remote_response_status_handlers import (
     search_branch_request_on_success,
     stock_mvt_search_on_success,
     submit_inventory_on_success,
+    update_invoice_info,
     user_details_fetch_on_success,
     user_details_submission_on_success,
 )
@@ -859,4 +860,14 @@ def initialize_device(request_data: str) -> None:
         initialize_device_submission_on_success,
         method="POST",
         doctype=SETTINGS_DOCTYPE_NAME,
+    )
+
+
+@frappe.whitelist()
+def get_invoice_details(request_data: str, invoice_type: str) -> None:
+    process_request(
+        request_data,
+        "TrnsSalesSearchReq",
+        update_invoice_info,
+        doctype=invoice_type,
     )
