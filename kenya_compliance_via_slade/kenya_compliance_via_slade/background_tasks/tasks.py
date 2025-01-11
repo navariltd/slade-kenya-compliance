@@ -7,6 +7,7 @@ from ..apis.remote_response_status_handlers import notices_search_on_success
 from ..doctype.doctype_names_mapping import UOM_CATEGORY_DOCTYPE_NAME
 from .task_response_handlers import (
     uom_category_search_on_success,
+    uom_search_on_success,
     update_branches,
     update_countries,
     update_currencies,
@@ -39,7 +40,7 @@ def refresh_code_lists(request_data: str) -> str:
         ("CurrencyCountrySearchReq", update_countries),
         ("CurrencySearchReq", update_currencies),
         ("PackagingUnitSearchReq", update_packaging_units),
-        ("UOMSearchReq", update_unit_of_quantity),
+        ("QuantityUnitsSearchReq", update_unit_of_quantity),
         ("TaxSearchReq", update_taxation_type),
         ("PaymentMtdSearchReq", update_payment_methods),
     ]
@@ -80,5 +81,16 @@ def fetch_etims_uom_categories(request_data: str) -> None:
         "UOMCategoriesSearchReq",
         uom_category_search_on_success,
         doctype=UOM_CATEGORY_DOCTYPE_NAME,
+    )
+    return message
+
+
+@frappe.whitelist()
+def fetch_etims_uom_list(request_data: str) -> None:
+    message = process_request(
+        request_data,
+        "UOMListSearchReq",
+        uom_search_on_success,
+        doctype="UOM",
     )
     return message

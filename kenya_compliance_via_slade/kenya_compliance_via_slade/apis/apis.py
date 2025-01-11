@@ -54,7 +54,10 @@ from .remote_response_status_handlers import (
 )
 
 endpoints_builder = EndpointsBuilder()
-from ..background_tasks.task_response_handlers import uom_category_search_on_success
+from ..background_tasks.task_response_handlers import (
+    uom_category_search_on_success,
+    uom_search_on_success,
+)
 from .remote_response_status_handlers import on_slade_error
 
 
@@ -930,4 +933,53 @@ def sync_uom_category_details(request_data: str) -> None:
         "UOMCategorySearchReq",
         uom_category_search_on_success,
         doctype=UOM_CATEGORY_DOCTYPE_NAME,
+    )
+
+
+@frappe.whitelist()
+def save_uom_details(name: str) -> dict | None:
+    item = frappe.get_doc("UOM", name)
+
+    slade_id = item.get("slade_id", None)
+
+    request_data = {
+        "name": item.get("uom_name"),
+        "document_name": item.get("name"),
+        "factor": item.get("custom_factor"),
+        "uom_type": item.get("custom_uom_type"),
+        "category": get_link_value(
+            UOM_CATEGORY_DOCTYPE_NAME,
+            "name",
+            item.get("custom_category"),
+            "slade_id",
+        ),
+        "active": True if item.get("active") == 1 else False,
+    }
+
+    if slade_id:
+        request_data["id"] = slade_id
+        process_request(
+            request_data,
+            "UOMListSearchReq",
+            uom_search_on_success,
+            method="PATCH",
+            doctype="UOM",
+        )
+    else:
+        process_request(
+            request_data,
+            "UOMListSearchReq",
+            uom_search_on_success,
+            method="POST",
+            doctype="UOM",
+        )
+
+
+@frappe.whitelist()
+def sync_uom_details(request_data: str) -> None:
+    process_request(
+        request_data,
+        "UOMDetailSearchReq",
+        uom_search_on_success,
+        doctype="UOM",
     )

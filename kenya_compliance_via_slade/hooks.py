@@ -137,6 +137,7 @@ doctype_js = {
     "Item": "kenya_compliance_via_slade/overrides/client/items.js",
     "BOM": "kenya_compliance_via_slade/overrides/client/bom.js",
     "Branch": "kenya_compliance_via_slade/overrides/client/branch.js",
+    "UOM": "kenya_compliance_via_slade/overrides/client/uom.js",
 }
 
 doctype_list_js = {
@@ -144,6 +145,7 @@ doctype_list_js = {
     "Sales Invoice": "kenya_compliance_via_slade/overrides/client/sales_invoice_list.js",
     "Branch": "kenya_compliance_via_slade/overrides/client/branch_list.js",
     "Customer": "kenya_compliance_via_slade/overrides/client/customer_list.js",
+    "UOM": "kenya_compliance_via_slade/overrides/client/uom_list.js",
 }
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
