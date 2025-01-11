@@ -200,12 +200,7 @@ def perform_item_registration(item_name: str) -> dict | None:
         "product_type": item.get("custom_product_type"),
         "item_type": item.get("custom_item_type"),
         "preferred_name": item.get("item_name"),
-        "country_of_origin": get_link_value(
-            COUNTRIES_DOCTYPE_NAME,
-            "code",
-            item.get("custom_etims_country_of_origin_code"),
-            "slade_id",
-        ),
+        "country_of_origin": item.get("custom_etims_country_of_origin_code"),
         "packaging_unit": get_link_value(
             PACKAGING_UNIT_DOCTYPE_NAME,
             "code",
@@ -229,7 +224,7 @@ def perform_item_registration(item_name: str) -> dict | None:
         request_data["id"] = custom_slade_id
         process_request(
             request_data,
-            "ItemSaveReq",
+            "ItemsSearchReq",
             item_registration_on_success,
             method="PATCH",
             doctype="Item",
@@ -242,6 +237,13 @@ def perform_item_registration(item_name: str) -> dict | None:
             method="POST",
             doctype="Item",
         )
+
+
+@frappe.whitelist()
+def fetch_item_details(request_data: str) -> None:
+    process_request(
+        request_data, "ItemSearchReq", item_search_on_success, doctype="Item"
+    )
 
 
 @frappe.whitelist()
@@ -391,7 +393,7 @@ def perform_item_search(request_data: str) -> None:
     data: dict = json.loads(request_data)
 
     process_request(
-        request_data, "ItemSearchReq", item_search_on_success, doctype="Item"
+        request_data, "ItemsSearchReq", item_search_on_success, doctype="Item"
     )
 
 

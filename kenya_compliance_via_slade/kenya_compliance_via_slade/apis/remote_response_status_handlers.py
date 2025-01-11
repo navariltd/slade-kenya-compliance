@@ -896,7 +896,7 @@ def search_branch_request_on_success(response: dict, **kwargs) -> None:
 
 
 def item_search_on_success(response: dict, **kwargs) -> None:
-    items = response.get("results", [])
+    items = response.get("results", []) or [response]
     batch_size = 20
     counter = 0
 
