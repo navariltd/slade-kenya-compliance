@@ -8,6 +8,7 @@ import aiohttp
 
 import frappe
 import frappe.defaults
+from frappe import _
 from frappe.model.document import Document
 
 from ..doctype.doctype_names_mapping import (
@@ -162,6 +163,19 @@ def perform_customer_search(request_data: str) -> None:
 @frappe.whitelist()
 def perform_item_registration(item_name: str) -> dict | None:
     item = frappe.get_doc("Item", item_name)
+    missing_fields = []
+
+    for field in item.meta.fields:
+        if field.reqd and not item.get(field.fieldname):
+            missing_fields.append(field.label)
+
+    if missing_fields:
+        frappe.throw(
+            _("The following required fields are missing: {0}").format(
+                ", ".join(missing_fields)
+            )
+        )
+
     tax = get_link_value(
         TAXATION_TYPE_DOCTYPE_NAME, "cd", item.get("custom_taxation_type"), "slade_id"
     )

@@ -10,26 +10,26 @@ frappe.ui.form.on(itemDoctypName, {
     frappe.call({
       method: "frappe.client.get",
       args: {
-      doctype: "Company",
-      name: companyName,
+        doctype: "Company",
+        name: companyName,
       },
       callback: function (response) {
-      if (response && response.message) {
-        organisation = response.message.custom_slade_id
-      }
+        if (response && response.message) {
+          organisation = response.message.custom_slade_id;
+        }
       },
     });
 
     frappe.call({
       method: "frappe.client.get",
       args: {
-      doctype: "Branch",
-      name: branchName,
+        doctype: "Branch",
+        name: branchName,
       },
       callback: function (response) {
-      if (response && response.message) {
-        branch = response.message.slade_id
-      }
+        if (response && response.message) {
+          branch = response.message.slade_id;
+        }
       },
     });
 
@@ -206,7 +206,6 @@ frappe.ui.form.on(itemDoctypName, {
       //       __("eTims Actions")
       //     );
       //   }
-
 
       // }
     }
