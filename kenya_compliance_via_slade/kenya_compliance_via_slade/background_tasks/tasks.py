@@ -6,6 +6,7 @@ from ..apis.apis import process_request
 from ..apis.remote_response_status_handlers import notices_search_on_success
 from ..doctype.doctype_names_mapping import UOM_CATEGORY_DOCTYPE_NAME
 from .task_response_handlers import (
+    location_search_on_success,
     uom_category_search_on_success,
     uom_search_on_success,
     update_branches,
@@ -19,6 +20,7 @@ from .task_response_handlers import (
     update_taxation_type,
     update_unit_of_quantity,
     update_workstations,
+    warehouse_search_on_success,
 )
 
 endpoints_builder = EndpointsBuilder()
@@ -94,3 +96,20 @@ def fetch_etims_uom_list(request_data: str) -> None:
         doctype="UOM",
     )
     return message
+
+
+@frappe.whitelist()
+def fetch_etims_warehouse_list(request_data: str) -> None:
+    warehouses = process_request(
+        request_data,
+        "WarehousesSearchReq",
+        warehouse_search_on_success,
+        doctype="Warehouse",
+    )
+    locations = process_request(
+        request_data,
+        "LocationsSearchReq",
+        location_search_on_success,
+        doctype="Warehouse",
+    )
+    return warehouses, locations

@@ -423,7 +423,7 @@ def update_departments(response: dict, **kwargs) -> None:
             raise ValueError(f"Invalid JSON string: {response}")
 
     doc_list = (
-        response if isinstance(response, list) else response.get("results", response)
+        response if isinstance(response, list) else response.get("results", [response])
     )
 
     for record in doc_list:
@@ -523,3 +523,65 @@ def uom_search_on_success(response: dict, **kwargs) -> None:
         "active": lambda x: 1 if x.get("active") else 0,
     }
     update_documents(response, "UOM", field_mapping, filter_field="name")
+
+
+def warehouse_search_on_success(response: dict, **kwargs) -> None:
+    handle_warehouse_search_on_success(response)
+
+
+def location_search_on_success(response: dict, **kwargs) -> None:
+    handle_warehouse_search_on_success(response, True)
+
+
+def handle_warehouse_search_on_success(
+    response: dict, is_location: bool = False
+) -> None:
+    if isinstance(response, str):
+        try:
+            response = json.loads(response)
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON string: {response}")
+
+    doc_list = (
+        response if isinstance(response, list) else response.get("results", [response])
+    )
+
+    for record in doc_list:
+        if isinstance(record, str):
+            continue
+
+        existing_warehouse = frappe.db.get_value(
+            "Warehouse", {"warehouse_name": record.get("name")}, "name"
+        )
+        if existing_warehouse:
+            doc = frappe.get_doc("Warehouse", existing_warehouse)
+        else:
+            warehouse_name = record.get("name")
+
+            doc = frappe.new_doc("Warehouse")
+            doc.warehouse_name = warehouse_name
+
+        if record.get("organisation"):
+            doc.company = (
+                get_link_value("Company", "custom_slade_id", record.get("organisation"))
+                or frappe.defaults.get_user_default("Company")
+                or frappe.get_value("Company", {}, "name")
+            )
+        if is_location and record.get("branch"):
+            doc.branch = get_link_value("Branch", "slade_id", record.get("branch"))
+        if is_location and record.get("warehouse"):
+            doc.parent_warehouse = get_link_value(
+                "Warehouse", "custom_slade_id", record.get("warehouse")
+            )
+        if record.get("id"):
+            doc.custom_slade_id = record.get("id", "")
+        doc.disabled = 0 if record.get("active") else 1
+        if not is_location:
+            doc.is_group = 1
+
+        try:
+            doc.save()
+        except frappe.DuplicateEntryError:
+            continue
+
+    frappe.db.commit()

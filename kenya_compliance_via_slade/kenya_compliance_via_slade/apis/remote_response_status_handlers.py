@@ -1024,3 +1024,9 @@ def customers_search_on_success(response: dict, **kwargs) -> None:
             doc.update(data)
             doc.insert(ignore_permissions=True)
         frappe.db.commit()
+
+
+def warehouse_update_on_success(response: dict, document_name: str, **kwargs) -> None:
+    frappe.db.set_value(
+        "Warehouse", document_name, {"custom_slade_id": response.get("id")}
+    )

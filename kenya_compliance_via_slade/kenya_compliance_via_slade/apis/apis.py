@@ -51,12 +51,15 @@ from .remote_response_status_handlers import (
     update_invoice_info,
     user_details_fetch_on_success,
     user_details_submission_on_success,
+    warehouse_update_on_success,
 )
 
 endpoints_builder = EndpointsBuilder()
 from ..background_tasks.task_response_handlers import (
+    location_search_on_success,
     uom_category_search_on_success,
     uom_search_on_success,
+    warehouse_search_on_success,
 )
 from .remote_response_status_handlers import on_slade_error
 
@@ -71,19 +74,34 @@ def process_request(
     """Reusable function to process requests with common logic."""
     if isinstance(request_data, str):
         data = json.loads(request_data)
-    elif isinstance(request_data, dict):
+    elif isinstance(request_data, (dict, list)):
         data = request_data
-    company_name = (
-        data.get("company_name")
-        or frappe.defaults.get_user_default("Company")
-        or frappe.get_value("Company", {}, "name")
-    )
-    branch_id = (
-        data.get("branch_id")
-        or frappe.defaults.get_user_default("Branch")
-        or frappe.get_value("Branch", {"is_group": 0}, "name")
-    )
-    document_name = data.get("document_name", None)
+
+    if isinstance(data, list) and data:
+        first_entry = data[0]
+        company_name = (
+            first_entry.get("company_name", None)
+            or frappe.defaults.get_user_default("Company")
+            or frappe.get_value("Company", {}, "name")
+        )
+        branch_id = (
+            first_entry.get("branch_id", None)
+            or frappe.defaults.get_user_default("Branch")
+            or frappe.get_value("Branch", {"is_group": 0}, "name")
+        )
+        document_name = first_entry.get("document_name", None)
+    else:
+        company_name = (
+            data.get("company_name", None)
+            or frappe.defaults.get_user_default("Company")
+            or frappe.get_value("Company", {}, "name")
+        )
+        branch_id = (
+            data.get("branch_id", None)
+            or frappe.defaults.get_user_default("Branch")
+            or frappe.get_value("Branch", {"is_group": 0}, "name")
+        )
+        document_name = data.get("document_name", None)
 
     headers = build_headers(company_name, branch_id)
     server_url = get_server_url(company_name, branch_id)
@@ -982,4 +1000,99 @@ def sync_uom_details(request_data: str) -> None:
         "UOMDetailSearchReq",
         uom_search_on_success,
         doctype="UOM",
+    )
+
+
+@frappe.whitelist()
+def submit_uom_list() -> dict | None:
+    uoms = frappe.get_all(
+        "UOM", filters={"custom_slade_id": ["is", "not set"]}, fields=["name"]
+    )
+    request_data = []
+    for uom in uoms:
+        item = frappe.get_doc("UOM", uom.name)
+        category = item.get("custom_category") or "Unit"
+        item_data = {
+            "name": item.get("uom_name"),
+            "factor": item.get("custom_factor"),
+            "uom_type": item.get("custom_uom_type") or "reference",
+            "category": get_link_value(
+                UOM_CATEGORY_DOCTYPE_NAME,
+                "name",
+                category,
+                "slade_id",
+            ),
+            "active": True if item.get("active") == 1 else False,
+        }
+        request_data.append(item_data)
+
+    process_request(
+        request_data,
+        "UOMListSearchReq",
+        uom_search_on_success,
+        method="POST",
+        doctype="UOM",
+    )
+
+
+@frappe.whitelist()
+def sync_warehouse_details(request_data: str, type: str = "warehouse") -> None:
+    if type == "warehouse":
+        process_request(
+            request_data,
+            "WarehouseSearchReq",
+            warehouse_search_on_success,
+            doctype="Warehouse",
+        )
+    else:
+        process_request(
+            request_data,
+            "LocationSearchReq",
+            location_search_on_success,
+            doctype="Warehouse",
+        )
+
+
+@frappe.whitelist()
+def save_warehouse_details(name: str) -> dict | None:
+    item = frappe.get_doc("Warehouse", name)
+    slade_id = item.get("custom_slade_id", None)
+    is_group = item.get("is_group", 0)
+
+    route_key = "WarehousesSearchReq"
+    on_success = warehouse_update_on_success
+
+    request_data = {
+        "name": item.get("warehouse_name"),
+        "document_name": item.get("name"),
+        "organisation": get_link_value(
+            "Company",
+            "name",
+            item.get("company"),
+            "custom_slade_id",
+        ),
+        "active": False if item.get("disabled") == 1 else True,
+    }
+
+    if not is_group:
+        request_data["branch"] = get_link_value(
+            "Branch", "name", item.get("branch"), "slade_id"
+        )
+        request_data["warehouse"] = get_link_value(
+            "Warehouse", "name", item.get("parent_warehouse"), "custom_slade_id"
+        )
+        route_key = "LocationsSearchReq"
+
+    if slade_id:
+        request_data["id"] = slade_id
+        method = "PATCH"
+    else:
+        method = "POST"
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        method=method,
+        doctype="Warehouse",
     )

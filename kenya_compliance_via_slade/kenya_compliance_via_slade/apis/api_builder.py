@@ -243,13 +243,16 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                 self.refresh_token(document_name)
                 self.make_remote_call(doctype, document_name, retrying=True)
             else:
-                error = (
-                    response_data
-                    if isinstance(response_data, str)
-                    else response_data.get("error")
-                    or response_data.get("detail")
-                    or str(response_data)
-                )
+                if isinstance(response_data, str):
+                    error = response_data
+                elif isinstance(response_data, list):
+                    error = response_data[0]
+                else:
+                    error = (
+                        response_data.get("error")
+                        or response_data.get("detail")
+                        or str(response_data)
+                    )
                 update_integration_request(
                     self.integration_request.name,
                     status="Failed",
