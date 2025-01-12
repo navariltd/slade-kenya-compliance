@@ -233,14 +233,17 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                     response=response_data, document_name=document_name, doctype=doctype
                 )
 
+                current_page = response_data.get("current_page", None)
+                total_pages = response_data.get("total_pages", 0)
+
                 update_integration_request(
                     self.integration_request.name,
                     status="Completed",
                     output=str(response_data),
                     error=None,
                     request_description=(
-                        f"Page {response_data.get('current_page', 'N/A')} of {response_data.get('total_pages', 'N/A')}"
-                        if int(response_data.get("total_pages")) > 1
+                        f"Page {current_page} of {total_pages}"
+                        if int(total_pages) > 1
                         else None
                     ),
                 )

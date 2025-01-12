@@ -188,7 +188,10 @@ def update_documents(
             else:
                 setattr(doc, field, record.get(value, ""))
 
-        doc.save()
+        try:
+            doc.save()
+        except Exception:
+            continue
 
     frappe.db.commit()
 
@@ -587,7 +590,7 @@ def handle_warehouse_search_on_success(
     frappe.db.commit()
 
 
-def pricelist_search_on_success(response: dict, is_location: bool = False) -> None:
+def pricelist_search_on_success(response: dict, **kwargs) -> None:
     if isinstance(response, str):
         try:
             response = json.loads(response)

@@ -837,21 +837,29 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
 
 @frappe.whitelist()
 def ping_server(request_data: str) -> None:
-    url = json.loads(request_data)["server_url"]
+    data = json.loads(request_data)
+    server_url = f"{data["server_url"]}/alive"
+    auth_url = data["auth_url"]
 
-    try:
-        response = asyncio.run(make_get_request(url))
+    async def check_server(url: str) -> tuple:
+        try:
+            response = await make_get_request(url)
+            return "Online", response
+        except aiohttp.client_exceptions.ClientConnectorError:
+            return "Offline", None
 
-        if len(response) == 13:
-            frappe.msgprint("The Server is Online")
-            return
+    async def main() -> None:
+        server_status, server_response = await check_server(server_url)
+        auth_status, auth_response = await check_server(auth_url)
 
-        frappe.msgprint("The Server is Offline")
-        return
+        if server_response:
+            frappe.msgprint(f"Server Status: {server_status}\n{server_response}")
+        else:
+            frappe.msgprint(f"Server Status: {server_status}")
 
-    except aiohttp.client_exceptions.ClientConnectorError:
-        frappe.msgprint("The Server is Offline")
-        return
+        frappe.msgprint(f"Auth Server Status: {auth_status}")
+
+    asyncio.run(main())
 
 
 @frappe.whitelist()
