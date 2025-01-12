@@ -11,10 +11,8 @@ from ..doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
-    ITEM_TYPE_DOCTYPE_NAME,
     NOTICES_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
-    PRODUCT_TYPE_DOCTYPE_NAME,
     REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
     REGISTERED_PURCHASES_DOCTYPE_NAME,
     REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM,
@@ -484,9 +482,6 @@ def parse_datetime(date_str: str, format: str = "%Y-%m-%dT%H:%M:%S%z") -> str:
             parsed_date = datetime.strptime(date_str, "%Y-%m-%d")
         return parsed_date.strftime("%Y-%m-%d %H:%M:%S")
     except Exception:
-        frappe.log_error(
-            f"Invalid datetime format: {date_str}", title="Datetime Parsing Error"
-        )
         return None
 
 
@@ -822,10 +817,7 @@ def imported_items_search_on_success(response: dict, **kwargs) -> None:
                 frappe.db.commit()
 
         except Exception as e:
-            frappe.log_error(
-                title="Imported Item Sync Error",
-                message=f"Error while processing item with ID {item.get('id')}: {str(e)}",
-            )
+            continue
 
     if counter % batch_size != 0:
         frappe.db.commit()
@@ -897,8 +889,6 @@ def search_branch_request_on_success(response: dict, **kwargs) -> None:
 
 def item_search_on_success(response: dict, **kwargs) -> None:
     items = response.get("results", []) or [response]
-    batch_size = 20
-    counter = 0
 
     for item_data in items:
         try:
@@ -906,25 +896,30 @@ def item_search_on_success(response: dict, **kwargs) -> None:
             existing_item = frappe.db.get_value(
                 "Item", {"custom_slade_id": slade_id}, "name", order_by="creation desc"
             )
+            country_of_origin_code = item_data.get("country_of_origin", "KE")[
+                :2
+            ].upper()
+            country_of_origin = get_link_value(
+                COUNTRIES_DOCTYPE_NAME, "code", country_of_origin_code
+            )
+            item_code = item_data.get("code")
+
+            if existing_item:
+                item_doc = frappe.get_doc("Item", existing_item)
+                item_code = item_doc.item_code
 
             request_data = {
                 "item_name": item_data.get("name"),
-                "item_code": item_data.get("name"),
+                "item_code": item_code,
                 "custom_item_registered": 1 if item_data.get("sent_to_etims") else 0,
                 "custom_slade_id": item_data.get("id"),
                 "custom_sent_to_slade": 1,
                 "description": item_data.get("description"),
                 "is_sales_item": item_data.get("can_be_sold", False),
                 "is_purchase_item": item_data.get("can_be_purchased", False),
-                "company_name": frappe.defaults.get_user_default("Company"),
                 "code": item_data.get("code"),
                 "custom_item_code_etims": item_data.get("scu_item_code"),
-                "product_type": item_data.get("product_type"),
-                "product_type_code": item_data.get("product_type"),
-                "preferred_name": item_data.get("preferred_name"),
-                "custom_etims_country_of_origin_code": item_data.get(
-                    "country_of_origin"
-                ),
+                "custom_etims_country_of_origin_code": country_of_origin_code,
                 "valuation_rate": round(item_data.get("selling_price", 0.0), 2),
                 "last_purchase_rate": round(item_data.get("purchasing_price", 0.0), 2),
                 "custom_item_classification": get_link_value(
@@ -932,9 +927,7 @@ def item_search_on_success(response: dict, **kwargs) -> None:
                     "slade_id",
                     item_data.get("scu_item_classification"),
                 ),
-                "custom_etims_country_of_origin": get_link_value(
-                    COUNTRIES_DOCTYPE_NAME, "code", item_data.get("country_of_origin")
-                ),
+                "custom_etims_country_of_origin": country_of_origin,
                 "custom_packaging_unit": get_link_value(
                     PACKAGING_UNIT_DOCTYPE_NAME,
                     "slade_id",
@@ -945,17 +938,13 @@ def item_search_on_success(response: dict, **kwargs) -> None:
                     "slade_id",
                     item_data.get("quantity_unit"),
                 ),
-                "custom_item_type": get_link_value(
-                    ITEM_TYPE_DOCTYPE_NAME, "name", item_data.get("item_type")
-                ),
+                "custom_item_type": item_data.get("item_type"),
                 "custom_taxation_type": get_link_value(
                     TAXATION_TYPE_DOCTYPE_NAME,
                     "slade_id",
                     item_data.get("sale_taxes")[0],
                 ),
-                "custom_product_type": get_link_value(
-                    PRODUCT_TYPE_DOCTYPE_NAME, "code", item_data.get("product_type")
-                ),
+                "custom_product_type": item_data.get("product_type"),
             }
 
             if existing_item:
@@ -966,24 +955,17 @@ def item_search_on_success(response: dict, **kwargs) -> None:
             else:
                 request_data["item_group"] = "All Item Groups"
                 new_item = frappe.get_doc({"doctype": "Item", **request_data})
+                new_item.flags.ignore_mandatory = True
                 new_item.insert(
                     ignore_permissions=True,
                     ignore_mandatory=True,
                     ignore_if_duplicate=True,
                 )
 
-            counter += 1
-            if counter % batch_size == 0:
-                frappe.db.commit()
-
         except Exception as e:
-            frappe.log_error(
-                title="Item Sync Error",
-                message=f"Error while processing item with ID {item_data.get('id')}: {str(e)}",
-            )
+            continue
 
-    if counter % batch_size != 0:
-        frappe.db.commit()
+    frappe.db.commit()
 
 
 def initialize_device_submission_on_success(response: dict, **kwargs) -> None:

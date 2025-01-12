@@ -121,18 +121,24 @@ def process_request(
     if headers and server_url and route_path:
         url = f"{server_url}{route_path}"
 
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = data
-        endpoints_builder.request_description = route_key
-        endpoints_builder.method = method
-        endpoints_builder.success_callback = handler_function
-        endpoints_builder.error_callback = on_slade_error
+        while url:
+            endpoints_builder.headers = headers
+            endpoints_builder.url = url
+            endpoints_builder.payload = data
+            endpoints_builder.request_description = route_key
+            endpoints_builder.method = method
+            endpoints_builder.success_callback = handler_function
+            endpoints_builder.error_callback = on_slade_error
 
-        endpoints_builder.make_remote_call(
-            doctype=doctype,
-            document_name=document_name,
-        )
+            response = endpoints_builder.make_remote_call(
+                doctype=doctype,
+                document_name=document_name,
+            )
+
+            if isinstance(response, dict) and "next" in response:
+                url = response["next"]
+            else:
+                url = None
 
         return f"{route_key} completed successfully."
     else:
