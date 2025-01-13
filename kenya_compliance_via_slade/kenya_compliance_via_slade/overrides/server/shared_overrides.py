@@ -42,7 +42,7 @@ def generic_invoices_on_submit_override(
             **additional_context,
             **kwargs,
         ),
-        method="POST",
+        request_method="POST",
         doctype=invoice_type,
     )
 

@@ -14,6 +14,7 @@ from frappe.model.document import Document
 from ..doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+    OPERATION_TYPE_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     REGISTERED_PURCHASES_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,
@@ -45,6 +46,7 @@ from .remote_response_status_handlers import (
     item_registration_on_success,
     item_search_on_success,
     on_error,
+    operation_type_create_on_success,
     pricelist_update_on_success,
     purchase_search_on_success,
     search_branch_request_on_success,
@@ -59,6 +61,7 @@ from .remote_response_status_handlers import (
 endpoints_builder = EndpointsBuilder()
 from ..background_tasks.task_response_handlers import (
     location_search_on_success,
+    operation_types_search_on_success,
     uom_category_search_on_success,
     uom_search_on_success,
     warehouse_search_on_success,
@@ -70,7 +73,7 @@ def process_request(
     request_data: str | dict,
     route_key: str,
     handler_function: Callable,
-    method: str = "GET",
+    request_method: str = "GET",
     doctype: str = SETTINGS_DOCTYPE_NAME,
 ) -> str:
     """Reusable function to process requests with common logic."""
@@ -111,7 +114,7 @@ def process_request(
 
     route_path = process_dynamic_url(route_path, request_data)
 
-    if method == "GET":
+    if request_method == "GET":
         if "document_name" in data and data["document_name"]:
             data.pop("document_name")
 
@@ -126,7 +129,7 @@ def process_request(
             endpoints_builder.url = url
             endpoints_builder.payload = data
             endpoints_builder.request_description = route_key
-            endpoints_builder.method = method
+            endpoints_builder.method = request_method
             endpoints_builder.success_callback = handler_function
             endpoints_builder.error_callback = on_slade_error
 
@@ -186,7 +189,7 @@ def perform_customer_search(request_data: str) -> None:
         request_data,
         "CustSearchReq",
         customer_search_on_success,
-        method="POST",
+        request_method="POST",
         doctype="Customer",
     )
 
@@ -257,7 +260,7 @@ def perform_item_registration(item_name: str) -> dict | None:
             request_data,
             "ItemsSearchReq",
             item_registration_on_success,
-            method="PATCH",
+            request_method="PATCH",
             doctype="Item",
         )
     else:
@@ -265,7 +268,7 @@ def perform_item_registration(item_name: str) -> dict | None:
             request_data,
             "ItemsSearchReq",
             item_registration_on_success,
-            method="POST",
+            request_method="POST",
             doctype="Item",
         )
 
@@ -340,7 +343,7 @@ def send_branch_customer_details(request_data: str) -> None:
         json.dumps(data),
         "BhfCustSaveReq",
         customer_branch_details_submission_on_success,
-        method="POST",
+        request_method="POST",
         doctype=doctype,
     )
 
@@ -365,7 +368,7 @@ def get_my_user_details(request_data: str) -> None:
         request_data,
         "BhfUserSearchReq",
         user_details_fetch_on_success,
-        method="GET",
+        request_method="GET",
         doctype=USER_DOCTYPE_NAME,
     )
 
@@ -376,7 +379,7 @@ def get_branch_user_details(request_data: str) -> None:
         request_data,
         "BhfUserSaveReq",
         user_details_fetch_on_success,
-        method="GET",
+        request_method="GET",
         doctype=USER_DOCTYPE_NAME,
     )
 
@@ -387,7 +390,7 @@ def save_branch_user_details(request_data: str) -> None:
         request_data,
         "BhfUserSaveReq",
         user_details_submission_on_success,
-        method="POST",
+        request_method="POST",
         doctype=USER_DOCTYPE_NAME,
     )
 
@@ -527,7 +530,7 @@ def send_imported_item_request(request_data: str) -> None:
         request_data,
         "ImportItemSearchReq",
         imported_item_submission_on_success,
-        method="POST",
+        request_method="POST",
         doctype="Item",
     )
 
@@ -913,7 +916,7 @@ def initialize_device(request_data: str) -> None:
         request_data,
         "DeviceVerificationReq",
         initialize_device_submission_on_success,
-        method="POST",
+        request_method="POST",
         doctype=SETTINGS_DOCTYPE_NAME,
     )
 
@@ -947,7 +950,7 @@ def save_uom_category_details(name: str) -> dict | None:
             request_data,
             "UOMCategoriesSearchReq",
             uom_category_search_on_success,
-            method="PATCH",
+            request_method="PATCH",
             doctype=UOM_CATEGORY_DOCTYPE_NAME,
         )
     else:
@@ -955,7 +958,7 @@ def save_uom_category_details(name: str) -> dict | None:
             request_data,
             "UOMCategoriesSearchReq",
             uom_category_search_on_success,
-            method="POST",
+            request_method="POST",
             doctype=UOM_CATEGORY_DOCTYPE_NAME,
         )
 
@@ -996,7 +999,7 @@ def save_uom_details(name: str) -> dict | None:
             request_data,
             "UOMListSearchReq",
             uom_search_on_success,
-            method="PATCH",
+            request_method="PATCH",
             doctype="UOM",
         )
     else:
@@ -1004,7 +1007,7 @@ def save_uom_details(name: str) -> dict | None:
             request_data,
             "UOMListSearchReq",
             uom_search_on_success,
-            method="POST",
+            request_method="POST",
             doctype="UOM",
         )
 
@@ -1046,7 +1049,7 @@ def submit_uom_list() -> dict | None:
         request_data,
         "UOMListSearchReq",
         uom_search_on_success,
-        method="POST",
+        request_method="POST",
         doctype="UOM",
     )
 
@@ -1109,7 +1112,7 @@ def save_warehouse_details(name: str) -> dict | None:
         request_data,
         route_key=route_key,
         handler_function=on_success,
-        method=method,
+        request_method=method,
         doctype="Warehouse",
     )
 
@@ -1170,7 +1173,7 @@ def submit_pricelist(name: str) -> dict | None:
         request_data,
         route_key=route_key,
         handler_function=on_success,
-        method=method,
+        request_method=method,
         doctype="Price List",
     )
 
@@ -1234,7 +1237,7 @@ def submit_item_price(name: str) -> dict | None:
         request_data,
         route_key=route_key,
         handler_function=on_success,
-        method=method,
+        request_method=method,
         doctype="Item Price",
     )
 
@@ -1246,4 +1249,76 @@ def sync_item_price(request_data: str) -> None:
         "ItemPriceSearchReq",
         item_price_update_on_success,
         doctype="Item Price",
+    )
+
+
+@frappe.whitelist()
+def save_operation_type(
+    name: str, on_success: Callable = operation_type_create_on_success
+) -> dict | None:
+    item = frappe.get_doc(OPERATION_TYPE_DOCTYPE_NAME, name)
+    slade_id = item.get("slade_id", None)
+
+    route_key = "OperationTypesReq"
+
+    request_data = {
+        "operation_name": item.get("operation_name"),
+        "document_name": item.get("name"),
+        "operation_type": item.get("operation_type"),
+        "organisation": get_link_value(
+            "Company",
+            "name",
+            item.get("company"),
+            "custom_slade_id",
+        ),
+        "branch": get_link_value(
+            "Branch",
+            "name",
+            item.get("branch"),
+            "slade_id",
+        ),
+        "destination_location": get_link_value(
+            "Warehouse",
+            "name",
+            item.get("destination_location"),
+            "custom_slade_id",
+        ),
+        "source_location": get_link_value(
+            "Warehouse",
+            "name",
+            item.get("source_location"),
+            "custom_slade_id",
+        ),
+        "transit_location": get_link_value(
+            "Warehouse",
+            "name",
+            item.get("transit_location"),
+            "custom_slade_id",
+        ),
+        "active": False if item.get("active") == 0 else True,
+    }
+
+    if slade_id:
+        request_data["id"] = slade_id
+        method = "PATCH"
+        on_success = operation_types_search_on_success
+    else:
+        method = "POST"
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        request_method=method,
+        doctype=OPERATION_TYPE_DOCTYPE_NAME,
+    )
+
+
+@frappe.whitelist()
+def sync_operation_type(request_data: str) -> None:
+    process_request(
+        request_data,
+        "OperationTypeReq",
+        operation_types_search_on_success,
+        doctype=OPERATION_TYPE_DOCTYPE_NAME,
     )

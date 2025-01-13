@@ -360,7 +360,6 @@ def build_invoice_payload(
         invoice_name = clean_invc_no(invoice_name)
 
     payload = {
-        # "made_by": invoice.owner,
         "document_name": invoice.name,
         "branch_id": invoice.branch,
         "company_name": company_name,
@@ -373,8 +372,7 @@ def build_invoice_payload(
         "currency": frappe.get_value("Currency", invoice.currency, "custom_slade_id"),
         "source_organisation_unit": frappe.get_value(
             "Department", invoice.department, "custom_slade_id"
-        )
-        or "4f2ede94-cb03-4532-9c38-a455470cfe0e",
+        ),
         "branch": frappe.get_value("Branch", invoice.branch, "slade_id"),
         "organisation": frappe.get_value("Company", invoice.company, "custom_slade_id"),
         "sales_type": "cash",

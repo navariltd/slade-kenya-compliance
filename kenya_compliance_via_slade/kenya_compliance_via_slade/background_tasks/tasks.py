@@ -1,13 +1,19 @@
 import frappe
 import frappe.defaults
+from frappe.model.document import Document
 
 from ..apis.api_builder import EndpointsBuilder
 from ..apis.apis import process_request
 from ..apis.remote_response_status_handlers import notices_search_on_success
-from ..doctype.doctype_names_mapping import UOM_CATEGORY_DOCTYPE_NAME
+from ..doctype.doctype_names_mapping import (
+    OPERATION_TYPE_DOCTYPE_NAME,
+    UOM_CATEGORY_DOCTYPE_NAME,
+)
+from ..overrides.server.stock_ledger_entry import on_update
 from .task_response_handlers import (
     itemprice_search_on_success,
     location_search_on_success,
+    operation_types_search_on_success,
     pricelist_search_on_success,
     uom_category_search_on_success,
     uom_search_on_success,
@@ -137,3 +143,34 @@ def fetch_etims_item_prices(request_data: str) -> None:
         doctype="Item Price",
     )
     return itemprices
+
+
+@frappe.whitelist()
+def fetch_etims_operation_types(request_data: str) -> None:
+    operation_types = process_request(
+        request_data,
+        "OperationTypesReq",
+        operation_types_search_on_success,
+        doctype=OPERATION_TYPE_DOCTYPE_NAME,
+    )
+    return operation_types
+
+
+def send_stock_information() -> None:
+    all_stock_ledger_entries: list[Document] = frappe.get_all(
+        "Stock Ledger Entry",
+        {"docstatus": 1, "custom_submitted_successfully": 0},
+        ["name"],
+    )
+    for entry in all_stock_ledger_entries:
+        doc = frappe.get_doc(
+            "Stock Ledger Entry", entry.name, for_update=False
+        )  # Refetch to get the document representation of the record
+
+        try:
+            on_update(
+                doc, method=None
+            )  # Delegate to the on_update method for Stock Ledger Entry override
+
+        except TypeError:
+            continue

@@ -7,6 +7,7 @@ from frappe.model.document import Document
 from ..doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+    OPERATION_TYPE_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     PAYMENT_TYPE_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
@@ -14,7 +15,6 @@ from ..doctype.doctype_names_mapping import (
     UOM_CATEGORY_DOCTYPE_NAME,
     WORKSTATION_DOCTYPE_NAME,
 )
-from ..overrides.server.stock_ledger_entry import on_update
 from ..utils import get_link_value
 
 
@@ -68,26 +68,6 @@ def send_pos_invoices_information() -> None:
 
             except TypeError:
                 continue
-
-
-def send_stock_information() -> None:
-    all_stock_ledger_entries: list[Document] = frappe.get_all(
-        "Stock Ledger Entry",
-        {"docstatus": 1, "custom_submitted_successfully": 0},
-        ["name"],
-    )
-    for entry in all_stock_ledger_entries:
-        doc = frappe.get_doc(
-            "Stock Ledger Entry", entry.name, for_update=False
-        )  # Refetch to get the document representation of the record
-
-        try:
-            on_update(
-                doc, method=None
-            )  # Delegate to the on_update method for Stock Ledger Entry override
-
-        except TypeError:
-            continue
 
 
 def send_purchase_information() -> None:
@@ -163,10 +143,14 @@ def update_documents(
         if isinstance(record, str):
             continue
 
-        filter_value = record.get(filter_field)
-        try:
-            doc = frappe.get_doc(doctype_name, filter_value)
-        except frappe.DoesNotExistError:
+        filter_key = field_mapping.get(filter_field)
+        filter_value = record.get(filter_key)
+        doc_name = frappe.db.get_value(
+            doctype_name, {filter_field: filter_value}, "name"
+        )
+        if doc_name:
+            doc = frappe.get_doc(doctype_name, doc_name)
+        else:
             doc = frappe.new_doc(doctype_name)
 
         for field, value in field_mapping.items():
@@ -233,7 +217,7 @@ def update_payment_methods(response: dict, **kwargs) -> None:
         "account": "account",
     }
     update_documents(
-        response, PAYMENT_TYPE_DOCTYPE_NAME, field_mapping, filter_field="id"
+        response, PAYMENT_TYPE_DOCTYPE_NAME, field_mapping, filter_field="slade_id"
     )
 
 
@@ -244,7 +228,7 @@ def update_currencies(response: dict, **kwargs) -> None:
         "enabled": lambda x: 1 if x.get("active") else 0,
         "custom_conversion_rate": "conversion_rate",
     }
-    update_documents(response, "Currency", field_mapping, filter_field="iso_code")
+    update_documents(response, "Currency", field_mapping, filter_field="currency_name")
 
 
 def update_item_classification_codes(response: dict | list, **kwargs) -> None:
@@ -261,7 +245,7 @@ def update_item_classification_codes(response: dict | list, **kwargs) -> None:
         response,
         ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
         field_mapping,
-        filter_field="classification_code",
+        filter_field="itemclscd",
     )
 
 
@@ -415,7 +399,7 @@ def update_branches(response: dict, **kwargs) -> None:
         "custom_is_etims_branch": lambda x: 1 if x.get("branch_status") else 0,
         "custom_is_etims_verified": lambda x: 1 if x.get("is_etims_verified") else 0,
     }
-    update_documents(response, "Branch", field_mapping, filter_field="name")
+    update_documents(response, "Branch", field_mapping, filter_field="branch")
 
 
 def update_departments(response: dict, **kwargs) -> None:
@@ -465,7 +449,7 @@ def update_departments(response: dict, **kwargs) -> None:
                 "Branch", "slade_id", record.get("parent")
             )
         if record.get("id"):
-            doc.custom_slade_id = record.get("id", "")
+            doc.custom_slade_id = record.get("id")
         doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
 
         doc.save()
@@ -495,7 +479,7 @@ def update_workstations(response: dict, **kwargs) -> None:
         },
     }
     update_documents(
-        response, WORKSTATION_DOCTYPE_NAME, field_mapping, filter_field="id"
+        response, WORKSTATION_DOCTYPE_NAME, field_mapping, filter_field="slade_id"
     )
 
 
@@ -507,7 +491,7 @@ def uom_category_search_on_success(response: dict, **kwargs) -> None:
         "active": lambda x: 1 if x.get("active") else 0,
     }
     update_documents(
-        response, UOM_CATEGORY_DOCTYPE_NAME, field_mapping, filter_field="name"
+        response, UOM_CATEGORY_DOCTYPE_NAME, field_mapping, filter_field="category_name"
     )
 
 
@@ -525,7 +509,7 @@ def uom_search_on_success(response: dict, **kwargs) -> None:
         "uom_name": "name",
         "active": lambda x: 1 if x.get("active") else 0,
     }
-    update_documents(response, "UOM", field_mapping, filter_field="name")
+    update_documents(response, "UOM", field_mapping, filter_field="uom_name")
 
 
 def warehouse_search_on_success(response: dict, **kwargs) -> None:
@@ -674,4 +658,48 @@ def itemprice_search_on_success(response: dict, **kwargs) -> None:
         },
         "enabled": lambda x: 1 if x.get("active") else 0,
     }
-    update_documents(response, "Item Price", field_mapping, filter_field="id")
+    update_documents(
+        response, "Item Price", field_mapping, filter_field="custom_slade_id"
+    )
+
+
+def operation_types_search_on_success(response: dict, **kwargs) -> None:
+    field_mapping = {
+        "slade_id": "id",
+        "operation_name": "operation_name",
+        "operation_type": "operation_type",
+        "item_code": {
+            "doctype": "Item",
+            "link_field": "product",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "company": {
+            "doctype": "Company",
+            "link_field": "organisation",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "source_location": {
+            "doctype": "Warehouse",
+            "link_field": "source_location",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "destination_location": {
+            "doctype": "Warehouse",
+            "link_field": "destination_location",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "transit_location": {
+            "doctype": "Warehouse",
+            "link_field": "transit_location",
+            "filter_field": "custom_slade_id",
+            "extract_field": "name",
+        },
+        "active": lambda x: 1 if x.get("active") else 0,
+    }
+    update_documents(
+        response, OPERATION_TYPE_DOCTYPE_NAME, field_mapping, filter_field="slade_id"
+    )

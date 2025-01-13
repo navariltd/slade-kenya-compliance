@@ -1,436 +1,287 @@
-from functools import partial
 from hashlib import sha256
-from typing import Literal
 
 import frappe
 from frappe.model.document import Document
 
-from erpnext.controllers.taxes_and_totals import get_itemised_tax_breakup_data
-
 from ...apis.api_builder import EndpointsBuilder
-from ...apis.remote_response_status_handlers import (
-    on_error,
-    stock_mvt_submission_on_success,
-)
-from ...utils import (
-    build_headers,
-    extract_document_series_number,
-    get_route_path,
-    get_server_url,
-    quantize_number,
-    split_user_email,
-)
+from ...apis.apis import process_request
+from ...doctype.doctype_names_mapping import OPERATION_TYPE_DOCTYPE_NAME
+from ...utils import extract_document_series_number
 
 endpoints_builder = EndpointsBuilder()
 
 
 def on_update(doc: Document, method: str | None = None) -> None:
-    company_name = doc.company
-    vendor = "OSCU KRA"
-    all_items = frappe.db.get_all(
-        "Item", ["*"]
-    )  # Get all items to filter and fetch metadata
-    record = frappe.get_doc(doc.voucher_type, doc.voucher_no)
-    series_no = extract_document_series_number(record)
-    payload = {
-        "sarNo": series_no,
-        "orgSarNo": series_no,
-        "regTyCd": "M",
-        "custTin": None,
-        "custNm": None,
-        "custBhfId": get_warehouse_branch_id(doc.warehouse) or None,
-        "ocrnDt": record.posting_date.strftime("%Y%m%d"),
-        "totTaxblAmt": 0,
-        "totItemCnt": len(record.items),
-        "totTaxAmt": 0,
-        "totAmt": 0,
-        "remark": None,
-        "regrId": split_user_email(record.owner),
-        "regrNm": record.owner,
-        "modrNm": record.modified_by,
-        "modrId": split_user_email(record.modified_by),
-    }
-    headers = build_headers(company_name, vendor, record.branch)
+    save_ledger_details(doc.name)
 
-    if doc.voucher_type == "Stock Reconciliation":
-        items_list = get_stock_recon_movement_items_details(
-            record.items, all_items
-        )  # Get details abt item using the function
-        current_item = list(
-            filter(lambda item: item["itemNm"] == doc.item_code, items_list)
-        )  # filter only the item referenced in this stock ledger entry
-        qty_diff = int(
-            current_item[0].pop("quantity_difference")
-        )  # retrieve the quantity difference from the items dict. Only applies to stock recons
-        payload["itemList"] = current_item
-        payload["totItemCnt"] = len(current_item)
 
-        if record.purpose == "Opening Stock":
-            # Stock Recons of type "opening stock" are never negative, so just short-curcuit
-            payload["sarTyCd"] = "06"
-
+@frappe.whitelist()
+def save_ledger_details(name: str) -> None:
+    try:
+        doc = frappe.get_doc("Stock Ledger Entry", name)
+        company_name = doc.company
+        slade_id = doc.custom_slade_id
+        if slade_id:
+            return
+        record = frappe.get_doc(doc.voucher_type, doc.voucher_no)
+        item = frappe.get_doc("Item", doc.item_code)
+        series_no = extract_document_series_number(record)
+        route_key = "StockIOSaveReq"
+        if record.branch:
+            branch_name = record.branch
+        elif record.custom_branch:
+            branch_name = record.custom_branch
         else:
-            # Stock recons of other types apart from "opening stock"
-            if qty_diff < 0:
-                # If the quantity difference is negative, apply etims stock in/out code 16
-                payload["sarTyCd"] = "16"
+            branch_name = frappe.defaults.get_user_default(
+                "Branch"
+            ) or frappe.get_value("Branch", {}, "name")
 
-            else:
-                # If the quantity difference is positive, apply etims stock in/out code 06
-                payload["sarTyCd"] = "06"
+        department_name = frappe.defaults.get_user_default(
+            "Department"
+        ) or frappe.get_value("Department", {}, "name")
+        payload = {
+            "name": doc.name,
+            "document_name": doc.name,
+            "branch": frappe.get_value("Branch", branch_name, "slade_id"),
+            "organisation": frappe.get_value(
+                "Company", company_name, "custom_slade_id"
+            ),
+            "source_organisation_unit": frappe.get_value(
+                "Department", department_name, "custom_slade_id"
+            ),
+            "document_number": record.name,
+            "document_count": series_no,
+        }
 
-    if doc.voucher_type == "Stock Entry":
-        items_list = get_stock_entry_movement_items_details(record.items, all_items)
-        current_item = list(
-            filter(lambda item: item["itemNm"] == doc.item_code, items_list)
-        )
+        document_type_mapping = {
+            "Stock Reconciliation": "stock_take",
+            "Stock Entry": {
+                "Material Receipt": "warehouse_in",
+                "Material Transfer": "inventory_operation",
+                "Manufacture": "inventory_operation",
+                "Send to Subcontractor": "inventory_operation",
+                "Material Issue": "inventory_operation",
+                "Repack": "inventory_operation",
+            },
+            "Purchase Receipt": "grn",
+            "Purchase Invoice": "purchases_invoice",
+            "Delivery Note": "gdn",
+            "Sales Invoice": "sales_invoice",
+        }
 
-        payload["itemList"] = current_item
-        payload["totItemCnt"] = len(current_item)
-
-        if record.stock_entry_type == "Material Receipt":
-            payload["sarTyCd"] = "04"
-
-        if record.stock_entry_type == "Material Transfer":
-            doc_warehouse_branch_id = get_warehouse_branch_id(doc.warehouse)
-            voucher_details = frappe.db.get_value(
-                "Stock Entry Detail",
-                {"name": doc.voucher_detail_no},
-                ["s_warehouse", "t_warehouse"],
-                as_dict=True,
-            )
-
-            if doc.actual_qty < 0:
-                # If the record warehouse is the source warehouse
-                headers = build_headers(doc.company, vendor, doc_warehouse_branch_id)
-                payload["custBhfId"] = get_warehouse_branch_id(
-                    voucher_details.t_warehouse
+        if doc.voucher_type in document_type_mapping:
+            if isinstance(document_type_mapping[doc.voucher_type], dict):
+                payload["document_type"] = document_type_mapping[doc.voucher_type].get(
+                    record.stock_entry_type, "inventory_operation"
                 )
-                payload["sarTyCd"] = "13"
-
             else:
-                # If the record warehouse is the target warehouse
-                headers = build_headers(doc.company, vendor, doc_warehouse_branch_id)
-                payload["custBhfId"] = get_warehouse_branch_id(
-                    voucher_details.s_warehouse
-                )
-                payload["sarTyCd"] = "04"
+                payload["document_type"] = document_type_mapping[doc.voucher_type]
 
-        if record.stock_entry_type == "Manufacture":
-            if doc.actual_qty > 0:
-                payload["sarTyCd"] = "05"
-
-            else:
-                payload["sarTyCd"] = "14"
-
-        if record.stock_entry_type in ("Send to Subcontractor", "Material Issue"):
-            payload["sarTyCd"] = "13"
-
-        if record.stock_entry_type == "Repack":
-            if doc.actual_qty < 0:
-                # Negative repack
-                payload["sarTyCd"] = "14"
-
-            else:
-                payload["sarTyCd"] = "05"
-
-    if doc.voucher_type in ("Purchase Receipt", "Purchase Invoice"):
-        # TODO: This is very bad looking. Clean it up
-        items_list = get_purchase_docs_items_details(record.items, all_items)
-        item_taxes = get_itemised_tax_breakup_data(record)
-
-        current_item = list(
-            filter(lambda item: item["itemNm"] == doc.item_code, items_list)
-        )
-        tax_details = list(filter(lambda i: i["item"] == doc.item_code, item_taxes))[0]
-
-        # current_item[0]["taxblAmt"] = round(
-        #     tax_details["taxable_amount"] / current_item[0]["qty"], 2
-        # )
-        # current_item[0]["totAmt"] = round(
-        #     tax_details["taxable_amount"] / current_item[0]["qty"], 2
-        # )
-
-        # actual_tax_amount = 0
-        # tax_head = doc.taxes[0].description
-
-        # actual_tax_amount = tax_details[tax_head]["tax_amount"]
-
-        # current_item[0]["taxAmt"] = round(actual_tax_amount / current_item[0]["qty"], 2)
-
-        payload["itemList"] = current_item
-        payload["totItemCnt"] = len(current_item)
-
-        # TODO: use qty change field from SLE
-        if record.is_return:
-            payload["sarTyCd"] = "12"
-
-        else:
-            if current_item[0]["is_imported_item"]:
-                payload["sarTyCd"] = "01"
-
-            else:
-                payload["sarTyCd"] = "02"
-
-    if doc.voucher_type in ("Delivery Note", "Sales Invoice"):
+        # solve the issue of stock transer later
         if (
-            doc.voucher_type == "Sales Invoice"
-            and record.custom_successfully_submitted != 1
+            doc.voucher_type == "Stock Entry"
+            and record.stock_entry_type == "Material Transfer"
         ):
+            route_key = "StockMoveReq"
             return
 
-        items_list = get_notes_docs_items_details(record.items, all_items)
-        item_taxes = get_itemised_tax_breakup_data(record)
-
-        current_item = list(
-            filter(lambda item: item["itemNm"] == doc.item_code, items_list)
-        )  # Get current item only
-        tax_details = list(filter(lambda i: i["item"] == doc.item_code, item_taxes))[0]
-        # filter current items tax details
-
-        # current_item[0]["taxblAmt"] = round(
-        #     tax_details["taxable_amount"] / current_item[0]["qty"], 2
-        # )  # calculate taxable amt
-        # current_item[0]["totAmt"] = round(
-        #     tax_details["taxable_amount"] / current_item[0]["qty"], 2
-        # )  # calculate total amt
-
-        # actual_tax_amount = 0
-        # tax_head = doc.taxes[0].description
-
-        # actual_tax_amount = tax_details[tax_head]["tax_amount"]
-
-        # current_item[0]["taxAmt"] = round(
-        #     actual_tax_amount / current_item[0]["qty"], 2
-        # )  # calculate tax amt
-
-        payload["itemList"] = current_item
-        payload["totItemCnt"] = len(current_item)
-        payload["custNm"] = record.customer
-        payload["custTin"] = record.tax_id
-
-        # TODO: opposite of previous, and use qty change field
-        # TODO: These map to sales returns
-        if record.is_return:
-            # if is_return is checked, it turns to different type of docs
-            if doc.actual_qty > 0:
-                payload["sarTyCd"] = "03"
-
+        if doc.voucher_type == "Stock Reconciliation":
+            route_key = "StockMasterSaveReq"
+            qty_diff = doc.actual_qty
+            if record.purpose == "Opening Stock":
+                payload["document_type"] = "warehouse_in"
+            elif qty_diff < 0:
+                payload["document_type"] = "warehouse_out"
             else:
-                payload["sarTyCd"] = "11"
+                payload["document_type"] = "warehouse_in"
+
+        if doc.voucher_type in ("Purchase Receipt", "Purchase Invoice"):
+            if record.is_return:
+                payload["document_type"] = "return_inwards"
+            elif item.get("is_imported_item"):
+                payload["document_type"] = "purchases_invoice"
+
+        if doc.voucher_type in ("Delivery Note", "Sales Invoice"):
+            if (
+                doc.voucher_type == "Sales Invoice"
+                and record.custom_successfully_submitted != 1
+            ):
+                return
+            if record.is_return:
+                if doc.actual_qty > 0:
+                    payload["document_type"] = "return_inwards"
+                else:
+                    payload["document_type"] = "return_outwards"
+            else:
+                payload["document_type"] = "sales_invoice"
+
+        document_to_operation_mapping = {
+            "warehouse_in": "incoming",
+            "warehouse_out": "outgoing",
+            "stock_take": "internal",
+            "inventory_operation": "internal",
+            "grn": "incoming",
+            "gdn": "outgoing",
+            "purchases_invoice": "incoming",
+            "sales_invoice": "outgoing",
+            "return_inwards": "incoming",
+            "return_outwards": "outgoing",
+        }
+        operation_type = document_to_operation_mapping.get(payload["document_type"])
+        operation_type_fields = {
+            "operation_type": operation_type,
+            "company": doc.company,
+        }
+
+        operation_type_fields["source_location"] = (
+            doc.custom_source_warehouse or doc.warehouse
+        )
+        operation_type_fields["destination_location"] = (
+            doc.custom_target_warehouse or doc.warehouse
+        )
+        operation_type_fields["transit_location"] = (
+            frappe.get_value(
+                "Warehouse",
+                {"warehouse_type": "Transit", "company": doc.company},
+                "name",
+            )
+            or doc.warehouse
+        )
+
+        matching_operation_type = frappe.db.get_value(
+            OPERATION_TYPE_DOCTYPE_NAME, operation_type_fields, ["name", "slade_id"]
+        )
+
+        if matching_operation_type:
+            matching_operation_name, matching_operation_slade_id = (
+                matching_operation_type
+            )
+        else:
+            matching_operation_name, matching_operation_slade_id = None, None
+
+        if not matching_operation_name:
+            name_parts = [doc.company]
+            if operation_type_fields.get("source_location"):
+                name_parts.append(operation_type_fields["source_location"])
+            if operation_type_fields.get("destination_location"):
+                name_parts.append(operation_type_fields["destination_location"])
+            new_operation_type = frappe.get_doc(
+                {
+                    "doctype": OPERATION_TYPE_DOCTYPE_NAME,
+                    "operation_type": operation_type,
+                    "company": doc.company,
+                    "source_location": operation_type_fields.get("source_location"),
+                    "transit_location": operation_type_fields.get("transit_location"),
+                    "destination_location": operation_type_fields.get(
+                        "destination_location"
+                    ),
+                    "operation_name": " ".join(name_parts),
+                    "active": 1,
+                }
+            )
+            new_operation_type.insert()
+            matching_operation_name = new_operation_type.name
+
+        if not matching_operation_slade_id:
+            frappe.enqueue(
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.save_operation_type",
+                name=matching_operation_name,
+                on_success=lambda response, **kwargs: stock_operation_type_submit_on_success(
+                    response, doc_name=doc.name, **kwargs
+                ),
+                queue="long",
+            )
 
         else:
-            payload["sarTyCd"] = "11"
-
-    server_url = get_server_url(company_name, record.branch)
-    route_path, last_request_date = get_route_path("StockIOSaveReq")
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-
-        endpoints_builder.url = url
-        endpoints_builder.headers = headers
-        endpoints_builder.payload = payload
-        endpoints_builder.error_callback = on_error
-        endpoints_builder.success_callback = partial(
-            stock_mvt_submission_on_success, document_name=doc.name
-        )
-
-        job_name = sha256(
-            f"{doc.name}{doc.creation}{doc.modified}".encode(), usedforsecurity=False
-        ).hexdigest()
-
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            queue="default",
-            is_async=True,
-            timeout=300,
-            job_name=job_name,
-            doctype="Stock Ledger Entry",
-            document_name=doc.name,
+            payload["operation_type"] = matching_operation_slade_id
+            submit_stock_mvt(payload, route_key)
+    except Exception as e:
+        frappe.log_error(
+            title=f"Error Fetching submitting ledger {name}",
+            message=f"Error while submitting: {str(e)}",
         )
 
 
-def get_stock_entry_movement_items_details(
-    records: list[Document], all_items: list[Document]
-) -> list[dict]:
-    items_list = []
-
-    for item in records:
-        for fetched_item in all_items:
-            if item.item_code == fetched_item.name:
-                items_list.append(
-                    {
-                        "itemSeq": item.idx,
-                        "itemCd": fetched_item.custom_item_code_etims,
-                        "itemClsCd": fetched_item.custom_item_classification,
-                        "itemNm": fetched_item.item_code,
-                        "bcd": None,
-                        "pkgUnitCd": fetched_item.custom_packaging_unit_code,
-                        "pkg": 1,
-                        "qtyUnitCd": fetched_item.custom_unit_of_quantity_code,
-                        "qty": abs(item.qty),
-                        "itemExprDt": "",
-                        "prc": (
-                            round(int(item.basic_rate), 2) if item.basic_rate else 0
-                        ),
-                        "splyAmt": (
-                            round(int(item.basic_rate), 2) if item.basic_rate else 0
-                        ),
-                        # TODO: Handle discounts properly
-                        "totDcAmt": 0,
-                        "taxTyCd": fetched_item.custom_taxation_type_code or "B",
-                        "taxblAmt": 0,
-                        "taxAmt": 0,
-                        "totAmt": 0,
-                    }
-                )
-
-    return items_list
+def stock_operation_type_submit_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    frappe.db.set_value(
+        OPERATION_TYPE_DOCTYPE_NAME, document_name, {"slade_id": response.get("id")}
+    )
+    save_ledger_details(kwargs.get("doc_name"))
 
 
-def get_stock_recon_movement_items_details(
-    records: list, all_items: list
-) -> list[dict]:
-    items_list = []
-    # current_qty
+def submit_stock_mvt(payload: dict, route_key: str, **kwargs) -> None:
 
-    for item in records:
-        for fetched_item in all_items:
-            if item.item_code == fetched_item.name:
-                items_list.append(
-                    {
-                        "itemSeq": item.idx,
-                        "itemCd": fetched_item.custom_item_code_etims,
-                        "itemClsCd": fetched_item.custom_item_classification,
-                        "itemNm": fetched_item.item_code,
-                        "bcd": None,
-                        "pkgUnitCd": fetched_item.custom_packaging_unit_code,
-                        "pkg": 1,
-                        "qtyUnitCd": fetched_item.custom_unit_of_quantity_code,
-                        "qty": abs(int(item.quantity_difference)),
-                        "itemExprDt": "",
-                        "prc": (
-                            round(int(item.valuation_rate), 2)
-                            if item.valuation_rate
-                            else 0
-                        ),
-                        "splyAmt": (
-                            round(int(item.valuation_rate), 2)
-                            if item.valuation_rate
-                            else 0
-                        ),
-                        "totDcAmt": 0,
-                        "taxTyCd": fetched_item.custom_taxation_type_code or "B",
-                        "taxblAmt": 0,
-                        "taxAmt": 0,
-                        "totAmt": 0,
-                        "quantity_difference": item.quantity_difference,
-                    }
-                )
+    # job_name = sha256(
+    #     f"{doc.name}{doc.creation}{doc.modified}".encode(), usedforsecurity=False
+    # ).hexdigest()
 
-    return items_list
-
-
-def get_purchase_docs_items_details(
-    items: list, all_present_items: list[Document]
-) -> list[dict]:
-    items_list = []
-
-    for item in items:
-        for fetched_item in all_present_items:
-            if item.item_code == fetched_item.name:
-                items_list.append(
-                    {
-                        "itemSeq": item.idx,
-                        "itemCd": fetched_item.custom_item_code_etims,
-                        "itemClsCd": fetched_item.custom_item_classification,
-                        "itemNm": fetched_item.item_code,
-                        "bcd": None,
-                        "pkgUnitCd": fetched_item.custom_packaging_unit_code,
-                        "pkg": 1,
-                        "qtyUnitCd": fetched_item.custom_unit_of_quantity_code,
-                        "qty": abs(item.qty),
-                        "itemExprDt": "",
-                        "prc": (
-                            round(int(item.valuation_rate), 2)
-                            if item.valuation_rate
-                            else 0
-                        ),
-                        "splyAmt": (
-                            round(int(item.valuation_rate), 2)
-                            if item.valuation_rate
-                            else 0
-                        ),
-                        "totDcAmt": 0,
-                        "taxTyCd": fetched_item.custom_taxation_type_code or "B",
-                        "taxblAmt": quantize_number(item.net_amount),
-                        "taxAmt": quantize_number(item.custom_tax_amount) or 0,
-                        "totAmt": quantize_number(
-                            item.net_amount + item.custom_tax_amount
-                        ),
-                        "is_imported_item": (
-                            True
-                            if (
-                                fetched_item.custom_imported_item_status
-                                and fetched_item.custom_imported_item_task_code
-                            )
-                            else False
-                        ),
-                    }
-                )
-
-    return items_list
-
-
-def get_notes_docs_items_details(
-    items: list[Document], all_present_items: list[Document]
-) -> list[dict]:
-    items_list = []
-
-    for item in items:
-        for fetched_item in all_present_items:
-            if item.item_code == fetched_item.name:
-                items_list.append(
-                    {
-                        "itemSeq": item.idx,
-                        "itemCd": None,
-                        "itemClsCd": fetched_item.custom_item_classification,
-                        "itemNm": fetched_item.item_code,
-                        "bcd": None,
-                        "pkgUnitCd": fetched_item.custom_packaging_unit_code,
-                        "pkg": 1,
-                        "qtyUnitCd": fetched_item.custom_unit_of_quantity_code,
-                        "qty": abs(item.qty),
-                        "itemExprDt": "",
-                        "prc": (
-                            round(int(item.base_net_rate), 2)
-                            if item.base_net_rate
-                            else 0
-                        ),
-                        "splyAmt": (
-                            round(int(item.base_net_rate), 2)
-                            if item.base_net_rate
-                            else 0
-                        ),
-                        "totDcAmt": 0,
-                        "taxTyCd": fetched_item.custom_taxation_type_code or "B",
-                        "taxblAmt": quantize_number(item.net_amount),
-                        "taxAmt": quantize_number(item.custom_tax_amount) or 0,
-                        "totAmt": quantize_number(
-                            item.net_amount + item.custom_tax_amount
-                        ),
-                    }
-                )
-
-    return items_list
-
-
-def get_warehouse_branch_id(warehouse_name: str) -> str | Literal[0]:
-    branch_id = frappe.db.get_value(
-        "Warehouse", {"name": warehouse_name}, ["custom_branch"], as_dict=True
+    frappe.enqueue(
+        process_request,
+        queue="default",
+        doctype="Stock Ledger Entry",
+        request_data=payload,
+        route_key=route_key,
+        handler_function=stock_mvt_submission_on_success,
+        request_method="POST",
     )
 
-    if branch_id:
-        return branch_id.custom_branch
 
-    return 0
+def stock_mvt_submission_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    id = response.get("id")
+    frappe.db.set_value("Stock Ledger Entry", document_name, {"custom_slade_id": id})
+    doc = frappe.get_doc("Stock Ledger Entry", document_name)
+    record = frappe.get_doc(doc.voucher_type, doc.voucher_no)
+    item = frappe.get_doc("Item", doc.item_code)
+    route_key = "StockIOLineReq"
+    requset_data = {
+        "document_name": document_name,
+        "branch": frappe.get_value("Branch", record.branch, "slade_id"),
+        "organisation": frappe.get_value("Company", record.company, "custom_slade_id"),
+        "source_organisation_unit": frappe.get_value(
+            "Department", record.department, "custom_slade_id"
+        ),
+        "product": item.custom_slade_id,
+        "quantity": abs(doc.actual_qty),
+        "quantity_confirmed": abs(doc.actual_qty),
+        "new_price": (round(int(doc.valuation_rate), 2) if doc.valuation_rate else 0),
+    }
+    if doc.voucher_type == "Stock Reconciliation":
+        route_key = "StockMasterLineReq"
+
+    if (
+        doc.voucher_type == "Stock Entry"
+        and record.stock_entry_type == "Material Transfer"
+    ):
+        return
+
+    if route_key == "StockIOLineReq":
+        requset_data["inventory_operation"] = id
+    else:
+        requset_data["inventory_adjustment"] = id
+    frappe.enqueue(
+        process_request,
+        queue="default",
+        is_async=True,
+        timeout=300,
+        job_name=sha256(
+            f"{doc.name}{doc.creation}{doc.modified}".encode(), usedforsecurity=False
+        ).hexdigest(),
+        doctype="Stock Ledger Entry",
+        request_data=requset_data,
+        route_key=route_key,
+        handler_function=stock_mvt_submit_items_on_success,
+        request_method="POST",
+    )
+
+
+def stock_mvt_submit_items_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    pass
+    frappe.db.set_value(
+        "Stock Ledger Entry", document_name, {"custom_submitted_successfully": 1}
+    )

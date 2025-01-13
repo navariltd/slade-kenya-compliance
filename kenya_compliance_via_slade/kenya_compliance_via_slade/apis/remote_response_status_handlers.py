@@ -12,6 +12,7 @@ from ..doctype.doctype_names_mapping import (
     IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
     NOTICES_DOCTYPE_NAME,
+    OPERATION_TYPE_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
     REGISTERED_PURCHASES_DOCTYPE_NAME,
@@ -284,7 +285,7 @@ def process_invoice_items(
             "SalesLineSaveReq",
             sales_item_submission_on_success,
             doctype=items_table_doctype,
-            method="POST",
+            request_method="POST",
         )
 
     process_sales_transition(document_name, doctype, invoice_slade_id)
@@ -311,7 +312,7 @@ def process_sales_transition(
         payload,
         "SalesTransitionReq",
         handle_transition_success,
-        method="PATCH",
+        request_method="PATCH",
         doctype=doctype,
     )
 
@@ -336,7 +337,7 @@ def process_sales_sign(document_name: str, doctype: str, invoice_slade_id: str) 
         payload,
         "SalesSignInvReq",
         handle_invoice_sign_success,
-        method="POST",
+        request_method="POST",
         doctype=doctype,
     )
 
@@ -432,14 +433,6 @@ def purchase_invoice_submission_on_success(
     )
 
 
-def stock_mvt_submission_on_success(
-    response: dict, document_name: str, **kwargs
-) -> None:
-    frappe.db.set_value(
-        "Stock Ledger Entry", document_name, {"custom_submitted_successfully": 1}
-    )
-
-
 def purchase_search_on_success(response: dict, **kwargs) -> None:
     sales_list = (
         response.get("results", [])
@@ -467,7 +460,7 @@ def fetch_purchase_items(registered_purchase: str) -> None:
         payload,
         "TrnsPurchaseItemReq",
         create_and_link_purchase_item,
-        method="GET",
+        request_method="GET",
         doctype=REGISTERED_PURCHASES_DOCTYPE_NAME,
     )
 
@@ -1023,4 +1016,12 @@ def pricelist_update_on_success(response: dict, document_name: str, **kwargs) ->
 def item_price_update_on_success(response: dict, document_name: str, **kwargs) -> None:
     frappe.db.set_value(
         "Item Price", document_name, {"custom_slade_id": response.get("id")}
+    )
+
+
+def operation_type_create_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    frappe.db.set_value(
+        OPERATION_TYPE_DOCTYPE_NAME, document_name, {"slade_id": response.get("id")}
     )
