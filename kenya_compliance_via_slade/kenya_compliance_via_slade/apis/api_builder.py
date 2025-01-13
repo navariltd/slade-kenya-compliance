@@ -211,17 +211,18 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                 response = requests.get(
                     self._url, headers=self._headers, params=self._payload
                 )
+
             elif self._method == "PATCH":
                 patch_id = self._payload.pop("id", None)
-                if patch_id:
-                    self._url = f"{self._url}/{patch_id}/"
+                if patch_id and f"/{patch_id}/" not in self._url:
+                    self._url = f"{self._url.rstrip('/')}/{patch_id}/"
                 response = requests.patch(
                     self._url, json=self._payload, headers=self._headers
                 )
             elif self._method == "PUT":
                 put_id = self._payload.pop("id", None)
-                if put_id:
-                    self._url = f"{self._url}/{put_id}/"
+                if put_id and f"/{put_id}/" not in self._url:
+                    self._url = f"{self._url.rstrip('/')}/{put_id}/"
                 response = requests.put(
                     self._url, json=self._payload, headers=self._headers
                 )
@@ -256,11 +257,8 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                 elif isinstance(response_data, list):
                     error = response_data[0]
                 else:
-                    error = (
-                        response_data.get("error")
-                        or response_data.get("detail")
-                        or str(response_data)
-                    )
+                    error = str(response_data)
+
                 update_integration_request(
                     self.integration_request.name,
                     status="Failed",
