@@ -180,20 +180,22 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
       __("eTims Actions")
     );
 
-    // frm.add_custom_button(
-    //   __("Ping Server"),
-    //   function () {
-    //     frappe.call({
-    //       method: "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.ping_server",
-    //       args: {
-    //         request_data: {
-    //           server_url: frm.doc.server_url,
-    //         },
-    //       },
-    //     });
-    //   },
-    //   __("eTims Actions")
-    // );
+    frm.add_custom_button(
+      __("Ping Server"),
+      function () {
+        frappe.call({
+          method:
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.ping_server",
+          args: {
+            request_data: {
+              server_url: frm.doc.server_url,
+              auth_url: frm.doc.auth_server_url,
+            },
+          },
+        });
+      },
+      __("eTims Actions")
+    );
 
     frm.set_query("bhfid", function () {
       return {

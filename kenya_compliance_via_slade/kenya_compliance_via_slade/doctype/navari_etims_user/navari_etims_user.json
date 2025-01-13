@@ -12,8 +12,8 @@
   "email",
   "workstation",
   "column_break_bddz",
-  "branch_id",
-  "organisation",
+  "branch",
+  "company",
   "slade_id",
   "submitted_successfully_to_etims",
   "sent_to_slade",
@@ -31,14 +31,6 @@
   {
    "fieldname": "column_break_bddz",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "branch_id",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Branch ID",
-   "options": "Branch"
   },
   {
    "fetch_from": "system_user.full_name",
@@ -101,22 +93,31 @@
   },
   {
    "fieldname": "workstation",
-   "fieldtype": "Data",
-   "label": "Workstation"
+   "fieldtype": "Link",
+   "label": "Workstation",
+   "options": "Navari KRA eTims Workstation"
   },
   {
-   "fieldname": "organisation",
+   "fieldname": "company",
    "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Organisation",
+   "label": "Company",
    "options": "Company",
    "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "Branch"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-07 10:57:48.744271",
+ "modified": "2025-01-09 16:17:05.579297",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims User",

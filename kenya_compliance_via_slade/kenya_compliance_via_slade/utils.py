@@ -265,12 +265,12 @@ def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | 
     settings = frappe.db.get_value(
         SETTINGS_DOCTYPE_NAME,
         {"bhfid": branch_id, "company": company_name, "is_active": 1},
-        ["access_token", "token_expiry", "name"],
+        ["access_token", "token_expiry", "name", "workstation"],
         as_dict=True,
     ) or frappe.db.get_value(
         SETTINGS_DOCTYPE_NAME,
         {"company": company_name, "is_active": 1},
-        ["access_token", "token_expiry", "name"],
+        ["access_token", "token_expiry", "name", "workstation"],
         as_dict=True,
     )
 
@@ -303,7 +303,7 @@ def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | 
             as_dict=True,
         )
 
-        workstation = user_data.get("workstation") if user_data else None
+        workstation = settings.get("workstation") or user_data.get("workstation")
 
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -313,8 +313,6 @@ def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | 
 
         if workstation:
             headers["X-Workstation"] = workstation
-        else:
-            headers["X-Workstation"] = "731ddef2-9011-4fbe-8f15-af86a81e9bd7"
 
         return headers
 
@@ -362,7 +360,6 @@ def build_invoice_payload(
         invoice_name = clean_invc_no(invoice_name)
 
     payload = {
-        # "made_by": invoice.owner,
         "document_name": invoice.name,
         "branch_id": invoice.branch,
         "company_name": company_name,
@@ -375,8 +372,7 @@ def build_invoice_payload(
         "currency": frappe.get_value("Currency", invoice.currency, "custom_slade_id"),
         "source_organisation_unit": frappe.get_value(
             "Department", invoice.department, "custom_slade_id"
-        )
-        or "4f2ede94-cb03-4532-9c38-a455470cfe0e",
+        ),
         "branch": frappe.get_value("Branch", invoice.branch, "slade_id"),
         "organisation": frappe.get_value("Company", invoice.company, "custom_slade_id"),
         "sales_type": "cash",
@@ -665,6 +661,9 @@ def update_navari_settings_with_token(docname: str) -> str:
     token_details = authenticate_and_get_token(
         auth_server_url, username, password, client_id, client_secret
     )
+
+    if not token_details:
+        return None
 
     settings_doc.access_token = token_details["access_token"]
     settings_doc.refresh_token = token_details["refresh_token"]

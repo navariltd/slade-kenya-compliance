@@ -30,9 +30,30 @@ frappe.ui.form.on(parentDoctype, {
         },
         __("eTims Actions")
       );
+    } else if (!frm.doc.custom_qr_code) {
+      frm.add_custom_button(
+        __("Sync Invoice Details"),
+        function () {
+          frappe.call({
+            method:
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_invoice_details",
+            args: {
+              request_data: {
+                id: frm.doc.custom_slade_id,
+              },
+              invoice_type: "Sales Invoice",
+            },
+            callback: (response) => {},
+            error: (r) => {
+              // Error Handling is Defered to the Server
+            },
+          });
+        },
+        __("eTims Actions")
+      );
     }
-
   },
+
   validate: function (frm) {
     frappe.db.get_value(
       settingsDoctypeName,

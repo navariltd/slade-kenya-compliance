@@ -7,34 +7,15 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_mgte",
+  "workstation",
   "slade_id",
-  "org_name",
-  "orgunit_type",
-  "manager_name",
-  "phone_number",
-  "default_store",
-  "default_country",
+  "workstation_type",
+  "workstation_type_display",
   "column_break_stkg",
-  "email_address",
-  "physical_address",
-  "postal_address",
-  "web_address",
-  "county_name",
-  "sub_county_name",
-  "tax_locality_name",
-  "column_break_urmu",
-  "organisation_tax_pin",
-  "etims_branch_id",
-  "username",
-  "password",
-  "is_etims_verified",
-  "active",
-  "is_headquater",
-  "use_cluster_doc_details",
-  "section_break_mvnn",
-  "description",
-  "column_break_fkrl",
-  "location_description"
+  "company",
+  "department",
+  "is_billing_point",
+  "active"
  ],
  "fields": [
   {
@@ -45,118 +26,12 @@
    "fieldname": "slade_id",
    "fieldtype": "Data",
    "label": "Slade ID",
+   "read_only": 1,
    "unique": 1
-  },
-  {
-   "fieldname": "org_name",
-   "fieldtype": "Data",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Org Name"
-  },
-  {
-   "fieldname": "orgunit_type",
-   "fieldtype": "Data",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Orgunit Type"
-  },
-  {
-   "fieldname": "manager_name",
-   "fieldtype": "Data",
-   "label": "Manager Name"
-  },
-  {
-   "fieldname": "phone_number",
-   "fieldtype": "Data",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Phone Number"
-  },
-  {
-   "fieldname": "default_store",
-   "fieldtype": "Data",
-   "label": "Default Store"
-  },
-  {
-   "fieldname": "default_country",
-   "fieldtype": "Data",
-   "label": "Default Country"
   },
   {
    "fieldname": "column_break_stkg",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "email_address",
-   "fieldtype": "Data",
-   "label": "Email Address"
-  },
-  {
-   "fieldname": "physical_address",
-   "fieldtype": "Data",
-   "label": "Physical Address"
-  },
-  {
-   "fieldname": "postal_address",
-   "fieldtype": "Data",
-   "label": "Postal Address"
-  },
-  {
-   "fieldname": "web_address",
-   "fieldtype": "Data",
-   "label": "Web Address"
-  },
-  {
-   "fieldname": "county_name",
-   "fieldtype": "Data",
-   "label": "County Name"
-  },
-  {
-   "fieldname": "sub_county_name",
-   "fieldtype": "Data",
-   "label": "Sub County Name"
-  },
-  {
-   "fieldname": "tax_locality_name",
-   "fieldtype": "Data",
-   "label": "Tax Locality Name"
-  },
-  {
-   "fieldname": "column_break_urmu",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "organisation_tax_pin",
-   "fieldtype": "Data",
-   "label": "Organisation Tax Pin"
-  },
-  {
-   "fieldname": "etims_branch_id",
-   "fieldtype": "Data",
-   "label": "Etims Branch ID"
-  },
-  {
-   "fieldname": "username",
-   "fieldtype": "Data",
-   "label": "Username"
-  },
-  {
-   "fieldname": "password",
-   "fieldtype": "Data",
-   "label": "Password"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_etims_verified",
-   "fieldtype": "Check",
-   "label": "Is Etims Verified"
   },
   {
    "default": "0",
@@ -165,39 +40,54 @@
    "label": "Active"
   },
   {
-   "default": "0",
-   "fieldname": "is_headquater",
-   "fieldtype": "Check",
-   "label": "Is Headquater"
+   "fieldname": "workstation",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Workstation"
+  },
+  {
+   "fieldname": "workstation_type",
+   "fieldtype": "Data",
+   "label": "Workstation Type"
+  },
+  {
+   "fieldname": "workstation_type_display",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Workstation Type Display"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Department",
+   "options": "Department"
   },
   {
    "default": "0",
-   "fieldname": "use_cluster_doc_details",
+   "fieldname": "is_billing_point",
    "fieldtype": "Check",
-   "label": "Use Cluster Doc Details"
-  },
-  {
-   "fieldname": "section_break_mvnn",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "description",
-   "fieldtype": "Small Text",
-   "label": "Description"
-  },
-  {
-   "fieldname": "column_break_fkrl",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "location_description",
-   "fieldtype": "Small Text",
-   "label": "Location Description"
+   "label": "Is Billing Point"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-06 12:42:38.505521",
+ "modified": "2025-01-09 14:04:05.028397",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Workstation",
@@ -218,11 +108,11 @@
    "write": 1
   }
  ],
- "search_fields": "org_name,email_address,phone_number",
+ "search_fields": "workstation,department,workstation_type_display",
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "org_name",
+ "title_field": "workstation",
  "translated_doctype": 1
 }

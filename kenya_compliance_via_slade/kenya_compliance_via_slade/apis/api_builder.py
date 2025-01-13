@@ -169,7 +169,7 @@ class EndpointsBuilder(BaseEndpointsBuilder):
         doctype: Document | str | None = None,
         document_name: str | None = None,
         retrying: bool = False,
-    ) -> None:
+    ) -> str | None:
         """Handles communication to Slade360 servers."""
         if (
             self._url is None
@@ -194,7 +194,7 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                 data=self._payload,
                 request_description=self._request_description,
                 is_remote_request=True,
-                service_name="Slade360",
+                service_name="eTims via Slade360",
                 request_headers=self._headers,
                 url=self._url,
                 reference_docname=document_name,
@@ -229,25 +229,38 @@ class EndpointsBuilder(BaseEndpointsBuilder):
             response_data = get_response_data(response)
 
             if response.status_code in {200, 201}:
-                self._success_callback_handler(response_data, document_name)
+                self._success_callback_handler(
+                    response=response_data, document_name=document_name, doctype=doctype
+                )
+
+                current_page = response_data.get("current_page", None)
+                total_pages = response_data.get("total_pages", 0)
 
                 update_integration_request(
                     self.integration_request.name,
                     status="Completed",
                     output=str(response_data),
                     error=None,
+                    request_description=(
+                        f"Page {current_page} of {total_pages}"
+                        if int(total_pages) > 1
+                        else None
+                    ),
                 )
             elif response.status_code == 401 and not retrying:
                 self.refresh_token(document_name)
                 self.make_remote_call(doctype, document_name, retrying=True)
             else:
-                error = (
-                    response_data
-                    if isinstance(response_data, str)
-                    else response_data.get("error")
-                    or response_data.get("detail")
-                    or str(response_data)
-                )
+                if isinstance(response_data, str):
+                    error = response_data
+                elif isinstance(response_data, list):
+                    error = response_data[0]
+                else:
+                    error = (
+                        response_data.get("error")
+                        or response_data.get("detail")
+                        or str(response_data)
+                    )
                 update_integration_request(
                     self.integration_request.name,
                     status="Failed",
@@ -260,10 +273,12 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                     doctype=doctype,
                     document_name=document_name,
                 )
+            return response_data
 
         except requests.exceptions.RequestException as error:
             self.error = error
             self.notify()
+            return None
 
 
 def get_response_data(response: requests.Response) -> Optional[Union[dict, str, bytes]]:
@@ -290,18 +305,33 @@ def update_integration_request(
     status: Literal["Completed", "Failed"],
     output: str | None = None,
     error: str | None = None,
+    request_description: str | None = None,
 ) -> None:
-    """Updates the given integration request record
+    """Updates the given integration request record.
 
     Args:
-        integration_request (str): The provided integration request
-        status (Literal[&quot;Completed&quot;, &quot;Failed&quot;]): The new status of the request
+        integration_request (str): The provided integration request.
+        status (Literal["Completed", "Failed"]): The new status of the request.
         output (str | None, optional): The response message, if any. Defaults to None.
         error (str | None, optional): The error message, if any. Defaults to None.
     """
     doc = frappe.get_doc("Integration Request", integration_request, for_update=True)
+
+    if error:
+        doc.error = error if doc.error is None or "null" else (doc.error + "\n" + error)
+
+    if output:
+        doc.output = (
+            output if doc.output is None or "null" else (doc.output + "\n" + output)
+        )
+
+    if request_description:
+        doc.request_description = (
+            request_description
+            if doc.request_description is None
+            else (doc.request_description + " - " + request_description)
+        )
+
     doc.status = status
-    doc.error = error
-    doc.output = output
 
     doc.save(ignore_permissions=True)

@@ -13,16 +13,6 @@ repos:
       - id: check-merge-conflict
       - id: check-ast
 
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
-    hooks:
-      - id: autoflake
-        args:
-          - '--remove-all-unused-imports'
-          - '--remove-unused-variables'
-          - '--exclude=__init__.py'
-        files: \.py$
-        
   - repo: https://github.com/psf/black
     rev: 24.4.2
     hooks:

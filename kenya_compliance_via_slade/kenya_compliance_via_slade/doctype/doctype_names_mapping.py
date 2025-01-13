@@ -12,6 +12,7 @@ PAYMENT_TYPE_DOCTYPE_NAME: Final[str] = "Navari KRA eTims Payment Type"
 TRANSACTION_PROGRESS_DOCTYPE_NAME: Final[str] = "Navari KRA eTims Transaction Progress"
 PACKAGING_UNIT_DOCTYPE_NAME: Final[str] = "Navari eTims Packaging Unit"
 WORKSTATION_DOCTYPE_NAME: Final[str] = "Navari KRA eTims Workstation"
+OPERATION_TYPE_DOCTYPE_NAME: Final[str] = "Navari eTims Stock Operation Type"
 UNIT_OF_QUANTITY_DOCTYPE_NAME: Final[str] = "Navari eTims Unit of Quantity"
 ENVIRONMENT_SPECIFICATION_DOCTYPE_NAME: Final[str] = (
     "Navari KRA eTims Environment Identifier"
@@ -25,6 +26,7 @@ IMPORTED_ITEMS_STATUS_DOCTYPE_NAME: Final[str] = "Navari eTims Import Item Statu
 PURCHASE_RECEIPT_DOCTYPE_NAME: Final[str] = "Navari eTims Purchase Receipt Type"
 TRANSACTION_TYPE_DOCTYPE_NAME: Final[str] = "Navari eTims Transaction Type"
 REGISTERED_PURCHASES_DOCTYPE_NAME: Final[str] = "Navari eTims Registered Purchases"
+UOM_CATEGORY_DOCTYPE_NAME: Final[str] = "Navari eTims UOM Category"
 REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM: Final[str] = (
     "Navari eTims Registered Purchases Items"
 )

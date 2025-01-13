@@ -10,26 +10,26 @@ frappe.ui.form.on(itemDoctypName, {
     frappe.call({
       method: "frappe.client.get",
       args: {
-      doctype: "Company",
-      name: companyName,
+        doctype: "Company",
+        name: companyName,
       },
       callback: function (response) {
-      if (response && response.message) {
-        organisation = response.message.custom_slade_id
-      }
+        if (response && response.message) {
+          organisation = response.message.custom_slade_id;
+        }
       },
     });
 
     frappe.call({
       method: "frappe.client.get",
       args: {
-      doctype: "Branch",
-      name: branchName,
+        doctype: "Branch",
+        name: branchName,
       },
       callback: function (response) {
-      if (response && response.message) {
-        branch = response.message.slade_id
-      }
+        if (response && response.message) {
+          branch = response.message.slade_id;
+        }
       },
     });
 
@@ -49,7 +49,7 @@ frappe.ui.form.on(itemDoctypName, {
 
     if (!frm.is_new()) {
       if (
-        !frm.doc.custom_item_registered &&
+        !frm.doc.custom_sent_to_slade &&
         frm.doc.custom_item_classification &&
         frm.doc.custom_taxation_type
       ) {
@@ -75,6 +75,55 @@ frappe.ui.form.on(itemDoctypName, {
           },
           __("eTims Actions")
         );
+      } else if (frm.doc.custom_sent_to_slade && frm.doc.custom_slade_id) {
+        frm.add_custom_button(
+          __("Fetch Item Deatils"),
+          function () {
+            // call with all options
+            frappe.call({
+              method:
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.fetch_item_details",
+              args: {
+                request_data: {
+                  document_name: frm.doc.name,
+                  id: frm.doc.custom_slade_id,
+                },
+              },
+              callback: (response) => {
+                frappe.msgprint(
+                  "Item Fetch Request Queued. Please check in later."
+                );
+              },
+              error: (error) => {
+                // Error Handling is Defered to the Server
+              },
+            });
+          },
+          __("eTims Actions")
+        );
+
+        frm.add_custom_button(
+          __("Update Item"),
+          function () {
+            // call with all options
+            frappe.call({
+              method:
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_item_registration",
+              args: {
+                item_name: frm.doc.name,
+              },
+              callback: (response) => {
+                frappe.msgprint("Item Upade Queued. Please check in later.");
+              },
+              error: (error) => {
+                // Error Handling is Defered to the Server
+              },
+            });
+          },
+          __("eTims Actions")
+        );
+      }
+      {
       }
       // if (frm.doc.is_stock_item) {
       //   frm.add_custom_button(
@@ -206,7 +255,6 @@ frappe.ui.form.on(itemDoctypName, {
       //       __("eTims Actions")
       //     );
       //   }
-
 
       // }
     }

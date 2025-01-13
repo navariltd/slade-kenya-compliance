@@ -65,7 +65,7 @@ def on_submit(doc: Document, method: str) -> None:
             payload,
             "TrnsPurchaseSaveReq",
             purchase_invoice_submission_on_success,
-            method="POST",
+            request_method="POST",
             doctype="Purchase Invoice",
         )
 

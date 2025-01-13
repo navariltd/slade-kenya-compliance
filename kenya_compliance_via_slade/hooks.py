@@ -137,6 +137,10 @@ doctype_js = {
     "Item": "kenya_compliance_via_slade/overrides/client/items.js",
     "BOM": "kenya_compliance_via_slade/overrides/client/bom.js",
     "Branch": "kenya_compliance_via_slade/overrides/client/branch.js",
+    "UOM": "kenya_compliance_via_slade/overrides/client/uom.js",
+    "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse.js",
+    "Price List": "kenya_compliance_via_slade/overrides/client/price_list.js",
+    "Item Price": "kenya_compliance_via_slade/overrides/client/item_price.js",
 }
 
 doctype_list_js = {
@@ -144,6 +148,10 @@ doctype_list_js = {
     "Sales Invoice": "kenya_compliance_via_slade/overrides/client/sales_invoice_list.js",
     "Branch": "kenya_compliance_via_slade/overrides/client/branch_list.js",
     "Customer": "kenya_compliance_via_slade/overrides/client/customer_list.js",
+    "UOM": "kenya_compliance_via_slade/overrides/client/uom_list.js",
+    "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse_list.js",
+    "Price List": "kenya_compliance_via_slade/overrides/client/price_list_list.js",
+    "Item Price": "kenya_compliance_via_slade/overrides/client/item_price_list.js",
 }
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -276,6 +284,9 @@ doc_events = {
     "Item": {
         "validate": [
             "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.validate"
+        ],
+        "after_insert": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.after_insert"
         ],
         "on_trash": "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.prevent_item_deletion",
     },

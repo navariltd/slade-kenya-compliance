@@ -8,16 +8,19 @@ import aiohttp
 
 import frappe
 import frappe.defaults
+from frappe import _
 from frappe.model.document import Document
 
 from ..doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+    OPERATION_TYPE_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     REGISTERED_PURCHASES_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
+    UOM_CATEGORY_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
 )
 from ..utils import (
@@ -39,18 +42,30 @@ from .remote_response_status_handlers import (
     imported_items_search_on_success,
     initialize_device_submission_on_success,
     item_composition_submission_on_success,
+    item_price_update_on_success,
     item_registration_on_success,
     item_search_on_success,
     on_error,
+    operation_type_create_on_success,
+    pricelist_update_on_success,
     purchase_search_on_success,
     search_branch_request_on_success,
     stock_mvt_search_on_success,
     submit_inventory_on_success,
+    update_invoice_info,
     user_details_fetch_on_success,
     user_details_submission_on_success,
+    warehouse_update_on_success,
 )
 
 endpoints_builder = EndpointsBuilder()
+from ..background_tasks.task_response_handlers import (
+    location_search_on_success,
+    operation_types_search_on_success,
+    uom_category_search_on_success,
+    uom_search_on_success,
+    warehouse_search_on_success,
+)
 from .remote_response_status_handlers import on_slade_error
 
 
@@ -58,23 +73,40 @@ def process_request(
     request_data: str | dict,
     route_key: str,
     handler_function: Callable,
-    method: str = "GET",
+    request_method: str = "GET",
     doctype: str = SETTINGS_DOCTYPE_NAME,
 ) -> str:
     """Reusable function to process requests with common logic."""
     if isinstance(request_data, str):
         data = json.loads(request_data)
-    elif isinstance(request_data, dict):
+    elif isinstance(request_data, (dict, list)):
         data = request_data
-    company_name = (
-        data.get("company_name")
-        or frappe.defaults.get_user_default("Company")
-        or frappe.get_value("Company", {}, "name")
-    )
-    branch_id = (
-        data.get("branch_id") or frappe.defaults.get_user_default("Branch") or "00"
-    )
-    document_name = data.get("document_name", None)
+
+    if isinstance(data, list) and data:
+        first_entry = data[0]
+        company_name = (
+            first_entry.get("company_name", None)
+            or frappe.defaults.get_user_default("Company")
+            or frappe.get_value("Company", {}, "name")
+        )
+        branch_id = (
+            first_entry.get("branch_id", None)
+            or frappe.defaults.get_user_default("Branch")
+            or frappe.get_value("Branch", {"is_group": 0}, "name")
+        )
+        document_name = first_entry.get("document_name", None)
+    else:
+        company_name = (
+            data.get("company_name", None)
+            or frappe.defaults.get_user_default("Company")
+            or frappe.get_value("Company", {}, "name")
+        )
+        branch_id = (
+            data.get("branch_id", None)
+            or frappe.defaults.get_user_default("Branch")
+            or frappe.get_value("Branch", {"is_group": 0}, "name")
+        )
+        document_name = data.get("document_name", None)
 
     headers = build_headers(company_name, branch_id)
     server_url = get_server_url(company_name, branch_id)
@@ -82,7 +114,7 @@ def process_request(
 
     route_path = process_dynamic_url(route_path, request_data)
 
-    if method == "GET":
+    if request_method == "GET":
         if "document_name" in data and data["document_name"]:
             data.pop("document_name")
 
@@ -92,18 +124,24 @@ def process_request(
     if headers and server_url and route_path:
         url = f"{server_url}{route_path}"
 
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = data
-        endpoints_builder.request_description = route_key
-        endpoints_builder.method = method
-        endpoints_builder.success_callback = handler_function
-        endpoints_builder.error_callback = on_slade_error
+        while url:
+            endpoints_builder.headers = headers
+            endpoints_builder.url = url
+            endpoints_builder.payload = data
+            endpoints_builder.request_description = route_key
+            endpoints_builder.method = request_method
+            endpoints_builder.success_callback = handler_function
+            endpoints_builder.error_callback = on_slade_error
 
-        endpoints_builder.make_remote_call(
-            doctype=doctype,
-            document_name=document_name,
-        )
+            response = endpoints_builder.make_remote_call(
+                doctype=doctype,
+                document_name=document_name,
+            )
+
+            if isinstance(response, dict) and "next" in response:
+                url = response["next"]
+            else:
+                url = None
 
         return f"{route_key} completed successfully."
     else:
@@ -151,7 +189,7 @@ def perform_customer_search(request_data: str) -> None:
         request_data,
         "CustSearchReq",
         customer_search_on_success,
-        method="POST",
+        request_method="POST",
         doctype="Customer",
     )
 
@@ -159,6 +197,19 @@ def perform_customer_search(request_data: str) -> None:
 @frappe.whitelist()
 def perform_item_registration(item_name: str) -> dict | None:
     item = frappe.get_doc("Item", item_name)
+    missing_fields = []
+
+    for field in item.meta.fields:
+        if field.reqd and not item.get(field.fieldname):
+            missing_fields.append(field.label)
+
+    if missing_fields:
+        frappe.throw(
+            _("The following required fields are missing: {0}").format(
+                ", ".join(missing_fields)
+            )
+        )
+
     tax = get_link_value(
         TAXATION_TYPE_DOCTYPE_NAME, "cd", item.get("custom_taxation_type"), "slade_id"
     )
@@ -183,12 +234,7 @@ def perform_item_registration(item_name: str) -> dict | None:
         "product_type": item.get("custom_product_type"),
         "item_type": item.get("custom_item_type"),
         "preferred_name": item.get("item_name"),
-        "country_of_origin": get_link_value(
-            COUNTRIES_DOCTYPE_NAME,
-            "code",
-            item.get("custom_etims_country_of_origin_code"),
-            "slade_id",
-        ),
+        "country_of_origin": item.get("custom_etims_country_of_origin_code"),
         "packaging_unit": get_link_value(
             PACKAGING_UNIT_DOCTYPE_NAME,
             "code",
@@ -212,19 +258,26 @@ def perform_item_registration(item_name: str) -> dict | None:
         request_data["id"] = custom_slade_id
         process_request(
             request_data,
-            "ItemSaveReq",
+            "ItemsSearchReq",
             item_registration_on_success,
-            method="PATCH",
+            request_method="PATCH",
             doctype="Item",
         )
     else:
         process_request(
             request_data,
-            "ItemSaveReq",
+            "ItemsSearchReq",
             item_registration_on_success,
-            method="POST",
+            request_method="POST",
             doctype="Item",
         )
+
+
+@frappe.whitelist()
+def fetch_item_details(request_data: str) -> None:
+    process_request(
+        request_data, "ItemSearchReq", item_search_on_success, doctype="Item"
+    )
 
 
 @frappe.whitelist()
@@ -290,7 +343,7 @@ def send_branch_customer_details(request_data: str) -> None:
         json.dumps(data),
         "BhfCustSaveReq",
         customer_branch_details_submission_on_success,
-        method="POST",
+        request_method="POST",
         doctype=doctype,
     )
 
@@ -315,7 +368,7 @@ def get_my_user_details(request_data: str) -> None:
         request_data,
         "BhfUserSearchReq",
         user_details_fetch_on_success,
-        method="GET",
+        request_method="GET",
         doctype=USER_DOCTYPE_NAME,
     )
 
@@ -326,7 +379,7 @@ def get_branch_user_details(request_data: str) -> None:
         request_data,
         "BhfUserSaveReq",
         user_details_fetch_on_success,
-        method="GET",
+        request_method="GET",
         doctype=USER_DOCTYPE_NAME,
     )
 
@@ -337,7 +390,7 @@ def save_branch_user_details(request_data: str) -> None:
         request_data,
         "BhfUserSaveReq",
         user_details_submission_on_success,
-        method="POST",
+        request_method="POST",
         doctype=USER_DOCTYPE_NAME,
     )
 
@@ -355,7 +408,13 @@ def create_branch_user() -> None:
 
             doc.system_user = user.email
             doc.branch_id = frappe.get_value(
-                "Branch", {"custom_branch_code": "00"}, ["name"]
+                "Branch",
+                {
+                    "custom_branch_code": frappe.get_value(
+                        "Branch", {"is_group": 0}, "name"
+                    )
+                },
+                ["name"],
             )  # Created users are assigned to Branch 00
 
             doc.save()
@@ -368,7 +427,7 @@ def perform_item_search(request_data: str) -> None:
     data: dict = json.loads(request_data)
 
     process_request(
-        request_data, "ItemSearchReq", item_search_on_success, doctype="Item"
+        request_data, "ItemsSearchReq", item_search_on_success, doctype="Item"
     )
 
 
@@ -471,7 +530,7 @@ def send_imported_item_request(request_data: str) -> None:
         request_data,
         "ImportItemSearchReq",
         imported_item_submission_on_success,
-        method="POST",
+        request_method="POST",
         doctype="Item",
     )
 
@@ -781,21 +840,29 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
 
 @frappe.whitelist()
 def ping_server(request_data: str) -> None:
-    url = json.loads(request_data)["server_url"]
+    data = json.loads(request_data)
+    server_url = f"{data["server_url"]}/alive"
+    auth_url = data["auth_url"]
 
-    try:
-        response = asyncio.run(make_get_request(url))
+    async def check_server(url: str) -> tuple:
+        try:
+            response = await make_get_request(url)
+            return "Online", response
+        except aiohttp.client_exceptions.ClientConnectorError:
+            return "Offline", None
 
-        if len(response) == 13:
-            frappe.msgprint("The Server is Online")
-            return
+    async def main() -> None:
+        server_status, server_response = await check_server(server_url)
+        auth_status, auth_response = await check_server(auth_url)
 
-        frappe.msgprint("The Server is Offline")
-        return
+        if server_response:
+            frappe.msgprint(f"Server Status: {server_status}\n{server_response}")
+        else:
+            frappe.msgprint(f"Server Status: {server_status}")
 
-    except aiohttp.client_exceptions.ClientConnectorError:
-        frappe.msgprint("The Server is Offline")
-        return
+        frappe.msgprint(f"Auth Server Status: {auth_status}")
+
+    asyncio.run(main())
 
 
 @frappe.whitelist()
@@ -849,6 +916,409 @@ def initialize_device(request_data: str) -> None:
         request_data,
         "DeviceVerificationReq",
         initialize_device_submission_on_success,
-        method="POST",
+        request_method="POST",
         doctype=SETTINGS_DOCTYPE_NAME,
+    )
+
+
+@frappe.whitelist()
+def get_invoice_details(request_data: str, invoice_type: str) -> None:
+    process_request(
+        request_data,
+        "TrnsSalesSearchReq",
+        update_invoice_info,
+        doctype=invoice_type,
+    )
+
+
+@frappe.whitelist()
+def save_uom_category_details(name: str) -> dict | None:
+    item = frappe.get_doc(UOM_CATEGORY_DOCTYPE_NAME, name)
+
+    slade_id = item.get("slade_id", None)
+
+    request_data = {
+        "name": item.get("category_name"),
+        "document_name": item.get("name"),
+        "measure_type": item.get("measure_type"),
+        "active": True if item.get("active") == 1 else False,
+    }
+
+    if slade_id:
+        request_data["id"] = slade_id
+        process_request(
+            request_data,
+            "UOMCategoriesSearchReq",
+            uom_category_search_on_success,
+            request_method="PATCH",
+            doctype=UOM_CATEGORY_DOCTYPE_NAME,
+        )
+    else:
+        process_request(
+            request_data,
+            "UOMCategoriesSearchReq",
+            uom_category_search_on_success,
+            request_method="POST",
+            doctype=UOM_CATEGORY_DOCTYPE_NAME,
+        )
+
+
+@frappe.whitelist()
+def sync_uom_category_details(request_data: str) -> None:
+    process_request(
+        request_data,
+        "UOMCategorySearchReq",
+        uom_category_search_on_success,
+        doctype=UOM_CATEGORY_DOCTYPE_NAME,
+    )
+
+
+@frappe.whitelist()
+def save_uom_details(name: str) -> dict | None:
+    item = frappe.get_doc("UOM", name)
+
+    slade_id = item.get("slade_id", None)
+
+    request_data = {
+        "name": item.get("uom_name"),
+        "document_name": item.get("name"),
+        "factor": item.get("custom_factor"),
+        "uom_type": item.get("custom_uom_type"),
+        "category": get_link_value(
+            UOM_CATEGORY_DOCTYPE_NAME,
+            "name",
+            item.get("custom_category"),
+            "slade_id",
+        ),
+        "active": True if item.get("active") == 1 else False,
+    }
+
+    if slade_id:
+        request_data["id"] = slade_id
+        process_request(
+            request_data,
+            "UOMListSearchReq",
+            uom_search_on_success,
+            request_method="PATCH",
+            doctype="UOM",
+        )
+    else:
+        process_request(
+            request_data,
+            "UOMListSearchReq",
+            uom_search_on_success,
+            request_method="POST",
+            doctype="UOM",
+        )
+
+
+@frappe.whitelist()
+def sync_uom_details(request_data: str) -> None:
+    process_request(
+        request_data,
+        "UOMDetailSearchReq",
+        uom_search_on_success,
+        doctype="UOM",
+    )
+
+
+@frappe.whitelist()
+def submit_uom_list() -> dict | None:
+    uoms = frappe.get_all(
+        "UOM", filters={"custom_slade_id": ["is", "not set"]}, fields=["name"]
+    )
+    request_data = []
+    for uom in uoms:
+        item = frappe.get_doc("UOM", uom.name)
+        category = item.get("custom_category") or "Unit"
+        item_data = {
+            "name": item.get("uom_name"),
+            "factor": item.get("custom_factor"),
+            "uom_type": item.get("custom_uom_type") or "reference",
+            "category": get_link_value(
+                UOM_CATEGORY_DOCTYPE_NAME,
+                "name",
+                category,
+                "slade_id",
+            ),
+            "active": True if item.get("active") == 1 else False,
+        }
+        request_data.append(item_data)
+
+    process_request(
+        request_data,
+        "UOMListSearchReq",
+        uom_search_on_success,
+        request_method="POST",
+        doctype="UOM",
+    )
+
+
+@frappe.whitelist()
+def sync_warehouse_details(request_data: str, type: str = "warehouse") -> None:
+    if type == "warehouse":
+        process_request(
+            request_data,
+            "WarehouseSearchReq",
+            warehouse_search_on_success,
+            doctype="Warehouse",
+        )
+    else:
+        process_request(
+            request_data,
+            "LocationSearchReq",
+            location_search_on_success,
+            doctype="Warehouse",
+        )
+
+
+@frappe.whitelist()
+def save_warehouse_details(name: str) -> dict | None:
+    item = frappe.get_doc("Warehouse", name)
+    slade_id = item.get("custom_slade_id", None)
+    is_group = item.get("is_group", 0)
+
+    route_key = "WarehousesSearchReq"
+    on_success = warehouse_update_on_success
+
+    request_data = {
+        "name": item.get("warehouse_name"),
+        "document_name": item.get("name"),
+        "organisation": get_link_value(
+            "Company",
+            "name",
+            item.get("company"),
+            "custom_slade_id",
+        ),
+        "active": False if item.get("disabled") == 1 else True,
+    }
+
+    if not is_group:
+        request_data["branch"] = get_link_value(
+            "Branch", "name", item.get("branch"), "slade_id"
+        )
+        request_data["warehouse"] = get_link_value(
+            "Warehouse", "name", item.get("parent_warehouse"), "custom_slade_id"
+        )
+        route_key = "LocationsSearchReq"
+
+    if slade_id:
+        request_data["id"] = slade_id
+        method = "PATCH"
+    else:
+        method = "POST"
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        request_method=method,
+        doctype="Warehouse",
+    )
+
+
+@frappe.whitelist()
+def submit_pricelist(name: str) -> dict | None:
+    item = frappe.get_doc("Price List", name)
+    slade_id = item.get("custom_slade_id", None)
+
+    route_key = "PriceListsSearchReq"
+    on_success = pricelist_update_on_success
+
+    # pricelist_type is mandatory for the request and cannot accept both selling and buying
+    pricelist_type = (
+        "selling"
+        if item.get("selling") == 1
+        else "purchases" if item.get("buying") == 1 else "selling"
+    )
+    request_data = {
+        "name": item.get("price_list_name"),
+        "document_name": item.get("name"),
+        "pricelist_status": item.get("custom_pricelist_status"),
+        "pricelist_type": pricelist_type,
+        "organisation": get_link_value(
+            "Company",
+            "name",
+            item.get("custom_company"),
+            "custom_slade_id",
+        ),
+        "active": False if item.get("enabled") == 0 else True,
+    }
+
+    if item.get("custom_warehouse"):
+        request_data["location"] = get_link_value(
+            "Warehouse",
+            "name",
+            item.get("custom_warehouse"),
+            "custom_slade_id",
+        )
+
+    if item.get("custom_effective_from"):
+        request_data["effective_from"] = item.get("custom_effective_from").strftime(
+            "%Y-%m-%d"
+        )
+
+    if item.get("custom_effective_to"):
+        request_data["effective_to"] = item.get("custom_effective_to").strftime(
+            "%Y-%m-%d"
+        )
+
+    if slade_id:
+        request_data["id"] = slade_id
+        method = "PATCH"
+    else:
+        method = "POST"
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        request_method=method,
+        doctype="Price List",
+    )
+
+
+@frappe.whitelist()
+def sync_pricelist(request_data: str) -> None:
+    process_request(
+        request_data,
+        "PriceListSearchReq",
+        pricelist_update_on_success,
+        doctype="Price List",
+    )
+
+
+@frappe.whitelist()
+def submit_item_price(name: str) -> dict | None:
+    item = frappe.get_doc("Item Price", name)
+    slade_id = item.get("custom_slade_id", None)
+
+    route_key = "ItemPricesSearchReq"
+    on_success = item_price_update_on_success
+
+    request_data = {
+        "name": f"{item.get("item_code")} - {item.get("name")}",
+        "document_name": item.get("name"),
+        "price_inclusive_tax": item.get("price_list_rate"),
+        "organisation": get_link_value(
+            "Company",
+            "name",
+            item.get("custom_company"),
+            "custom_slade_id",
+        ),
+        "product": get_link_value(
+            "Item",
+            "name",
+            item.get("item_code"),
+            "custom_slade_id",
+        ),
+        "currency": get_link_value(
+            "Currency",
+            "name",
+            item.get("currency"),
+            "custom_slade_id",
+        ),
+        "pricelist": get_link_value(
+            "Price List",
+            "name",
+            item.get("price_list"),
+            "custom_slade_id",
+        ),
+        "active": False if item.get("enabled") == 0 else True,
+    }
+
+    if slade_id:
+        request_data["id"] = slade_id
+        method = "PATCH"
+    else:
+        method = "POST"
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        request_method=method,
+        doctype="Item Price",
+    )
+
+
+@frappe.whitelist()
+def sync_item_price(request_data: str) -> None:
+    process_request(
+        request_data,
+        "ItemPriceSearchReq",
+        item_price_update_on_success,
+        doctype="Item Price",
+    )
+
+
+@frappe.whitelist()
+def save_operation_type(
+    name: str, on_success: Callable = operation_type_create_on_success
+) -> dict | None:
+    item = frappe.get_doc(OPERATION_TYPE_DOCTYPE_NAME, name)
+    slade_id = item.get("slade_id", None)
+
+    route_key = "OperationTypesReq"
+
+    request_data = {
+        "operation_name": item.get("operation_name"),
+        "document_name": item.get("name"),
+        "operation_type": item.get("operation_type"),
+        "organisation": get_link_value(
+            "Company",
+            "name",
+            item.get("company"),
+            "custom_slade_id",
+        ),
+        "branch": get_link_value(
+            "Branch",
+            "name",
+            item.get("branch"),
+            "slade_id",
+        ),
+        "destination_location": get_link_value(
+            "Warehouse",
+            "name",
+            item.get("destination_location"),
+            "custom_slade_id",
+        ),
+        "source_location": get_link_value(
+            "Warehouse",
+            "name",
+            item.get("source_location"),
+            "custom_slade_id",
+        ),
+        "transit_location": get_link_value(
+            "Warehouse",
+            "name",
+            item.get("transit_location"),
+            "custom_slade_id",
+        ),
+        "active": False if item.get("active") == 0 else True,
+    }
+
+    if slade_id:
+        request_data["id"] = slade_id
+        method = "PATCH"
+        on_success = operation_types_search_on_success
+    else:
+        method = "POST"
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        request_method=method,
+        doctype=OPERATION_TYPE_DOCTYPE_NAME,
+    )
+
+
+@frappe.whitelist()
+def sync_operation_type(request_data: str) -> None:
+    process_request(
+        request_data,
+        "OperationTypeReq",
+        operation_types_search_on_success,
+        doctype=OPERATION_TYPE_DOCTYPE_NAME,
     )
