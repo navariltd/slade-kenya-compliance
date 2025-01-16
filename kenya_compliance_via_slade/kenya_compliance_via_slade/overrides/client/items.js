@@ -125,36 +125,27 @@ frappe.ui.form.on(itemDoctypName, {
       }
       {
       }
-      // if (frm.doc.is_stock_item) {
-      //   frm.add_custom_button(
-      //     __('Submit Item Inventory'),
-      //     function () {
-      //       frappe.call({
-      //         method:
-      //           'kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_inventory',
-      //         args: {
-      //           request_data: {
-      //             company_name: companyName,
-      //             name: frm.doc.name,
-      //             itemName: frm.doc.item_code,
-      //             itemCd: frm.doc.custom_item_code_etims,
-      //             registered_by: frm.doc.owner,
-      //             modified_by: frm.doc.modified_by,
-      //             // TODO: Fix the branch id below
-      //             branch_id: '00',
-      //           },
-      //         },
-      //         callback: (response) => {
-      //           frappe.msgprint('Inventory submission queued.');
-      //         },
-      //         error: (error) => {
-      //           // Error Handling is Defered to the Server
-      //         },
-      //       });
-      //     },
-      //     __('eTims Actions'),
-      //   );
-      // }
+      if (frm.doc.is_stock_item) {
+        frm.add_custom_button(
+          __("Submit Item Inventory"),
+          function () {
+            frappe.call({
+              method:
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_inventory",
+              args: {
+                name: frm.doc.name,
+              },
+              callback: (response) => {
+                frappe.msgprint("Inventory submission queued.");
+              },
+              error: (error) => {
+                // Error Handling is Defered to the Server
+              },
+            });
+          },
+          __("eTims Actions")
+        );
+      }
 
       //  TODO: Fix later. Need more clarification on this
       // if (

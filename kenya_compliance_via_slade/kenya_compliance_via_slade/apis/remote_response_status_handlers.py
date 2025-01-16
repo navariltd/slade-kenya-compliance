@@ -103,6 +103,11 @@ def item_registration_on_success(response: dict, document_name: str, **kwargs) -
         "custom_sent_to_slade": 1,
     }
     frappe.db.set_value("Item", document_name, updates)
+    frappe.enqueue(
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_inventory",
+        name=document_name,
+        queue="long",
+    )
 
 
 def customer_insurance_details_submission_on_success(
@@ -218,11 +223,51 @@ def imported_item_submission_on_success(
 
 
 def submit_inventory_on_success(response: dict, document_name: str, **kwargs) -> None:
-    frappe.db.set_value(
-        "Stock Ledger Entry",
-        document_name,
-        {"custom_inventory_submitted_successfully": 1},
+    bin = frappe.get_doc("Bin", document_name)
+    from .apis import process_request
+
+    requset_data = {
+        "document_name": bin.item_code,
+        "product": frappe.get_value("Item", bin.item_code, "custom_slade_id"),
+        "quantity": bin.actual_qty,
+        "inventory_adjustment": response.get("id"),
+    }
+
+    frappe.enqueue(
+        process_request,
+        queue="default",
+        is_async=True,
+        doctype="Item",
+        request_data=requset_data,
+        route_key="StockMasterLineReq",
+        handler_function=submit_inventory_item_on_success,
+        request_method="POST",
     )
+
+
+def submit_inventory_item_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    from .apis import process_request
+
+    doc = frappe.get_doc("Item", document_name)
+    requset_data = {
+        "document_name": document_name,
+        "id": response.get("inventory_adjustment"),
+    }
+    frappe.enqueue(
+        process_request,
+        queue="default",
+        doctype="Item",
+        request_data=requset_data,
+        route_key="StockAdjustmentTransitionReq",
+        handler_function=process_inventory_transition,
+        request_method="PATCH",
+    )
+
+
+def process_inventory_transition(response: dict, document_name: str, **kwargs) -> None:
+    pass
 
 
 def sales_information_submission_on_success(
