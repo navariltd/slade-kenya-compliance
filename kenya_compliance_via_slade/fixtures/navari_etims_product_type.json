@@ -1,17 +1,5 @@
 [
  {
-  "code": "consu",
-  "code_description": "Consumable",
-  "code_name": "Consumable",
-  "docstatus": 0,
-  "doctype": "Navari eTims Product Type",
-  "modified": "2025-01-07 06:59:49.537136",
-  "name": "consu",
-  "remark": null,
-  "slade_id": "consu",
-  "sort_order": "1"
- },
- {
   "code": "service",
   "code_description": "Service without stock",
   "code_name": "Service",
@@ -22,6 +10,18 @@
   "remark": null,
   "slade_id": null,
   "sort_order": "3"
+ },
+ {
+  "code": "consu",
+  "code_description": "Consumable",
+  "code_name": "Consumable",
+  "docstatus": 0,
+  "doctype": "Navari eTims Product Type",
+  "modified": "2025-01-07 06:59:49.537136",
+  "name": "consu",
+  "remark": null,
+  "slade_id": "consu",
+  "sort_order": "1"
  },
  {
   "code": "sku",

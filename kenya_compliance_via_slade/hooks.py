@@ -49,6 +49,9 @@ fixtures = [
                     "Item Tax Template",
                     "Branch",
                     "Supplier",
+                    "Department",
+                    "Company",
+                    "UOM",
                 ),
             ],
             ["is_system_generated", "=", 0],
@@ -139,8 +142,8 @@ doctype_js = {
     "Branch": "kenya_compliance_via_slade/overrides/client/branch.js",
     "UOM": "kenya_compliance_via_slade/overrides/client/uom.js",
     "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse.js",
-    "Price List": "kenya_compliance_via_slade/overrides/client/price_list.js",
-    "Item Price": "kenya_compliance_via_slade/overrides/client/item_price.js",
+    # "Price List": "kenya_compliance_via_slade/overrides/client/price_list.js",
+    # "Item Price": "kenya_compliance_via_slade/overrides/client/item_price.js",
 }
 
 doctype_list_js = {
@@ -150,8 +153,8 @@ doctype_list_js = {
     "Customer": "kenya_compliance_via_slade/overrides/client/customer_list.js",
     "UOM": "kenya_compliance_via_slade/overrides/client/uom_list.js",
     "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse_list.js",
-    "Price List": "kenya_compliance_via_slade/overrides/client/price_list_list.js",
-    "Item Price": "kenya_compliance_via_slade/overrides/client/item_price_list.js",
+    # "Price List": "kenya_compliance_via_slade/overrides/client/price_list_list.js",
+    # "Item Price": "kenya_compliance_via_slade/overrides/client/item_price_list.js",
 }
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -313,7 +316,7 @@ scheduler_events = {
     # 	],
     "monthly": [
         "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_code_lists",
-        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.search_organisations_request",
+        # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.search_organisations_request",
         "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.get_item_classification_codes",
     ],
 }
