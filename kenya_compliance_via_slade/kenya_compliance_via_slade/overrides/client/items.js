@@ -2,37 +2,6 @@ const itemDoctypName = "Item";
 
 frappe.ui.form.on(itemDoctypName, {
   refresh: function (frm) {
-    const companyName = frappe.boot.sysdefaults.company;
-    const branchName = frappe.boot.sysdefaults.branch;
-
-    let organisation = "";
-    let branch = "";
-    frappe.call({
-      method: "frappe.client.get",
-      args: {
-        doctype: "Company",
-        name: companyName,
-      },
-      callback: function (response) {
-        if (response && response.message) {
-          organisation = response.message.custom_slade_id;
-        }
-      },
-    });
-
-    frappe.call({
-      method: "frappe.client.get",
-      args: {
-        doctype: "Branch",
-        name: branchName,
-      },
-      callback: function (response) {
-        if (response && response.message) {
-          branch = response.message.slade_id;
-        }
-      },
-    });
-
     if (frm.doc.custom_item_registered) {
       frm.toggle_enable("custom_item_classification", false);
       frm.toggle_enable("custom_etims_country_of_origin", false);

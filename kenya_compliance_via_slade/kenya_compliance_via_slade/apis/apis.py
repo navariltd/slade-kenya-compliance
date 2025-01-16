@@ -92,7 +92,7 @@ def process_request(
         branch_id = (
             first_entry.get("branch_id", None)
             or frappe.defaults.get_user_default("Branch")
-            or frappe.get_value("Branch", {"is_group": 0}, "name")
+            or frappe.get_value("Branch", "name")
         )
         document_name = first_entry.get("document_name", None)
     else:
@@ -104,7 +104,7 @@ def process_request(
         branch_id = (
             data.get("branch_id", None)
             or frappe.defaults.get_user_default("Branch")
-            or frappe.get_value("Branch", {"is_group": 0}, "name")
+            or frappe.get_value("Branch", "name")
         )
         document_name = data.get("document_name", None)
 
@@ -408,11 +408,7 @@ def create_branch_user() -> None:
             doc.system_user = user.email
             doc.branch_id = frappe.get_value(
                 "Branch",
-                {
-                    "custom_branch_code": frappe.get_value(
-                        "Branch", {"is_group": 0}, "name"
-                    )
-                },
+                {"custom_branch_code": frappe.get_value("Branch", "name")},
                 ["name"],
             )  # Created users are assigned to Branch 00
 
