@@ -20,6 +20,7 @@
   "tin",
   "column_break_mmvk",
   "bhfid",
+  "department",
   "dvcsrlno",
   "sales_control_unit_id",
   "communication_key_section",
@@ -101,8 +102,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Device Serial Number",
-   "no_copy": 1,
-   "reqd": 1
+   "no_copy": 1
   },
   {
    "description": "00 is Head-Office/Headquarters, 01 to 99 is Branch Office",
@@ -112,8 +112,7 @@
    "in_standard_filter": 1,
    "label": "Branch Id",
    "no_copy": 1,
-   "options": "Branch",
-   "reqd": 1
+   "options": "Branch"
   },
   {
    "fieldname": "environment_section",
@@ -422,6 +421,16 @@
    "label": "Auth Server URL",
    "options": "URL",
    "reqd": 1
+  },
+  {
+   "description": "00 is Head-Office/Headquarters, 01 to 99 is Branch Office",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Department",
+   "no_copy": 1,
+   "options": "Department"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -432,7 +441,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-01-09 15:06:31.625533",
+ "modified": "2025-01-16 07:38:38.280383",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",
