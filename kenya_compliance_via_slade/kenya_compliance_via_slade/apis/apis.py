@@ -316,7 +316,6 @@ def send_insurance_details(request_data: str) -> None:
             timeout=300,
             doctype="Customer",
             document_name=data["name"],
-            job_name=f"{data['name']}_submit_insurance_information",
         )
 
 
@@ -1196,13 +1195,15 @@ def sync_pricelist(request_data: str) -> None:
 def submit_item_price(name: str) -> dict | None:
     item = frappe.get_doc("Item Price", name)
     slade_id = item.get("custom_slade_id", None)
+    item_code = item.get("item_code", None)
+    item_name = item.get("name", None)
 
     route_key = "ItemPricesSearchReq"
     on_success = item_price_update_on_success
 
     request_data = {
-        "name": f"{item.get("item_code")} - {item.get("name")}",
-        "document_name": item.get("name"),
+        "name": f"{item_code} - {item_name}",
+        "document_name": item_name,
         "price_inclusive_tax": item.get("price_list_rate"),
         "organisation": get_link_value(
             "Company",
@@ -1213,7 +1214,7 @@ def submit_item_price(name: str) -> dict | None:
         "product": get_link_value(
             "Item",
             "name",
-            item.get("item_code"),
+            item_code,
             "custom_slade_id",
         ),
         "currency": get_link_value(
