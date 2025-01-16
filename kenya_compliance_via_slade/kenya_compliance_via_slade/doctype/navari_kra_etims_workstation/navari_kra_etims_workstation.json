@@ -26,7 +26,6 @@
    "fieldname": "slade_id",
    "fieldtype": "Data",
    "label": "Slade ID",
-   "read_only": 1,
    "unique": 1
   },
   {
@@ -87,7 +86,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-09 14:04:05.028397",
+ "modified": "2025-01-16 11:02:57.721543",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Workstation",

@@ -52,6 +52,7 @@ fixtures = [
                     "Department",
                     "Company",
                     "UOM",
+                    "Currency",
                 ),
             ],
             ["is_system_generated", "=", 0],
@@ -300,8 +301,8 @@ doc_events = {
 
 scheduler_events = {
     "all": [
-        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_stock_information",
-        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_item_inventory_information",
+        # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_stock_information",
+        # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_item_inventory_information",
     ],
     # 	"daily": [
     # 		"kenya_compliance_via_slade.tasks.daily"
