@@ -188,7 +188,7 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
             "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.ping_server",
           args: {
             request_data: {
-              server_url: frm.doc.server_url,
+              server_url: frm.doc.server_url + "/alive",
               auth_url: frm.doc.auth_server_url,
             },
           },
