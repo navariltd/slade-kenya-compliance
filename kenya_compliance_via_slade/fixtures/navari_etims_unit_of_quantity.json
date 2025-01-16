@@ -5,7 +5,7 @@
   "code_name": "box",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.557959",
+  "modified": "2025-01-12 21:30:29.614041",
   "name": "BX",
   "slade_id": "6ebcda5b-6e80-4456-85fb-03b11756b31c",
   "sort_order": 8
@@ -16,7 +16,7 @@
   "code_name": "Cell",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.599309",
+  "modified": "2025-01-12 21:30:29.622900",
   "name": "CEL",
   "slade_id": "a98a9864-e9bd-41c3-99d3-d372708fbc95",
   "sort_order": 10
@@ -27,7 +27,7 @@
   "code_name": "centimetre",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.619734",
+  "modified": "2025-01-12 21:30:29.627295",
   "name": "CMT",
   "slade_id": "b9f01d10-28d1-48dd-a7cb-728cc363f797",
   "sort_order": 11
@@ -38,7 +38,7 @@
   "code_name": "Dozen",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.705744",
+  "modified": "2025-01-12 21:30:29.640560",
   "name": "DZ",
   "slade_id": "91ac2936-7dfa-4fb5-90cd-b35e207fd990",
   "sort_order": 14
@@ -49,7 +49,7 @@
   "code_name": "Gallon",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.736265",
+  "modified": "2025-01-12 21:30:29.645275",
   "name": "GLL",
   "slade_id": "ceb178b3-1494-4832-816e-2de8a2659ec1",
   "sort_order": 15
@@ -60,7 +60,7 @@
   "code_name": "Gram",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.772168",
+  "modified": "2025-01-12 21:30:29.650629",
   "name": "GRM",
   "slade_id": "a50b1726-7bf8-4262-8d00-09a60821cadb",
   "sort_order": 16
@@ -71,7 +71,7 @@
   "code_name": "Gross",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.800197",
+  "modified": "2025-01-12 21:30:29.656117",
   "name": "GRO",
   "slade_id": "7b47cccb-5cd4-456b-ab72-bb68bbb11af9",
   "sort_order": 17
@@ -82,7 +82,7 @@
   "code_name": "kilometre",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.875089",
+  "modified": "2025-01-12 21:30:29.666701",
   "name": "KTM",
   "slade_id": "3dab0ebd-acd3-4e3b-b2ad-02750c157b96",
   "sort_order": 19
@@ -93,7 +93,7 @@
   "code_name": "kilowatt",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.904415",
+  "modified": "2025-01-12 21:30:29.672104",
   "name": "KWT",
   "slade_id": "b3e0ebed-5e51-4391-b95a-e88eb06d5b0c",
   "sort_order": 20
@@ -104,7 +104,7 @@
   "code_name": "pound",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.964979",
+  "modified": "2025-01-12 21:30:29.682445",
   "name": "LBR",
   "slade_id": "e972dcd8-9357-4fe6-9b44-d2cf70157950",
   "sort_order": 22
@@ -115,7 +115,7 @@
   "code_name": "link",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.999562",
+  "modified": "2025-01-12 21:30:29.687286",
   "name": "LK",
   "slade_id": "341edbdf-0cd9-4352-940d-3df5c8814ede",
   "sort_order": 23
@@ -126,7 +126,7 @@
   "code_name": "Litre",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.031277",
+  "modified": "2025-01-12 21:30:29.692572",
   "name": "LTR",
   "slade_id": "a3457902-a5fb-41a3-96f2-162800de11ae",
   "sort_order": 24
@@ -137,7 +137,7 @@
   "code_name": "Metre",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.060636",
+  "modified": "2025-01-12 21:30:29.697747",
   "name": "M",
   "slade_id": "4700131a-3a19-4273-b75c-37ed6fc78a4f",
   "sort_order": 25
@@ -148,7 +148,7 @@
   "code_name": "Square Metre",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.106337",
+  "modified": "2025-01-12 21:30:29.702694",
   "name": "M2",
   "slade_id": "054923e9-5ed7-4614-9ded-fbc752028a06",
   "sort_order": 26
@@ -159,21 +159,10 @@
   "code_name": "Cubic Metre",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.155320",
+  "modified": "2025-01-12 21:30:29.707642",
   "name": "M3",
   "slade_id": "ddc56e3a-49c2-4490-8fe8-13c27a455a34",
   "sort_order": 27
- },
- {
-  "code": "MGM",
-  "code_description": "milligram",
-  "code_name": "milligram",
-  "docstatus": 0,
-  "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.179453",
-  "name": "MGM",
-  "slade_id": "70d0f3ce-0a58-4d3a-bb3e-01fd20748a44",
-  "sort_order": 28
  },
  {
   "code": "MTR",
@@ -181,7 +170,7 @@
   "code_name": "metre",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.199792",
+  "modified": "2025-01-12 21:30:29.718371",
   "name": "MTR",
   "slade_id": "384db896-aa2e-4bcc-a07d-506346e596eb",
   "sort_order": 29
@@ -192,7 +181,7 @@
   "code_name": "megawatt hour (1000 kW.h)",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.223831",
+  "modified": "2025-01-12 21:30:29.723768",
   "name": "MWT",
   "slade_id": "0d67c2f3-f1bb-4406-b38b-9076b7f53487",
   "sort_order": 30
@@ -203,7 +192,7 @@
   "code_name": "Number",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.244738",
+  "modified": "2025-01-12 21:30:29.728694",
   "name": "NO",
   "slade_id": "47c96ade-fc1b-43e6-a481-2c2b85d0925b",
   "sort_order": 31
@@ -214,7 +203,7 @@
   "code_name": "part per thousand",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.265585",
+  "modified": "2025-01-12 21:30:29.734015",
   "name": "NX",
   "slade_id": "ad2f9f05-c85c-4fa7-a7c0-b20c64ea85fc",
   "sort_order": 32
@@ -225,7 +214,7 @@
   "code_name": "packet",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.287708",
+  "modified": "2025-01-12 21:30:29.739013",
   "name": "PA",
   "slade_id": "e6c32378-9ec8-4db6-9891-27a69ff9f16b",
   "sort_order": 33
@@ -236,7 +225,7 @@
   "code_name": "pair",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.326972",
+  "modified": "2025-01-12 21:30:29.748621",
   "name": "PR",
   "slade_id": "39ba85ed-c9a0-439a-a2db-12cf0b805205",
   "sort_order": 35
@@ -247,7 +236,7 @@
   "code_name": "reel",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.348474",
+  "modified": "2025-01-12 21:30:29.753792",
   "name": "RL",
   "slade_id": "6f93b3df-2993-4a49-aa9e-608b09bf9e63",
   "sort_order": 36
@@ -258,7 +247,7 @@
   "code_name": "sheet",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.401654",
+  "modified": "2025-01-12 21:30:29.769549",
   "name": "ST",
   "slade_id": "460e7913-b5aa-44f5-9417-5c3f51c0f6ae",
   "sort_order": 39
@@ -269,7 +258,7 @@
   "code_name": "tonne (metric ton)",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.416177",
+  "modified": "2025-01-12 21:30:29.774535",
   "name": "TNE",
   "slade_id": "2c68dc4b-8ff7-4fe9-9159-df08311f7722",
   "sort_order": 40
@@ -280,7 +269,7 @@
   "code_name": "tube",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.427699",
+  "modified": "2025-01-12 21:30:29.779474",
   "name": "TU",
   "slade_id": "2bd4ed19-14b7-45a8-86c8-03c360534b80",
   "sort_order": 41
@@ -291,21 +280,10 @@
   "code_name": "block",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.517565",
+  "modified": "2025-01-12 21:30:29.605177",
   "name": "BL",
   "slade_id": "7a40d80e-63d0-4e73-a3bb-6c11928b9e67",
   "sort_order": 6
- },
- {
-  "code": "CA",
-  "code_description": "Can",
-  "code_name": "Can",
-  "docstatus": 0,
-  "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.579811",
-  "name": "CA",
-  "slade_id": "758e8674-3574-4a3a-9d2c-362444bf59bf",
-  "sort_order": 9
  },
  {
   "code": "AV",
@@ -313,7 +291,7 @@
   "code_name": "Cap",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.422782",
+  "modified": "2025-01-12 21:30:29.586021",
   "name": "AV",
   "slade_id": "aa70cc90-82a2-4a7d-9647-10cac5772e48",
   "sort_order": 2
@@ -324,21 +302,10 @@
   "code_name": "Barrel",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.438351",
+  "modified": "2025-01-12 21:30:29.591248",
   "name": "BA",
   "slade_id": "4c7976e7-a060-47c6-a85f-b16bc5418251",
   "sort_order": 3
- },
- {
-  "code": "YRD",
-  "code_description": "yard",
-  "code_name": "yard",
-  "docstatus": 0,
-  "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.451063",
-  "name": "YRD",
-  "slade_id": "1100ad26-c9ef-4b59-9f5b-88a9fd99a6dc",
-  "sort_order": 43
  },
  {
   "code": "CR",
@@ -346,32 +313,10 @@
   "code_name": "CARAT",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.641248",
+  "modified": "2025-01-12 21:30:29.631661",
   "name": "CR",
   "slade_id": "11f158f4-8c44-4c55-9e6c-fe9ef2eec83c",
   "sort_order": 12
- },
- {
-  "code": "RO",
-  "code_description": "roll",
-  "code_name": "roll",
-  "docstatus": 0,
-  "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.374997",
-  "name": "RO",
-  "slade_id": "b478e904-2de1-4fd4-9282-aa668122fd00",
-  "sort_order": 37
- },
- {
-  "code": "BG",
-  "code_description": "bag",
-  "code_name": "bag",
-  "docstatus": 0,
-  "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.500742",
-  "name": "BG",
-  "slade_id": "664ead41-d15e-47ee-a4d9-786c80d7264c",
-  "sort_order": 5
  },
  {
   "code": "DR",
@@ -379,7 +324,7 @@
   "code_name": "Drum",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.667174",
+  "modified": "2025-01-12 21:30:29.636040",
   "name": "DR",
   "slade_id": "02c1491c-0a8e-48f9-9371-978214c9aff4",
   "sort_order": 13
@@ -390,54 +335,10 @@
   "code_name": "plate",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.307496",
+  "modified": "2025-01-12 21:30:29.743679",
   "name": "PG",
   "slade_id": "8f988f52-1549-437f-95b4-dad9213924bd",
   "sort_order": 34
- },
- {
-  "code": "U",
-  "code_description": "Pieces/item [Number]",
-  "code_name": "Pieces/item [Number]",
-  "docstatus": 0,
-  "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.439096",
-  "name": "U",
-  "slade_id": "c086d9af-b4d1-4ca1-a7ab-08e33d1b3c74",
-  "sort_order": 42
- },
- {
-  "code": "SET",
-  "code_description": "set",
-  "code_name": "set",
-  "docstatus": 0,
-  "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:01.389764",
-  "name": "SET",
-  "slade_id": "1995fd3a-8a12-47f3-a933-d7be210f22fc",
-  "sort_order": 38
- },
- {
-  "code": "BE",
-  "code_description": "bundle",
-  "code_name": "bundle",
-  "docstatus": 0,
-  "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.470650",
-  "name": "BE",
-  "slade_id": "7a8d5dd5-c635-44a3-b94e-a823201bb660",
-  "sort_order": 4
- },
- {
-  "code": "BLL",
-  "code_description": "BLL Barrel (petroleum) (158,987 dm3)",
-  "code_name": "BLL Barrel (petroleum) (158,987 dm3)",
-  "docstatus": 0,
-  "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.533768",
-  "name": "BLL",
-  "slade_id": "ad65428b-7895-453f-89fa-6a7fef760706",
-  "sort_order": 7
  },
  {
   "code": "KG",
@@ -445,7 +346,7 @@
   "code_name": "Kilo-Gramme",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.841565",
+  "modified": "2025-01-12 21:30:29.661430",
   "name": "KG",
   "slade_id": "8b5494ad-e47a-4866-baca-d23f82699797",
   "sort_order": 18
@@ -456,21 +357,87 @@
   "code_name": "Litre",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.932080",
+  "modified": "2025-01-12 21:30:29.677442",
   "name": "L",
   "slade_id": "9e698c6b-1906-4fd2-91e9-57b86a36d433",
   "sort_order": 21
  },
  {
-  "code": "4B",
-  "code_description": "Pair",
-  "code_name": "Pair",
+  "code": "U",
+  "code_description": "Pieces/item [Number]",
+  "code_name": "Pieces/item [Number]",
   "docstatus": 0,
   "doctype": "Navari eTims Unit of Quantity",
-  "modified": "2025-01-07 07:27:00.390433",
-  "name": "4B",
-  "slade_id": "352cf05a-ac34-4b1b-8c3b-0649dc3b3087",
-  "sort_order": 1
+  "modified": "2025-01-12 21:30:29.784658",
+  "name": "U",
+  "slade_id": "c086d9af-b4d1-4ca1-a7ab-08e33d1b3c74",
+  "sort_order": 42
+ },
+ {
+  "code": "YRD",
+  "code_description": "yard",
+  "code_name": "yard",
+  "docstatus": 0,
+  "doctype": "Navari eTims Unit of Quantity",
+  "modified": "2025-01-12 21:30:29.790109",
+  "name": "YRD",
+  "slade_id": "1100ad26-c9ef-4b59-9f5b-88a9fd99a6dc",
+  "sort_order": 43
+ },
+ {
+  "code": "MGM",
+  "code_description": "milligram",
+  "code_name": "milligram",
+  "docstatus": 0,
+  "doctype": "Navari eTims Unit of Quantity",
+  "modified": "2025-01-12 21:30:29.712533",
+  "name": "MGM",
+  "slade_id": "70d0f3ce-0a58-4d3a-bb3e-01fd20748a44",
+  "sort_order": 28
+ },
+ {
+  "code": "CA",
+  "code_description": "Can",
+  "code_name": "Can",
+  "docstatus": 0,
+  "doctype": "Navari eTims Unit of Quantity",
+  "modified": "2025-01-12 21:30:29.618436",
+  "name": "CA",
+  "slade_id": "758e8674-3574-4a3a-9d2c-362444bf59bf",
+  "sort_order": 9
+ },
+ {
+  "code": "BLL",
+  "code_description": "BLL Barrel (petroleum) (158,987 dm3)",
+  "code_name": "BLL Barrel (petroleum) (158,987 dm3)",
+  "docstatus": 0,
+  "doctype": "Navari eTims Unit of Quantity",
+  "modified": "2025-01-12 21:30:29.609662",
+  "name": "BLL",
+  "slade_id": "ad65428b-7895-453f-89fa-6a7fef760706",
+  "sort_order": 7
+ },
+ {
+  "code": "RO",
+  "code_description": "roll",
+  "code_name": "roll",
+  "docstatus": 0,
+  "doctype": "Navari eTims Unit of Quantity",
+  "modified": "2025-01-12 21:30:29.759037",
+  "name": "RO",
+  "slade_id": "b478e904-2de1-4fd4-9282-aa668122fd00",
+  "sort_order": 37
+ },
+ {
+  "code": "BE",
+  "code_description": "bundle",
+  "code_name": "bundle",
+  "docstatus": 0,
+  "doctype": "Navari eTims Unit of Quantity",
+  "modified": "2025-01-12 21:30:29.596166",
+  "name": "BE",
+  "slade_id": "7a8d5dd5-c635-44a3-b94e-a823201bb660",
+  "sort_order": 4
  },
  {
   "code": "UNT",
@@ -482,5 +449,38 @@
   "name": "UNT",
   "slade_id": null,
   "sort_order": 0
+ },
+ {
+  "code": "BG",
+  "code_description": "bag",
+  "code_name": "bag",
+  "docstatus": 0,
+  "doctype": "Navari eTims Unit of Quantity",
+  "modified": "2025-01-12 21:30:29.600612",
+  "name": "BG",
+  "slade_id": "664ead41-d15e-47ee-a4d9-786c80d7264c",
+  "sort_order": 5
+ },
+ {
+  "code": "SET",
+  "code_description": "set",
+  "code_name": "set",
+  "docstatus": 0,
+  "doctype": "Navari eTims Unit of Quantity",
+  "modified": "2025-01-12 21:30:29.764349",
+  "name": "SET",
+  "slade_id": "1995fd3a-8a12-47f3-a933-d7be210f22fc",
+  "sort_order": 38
+ },
+ {
+  "code": "4B",
+  "code_description": "Pair",
+  "code_name": "Pair",
+  "docstatus": 0,
+  "doctype": "Navari eTims Unit of Quantity",
+  "modified": "2025-01-12 21:30:29.572637",
+  "name": "4B",
+  "slade_id": "352cf05a-ac34-4b1b-8c3b-0649dc3b3087",
+  "sort_order": 1
  }
 ]

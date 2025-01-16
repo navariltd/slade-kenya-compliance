@@ -477,44 +477,48 @@ def perform_purchase_search(request_data: str) -> None:
 
 
 @frappe.whitelist()
-def submit_inventory(request_data: str) -> None:
-    data: dict = json.loads(request_data)
+def submit_inventory(name: str) -> None:
+    if not name:
+        frappe.throw("Item name is required.")
 
-    company_name = frappe.defaults.get_user_default("Company")
+    stock_levels = frappe.db.get_all(
+        "Bin",
+        filters={"item_code": name},
+        fields=["warehouse", "actual_qty", "reserved_qty", "projected_qty", "name"],
+    )
 
-    headers = build_headers(company_name, data["branch_id"])
-    server_url = get_server_url(company_name, data["branch_id"])
-    route_path, last_request_date = get_route_path("StockMasterSaveReq")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-
-        payload = {
-            "itemCd": data["item_code"],
-            "rsdQty": data["residual_qty"],
-            "regrId": split_user_email(data["owner"]),
-            "regrNm": data["owner"],
-            "modrId": split_user_email(data["owner"]),
-            "modrNm": data["owner"],
-        }
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = partial(
-            submit_inventory_on_success, document_name=data["name"]
+    if not stock_levels:
+        frappe.msgprint(f"No stock levels found for item {name}.")
+    else:
+        department = frappe.defaults.get_user_default("Department") or frappe.get_value(
+            "Department", {}, "name"
         )
-        endpoints_builder.error_callback = on_error
-
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="default",
-            timeout=300,
-            job_name=f"{data['name']}_submit_inventory",
-            doctype="Stock Ledger Entry",
-            document_name=data["name"],
-        )
+        for stock in stock_levels:
+            request_data = {
+                "document_name": stock.get("name"),
+                "inventory_reference": f"{name} - {stock['warehouse']}",
+                "description": f"{name} Stock Adjustment for {stock['warehouse']}",
+                "reason": "Opening Stock",
+                "source_organisation_unit": get_link_value(
+                    "Department",
+                    "name",
+                    department,
+                    "custom_slade_id",
+                ),
+                "location": get_link_value(
+                    "Warehouse",
+                    "name",
+                    stock.get("warehouse"),
+                    "custom_slade_id",
+                ),
+            }
+            process_request(
+                request_data,
+                route_key="StockMasterSaveReq",
+                handler_function=submit_inventory_on_success,
+                request_method="POST",
+                doctype="Bin",
+            )
 
 
 @frappe.whitelist()

@@ -12,18 +12,6 @@
   "sort_order": "3"
  },
  {
-  "code": "2",
-  "code_description": null,
-  "code_name": "Finished Product",
-  "docstatus": 0,
-  "doctype": "Navari eTims Item Type",
-  "modified": "2025-01-07 07:00:42.143179",
-  "name": "2",
-  "remark": null,
-  "slade_id": null,
-  "sort_order": "2"
- },
- {
   "code": "1",
   "code_description": null,
   "code_name": "Raw Material",
@@ -34,5 +22,17 @@
   "remark": null,
   "slade_id": null,
   "sort_order": "1"
+ },
+ {
+  "code": "2",
+  "code_description": null,
+  "code_name": "Finished Product",
+  "docstatus": 0,
+  "doctype": "Navari eTims Item Type",
+  "modified": "2025-01-07 07:00:42.143179",
+  "name": "2",
+  "remark": null,
+  "slade_id": null,
+  "sort_order": "2"
  }
 ]
