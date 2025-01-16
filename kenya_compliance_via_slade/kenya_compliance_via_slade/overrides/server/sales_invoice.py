@@ -5,9 +5,6 @@ from .shared_overrides import generic_invoices_on_submit_override
 
 
 def on_submit(doc: Document, method: str) -> None:
-    if not doc.branch:
-        frappe.throw("Please ensure the branch is set before submitting the document")
-    """Intercepts submit event for document"""
 
     if (
         doc.custom_successfully_submitted == 0
