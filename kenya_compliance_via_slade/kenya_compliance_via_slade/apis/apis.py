@@ -845,8 +845,8 @@ def create_purchase_invoice_from_request(request_data: str) -> None:
 @frappe.whitelist()
 def ping_server(request_data: str) -> None:
     data = json.loads(request_data)
-    server_url = f"{data["server_url"]}/alive"
-    auth_url = data["auth_url"]
+    server_url = data.get("server_url")
+    auth_url = data.get("auth_url")
 
     async def check_server(url: str) -> tuple:
         try:
