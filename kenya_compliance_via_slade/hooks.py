@@ -42,7 +42,6 @@ fixtures = [
                     "Purchase Invoice",
                     "Purchase Invoice Item",
                     "Customer",
-                    "Customer Group",
                     "Stock Ledger Entry",
                     "BOM",
                     "Warehouse",

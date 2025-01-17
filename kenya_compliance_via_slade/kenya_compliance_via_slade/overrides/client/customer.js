@@ -3,33 +3,49 @@ const doctype = "Customer";
 frappe.ui.form.on(doctype, {
   refresh: async function (frm) {
     const companyName = frappe.boot.sysdefaults.company;
+    let currency = frm.doc.default_currency || "KES";
 
-    if (!frm.is_new() && frm.doc.tax_id) {
-      frm.add_custom_button(
-        __("Perform Customer Search"),
-        function () {
-          frappe.call({
-            method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_customer_search",
-            args: {
-              request_data: {
-                doc_name: frm.doc.name,
-                customer_pin: frm.doc.tax_id,
-                company_name: companyName,
+    frappe.call({
+      method: "frappe.client.get_value",
+      args: {
+        doctype: "Currency",
+        fieldname: "name",
+        filters: { name: currency },
+      },
+      callback: function (r) {
+        if (r.message) {
+          currency = r.message.name;
+        }
+      },
+    });
+
+    if (!frm.is_new()) {
+      if (frm.doc.tax_id) {
+        frm.add_custom_button(
+          __("Perform Customer Search"),
+          function () {
+            frappe.call({
+              method:
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_customer_search",
+              args: {
+                request_data: {
+                  doc_name: frm.doc.name,
+                  customer_pin: frm.doc.tax_id,
+                  company_name: companyName,
+                },
               },
-            },
-            callback: (response) => {
-              frappe.msgprint("Search queued. Please check in later.");
-            },
-            error: (r) => {
-              // Error Handling is Defered to the Server
-            },
-          });
-        },
-        __("eTims Actions")
-      );
-
-      if (!frm.doc.custom_details_submitted_successfully) {
+              callback: (response) => {
+                frappe.msgprint("Search queued. Please check in later.");
+              },
+              error: (r) => {
+                // Error Handling is Defered to the Server
+              },
+            });
+          },
+          __("eTims Actions")
+        );
+      }
+      if (!frm.doc.slade_id) {
         frm.add_custom_button(
           __("Send Customer Details"),
           function () {
@@ -41,11 +57,8 @@ frappe.ui.form.on(doctype, {
                   document_name: frm.doc.name,
                   customer_tax_pin: frm.doc.tax_id,
                   partner_name: frm.doc.customer_name,
-                  company_name: companyName,
-                  registration_id: frm.doc.owner,
-                  modifier_id: frm.doc.modified_by,
                   phone_number: frm.doc.mobile_no,
-                  currency: frm.doc.default_currency,
+                  currency: currency,
                   is_customer: true,
                   country: "KEN",
                   customer_type: "INDIVIDUAL",
@@ -59,57 +72,23 @@ frappe.ui.form.on(doctype, {
           },
           __("eTims Actions")
         );
-      }
-    }
-
-    if (!frm.is_new() && frm.doc.slade_id) {
-      frm.add_custom_button(
-        __("Get Customer Detalis"),
-        function () {
-          frappe.call({
-            method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_customer_details",
-            args: {
-              request_data: {
-                doc_name: frm.doc.name,
-                id: frm.doc.slade_id,
-                company_name: companyName,
-              },
-            },
-            callback: (response) => {
-              frappe.msgprint("Search queued. Please check in later.");
-            },
-            error: (r) => {
-              // Error Handling is Defered to the Server
-            },
-          });
-        },
-        __("eTims Actions")
-      );
-
-      if (!frm.doc.custom_details_submitted_successfully) {
+      } else {
         frm.add_custom_button(
-          __("Send Customer Details"),
+          __("Get Customer Detals"),
           function () {
             frappe.call({
               method:
-                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_branch_customer_details",
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_customer_details",
               args: {
                 request_data: {
-                  document_name: frm.doc.name,
-                  customer_tax_pin: frm.doc.tax_id,
-                  partner_name: frm.doc.customer_name,
+                  doc_name: frm.doc.name,
+                  id: frm.doc.slade_id,
                   company_name: companyName,
-                  registration_id: frm.doc.owner,
-                  modifier_id: frm.doc.modified_by,
-                  phone_number: frm.doc.mobile_no,
-                  currency: frm.doc.default_currency,
-                  is_customer: true,
-                  country: "KEN",
-                  customer_type: "INDIVIDUAL",
                 },
               },
-              callback: (response) => {},
+              callback: (response) => {
+                frappe.msgprint("Search queued. Please check in later.");
+              },
               error: (r) => {
                 // Error Handling is Defered to the Server
               },
@@ -119,58 +98,6 @@ frappe.ui.form.on(doctype, {
         );
       }
     }
-
-    if (
-      frm.doc.custom_insurance_applicable &&
-      !frm.doc.custom_insurance_details_submitted_successfully
-    ) {
-      frm.add_custom_button(
-        __("Send Insurance Details"),
-        function () {
-          frappe.call({
-            method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_insurance_details",
-            args: {
-              request_data: {
-                name: frm.doc.name,
-                tax_id: frm.doc.tax_id,
-                company_name: companyName,
-                insurance_code: frm.doc.custom_insurance_code,
-                insurance_name: frm.doc.custom_insurance_name,
-                premium_rate: frm.doc.custom_premium_rate,
-                registration_id: frm.doc.owner,
-                modifier_id: frm.doc.modified_by,
-              },
-            },
-            callback: (response) => {
-              frappe.msgprint("Request queued. Please check in later.");
-            },
-            error: (r) => {
-              // Error Handling is Defered to the Server
-            },
-          });
-        },
-        __("eTims Actions")
-      );
-    }
-
-    // frm.fields_dict.items.grid.get_field("item_classification_code").get_query =
-    //   function (doc, cdt, cdn) {
-    //     // Adds a filter to the items item classification code based on item's description
-    //     const itemDescription = locals[cdt][cdn].description;
-    //     const descriptionText = parseItemDescriptionText(itemDescription);
-
-    //     return {
-    //       filters: [
-    //         [
-    //           "Navari KRA eTims Item Classification",
-    //           "itemclsnm",
-    //           "like",
-    //           `%${descriptionText}%`,
-    //         ],
-    //       ],
-    //     };
-    //   };
   },
   customer_group: function (frm) {
     frappe.db.get_value(

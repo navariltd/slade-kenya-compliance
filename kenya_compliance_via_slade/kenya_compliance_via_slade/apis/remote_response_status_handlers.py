@@ -77,10 +77,7 @@ These functions are required as serialising lambda expressions is a bit involvin
 """
 
 
-def customer_search_on_success(
-    response: dict,
-    document_name: str,
-) -> None:
+def customer_search_on_success(response: dict, document_name: str, **kwargs) -> None:
     frappe.db.set_value(
         "Customer",
         document_name,
@@ -111,7 +108,7 @@ def item_registration_on_success(response: dict, document_name: str, **kwargs) -
 
 
 def customer_insurance_details_submission_on_success(
-    response: dict, document_name: str
+    response: dict, document_name: str, **kwargs
 ) -> None:
     frappe.db.set_value(
         "Customer",
@@ -121,7 +118,7 @@ def customer_insurance_details_submission_on_success(
 
 
 def customer_branch_details_submission_on_success(
-    response: dict, document_name: str
+    response: dict, document_name: str, **kwargs
 ) -> None:
     doctype = "Supplier" if response.get("is_supplier") else "Customer"
     frappe.db.set_value(

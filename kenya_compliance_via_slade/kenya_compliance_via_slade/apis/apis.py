@@ -322,7 +322,7 @@ def send_insurance_details(request_data: str) -> None:
 @frappe.whitelist()
 def send_branch_customer_details(request_data: str) -> None:
     data = json.loads(request_data)
-    phone_number = data.get("phone_number", "").replace(" ", "").strip()
+    phone_number = (data.get("phone_number") or "").replace(" ", "").strip()
     data["phone_number"] = (
         "+254" + phone_number[-9:] if len(phone_number) >= 9 else None
     )
