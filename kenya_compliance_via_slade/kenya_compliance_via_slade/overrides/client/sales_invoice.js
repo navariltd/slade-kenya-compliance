@@ -6,51 +6,59 @@ const taxationTypeDoctypeName = "Navari KRA eTims Taxation Type";
 const settingsDoctypeName = "Navari KRA eTims Settings";
 
 frappe.ui.form.on(parentDoctype, {
-  refresh: function (frm) {
-    frm.set_value("update_stock", 1);
-    if (frm.doc.update_stock === 1) {
-      frm.toggle_reqd("set_warehouse", true);
-    }
+  refresh: async function (frm) {
+    const { message: activeSetting } = await frappe.db.get_value(
+      settingsDoctypeName,
+      { is_active: 1 },
+      "name"
+    );
 
-    if (!frm.doc.custom_successfully_submitted) {
-      frm.add_custom_button(
-        __("Send Invoice"),
-        function () {
-          frappe.call({
-            method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.sales_invoice.send_invoice_details",
-            args: {
-              name: frm.doc.name,
-            },
-            callback: (response) => {},
-            error: (r) => {
-              // Error Handling is Defered to the Server
-            },
-          });
-        },
-        __("eTims Actions")
-      );
-    } else if (!frm.doc.custom_qr_code) {
-      frm.add_custom_button(
-        __("Sync Invoice Details"),
-        function () {
-          frappe.call({
-            method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_invoice_details",
-            args: {
-              request_data: {
-                id: frm.doc.custom_slade_id,
+    if (activeSetting?.name) {
+      frm.set_value("update_stock", 1);
+      if (frm.doc.update_stock === 1) {
+        frm.toggle_reqd("set_warehouse", true);
+      }
+
+      if (!frm.doc.custom_successfully_submitted) {
+        frm.add_custom_button(
+          __("Send Invoice"),
+          function () {
+            frappe.call({
+              method:
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.sales_invoice.send_invoice_details",
+              args: {
+                name: frm.doc.name,
               },
-              invoice_type: "Sales Invoice",
-            },
-            callback: (response) => {},
-            error: (r) => {
-              // Error Handling is Defered to the Server
-            },
-          });
-        },
-        __("eTims Actions")
-      );
+              callback: (response) => {},
+              error: (r) => {
+                // Error Handling is Defered to the Server
+              },
+            });
+          },
+          __("eTims Actions")
+        );
+      } else if (!frm.doc.custom_qr_code) {
+        frm.add_custom_button(
+          __("Sync Invoice Details"),
+          function () {
+            frappe.call({
+              method:
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_invoice_details",
+              args: {
+                request_data: {
+                  id: frm.doc.custom_slade_id,
+                },
+                invoice_type: "Sales Invoice",
+              },
+              callback: (response) => {},
+              error: (r) => {
+                // Error Handling is Defered to the Server
+              },
+            });
+          },
+          __("eTims Actions")
+        );
+      }
     }
   },
 

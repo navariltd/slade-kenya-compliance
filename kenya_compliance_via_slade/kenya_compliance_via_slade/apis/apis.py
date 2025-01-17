@@ -77,6 +77,9 @@ def process_request(
     doctype: str = SETTINGS_DOCTYPE_NAME,
 ) -> str:
     """Reusable function to process requests with common logic."""
+    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+        return
+
     if isinstance(request_data, str):
         data = json.loads(request_data)
     elif isinstance(request_data, (dict, list)):
@@ -322,7 +325,7 @@ def send_insurance_details(request_data: str) -> None:
 @frappe.whitelist()
 def send_branch_customer_details(request_data: str) -> None:
     data = json.loads(request_data)
-    phone_number = data.get("phone_number", "").replace(" ", "").strip()
+    phone_number = (data.get("phone_number") or "").replace(" ", "").strip()
     data["phone_number"] = (
         "+254" + phone_number[-9:] if len(phone_number) >= 9 else None
     )
