@@ -5,13 +5,19 @@ from frappe.model.document import Document
 
 from ...apis.api_builder import EndpointsBuilder
 from ...apis.apis import process_request
-from ...doctype.doctype_names_mapping import OPERATION_TYPE_DOCTYPE_NAME
+from ...doctype.doctype_names_mapping import (
+    OPERATION_TYPE_DOCTYPE_NAME,
+    SETTINGS_DOCTYPE_NAME,
+)
 from ...utils import extract_document_series_number
 
 endpoints_builder = EndpointsBuilder()
 
 
 def on_update(doc: Document, method: str | None = None) -> None:
+    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+        return
+
     save_ledger_details(doc.name)
 
 

@@ -1,9 +1,17 @@
 const doctypeName = "POS Invoice";
 
-frappe.listview_settings[doctypeName].onload = function (listview) {
-  listview.page.add_action_item(__("Bulk Submit to eTims"), function () {
-    bulkSubmitInvoices(listview, doctypeName);
-  });
+frappe.listview_settings[doctypeName].onload = async function (listview) {
+  const { message: activeSetting } = await frappe.db.get_value(
+    settingsDoctypeName,
+    { is_active: 1 },
+    "name"
+  );
+
+  if (activeSetting?.name) {
+    listview.page.add_action_item(__("Bulk Submit to eTims"), function () {
+      bulkSubmitInvoices(listview, doctypeName);
+    });
+  }
 };
 
 function bulkSubmitInvoices(listview, doctype) {

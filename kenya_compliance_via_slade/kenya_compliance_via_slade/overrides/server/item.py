@@ -7,6 +7,7 @@ from frappe.model.document import Document
 
 from .... import __version__
 from ...apis.apis import perform_item_registration
+from ...doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
 
 
 @deprecation.deprecated(
@@ -17,6 +18,9 @@ from ...apis.apis import perform_item_registration
 )
 def after_insert(doc: Document, method: str) -> None:
     """Item doctype before insertion hook"""
+
+    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+        return
 
     perform_item_registration(doc.name)
 

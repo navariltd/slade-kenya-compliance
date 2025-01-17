@@ -77,6 +77,9 @@ def process_request(
     doctype: str = SETTINGS_DOCTYPE_NAME,
 ) -> str:
     """Reusable function to process requests with common logic."""
+    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+        return
+
     if isinstance(request_data, str):
         data = json.loads(request_data)
     elif isinstance(request_data, (dict, list)):

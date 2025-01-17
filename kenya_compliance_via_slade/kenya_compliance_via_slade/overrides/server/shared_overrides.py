@@ -8,6 +8,7 @@ from ...apis.apis import process_request
 from ...apis.remote_response_status_handlers import (
     sales_information_submission_on_success,
 )
+from ...doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
 from ...utils import build_invoice_payload
 
 endpoints_builder = EndpointsBuilder()
@@ -23,6 +24,10 @@ def generic_invoices_on_submit_override(
         invoice_type (Literal[&quot;Sales Invoice&quot;, &quot;POS Invoice&quot;]):
         The Type of the invoice. Either Sales, or POS
     """
+
+    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+        return
+
     company_name = (
         doc.company
         or frappe.defaults.get_user_default("Company")

@@ -10,6 +10,7 @@ from ...apis.apis import process_request
 from ...apis.remote_response_status_handlers import (
     purchase_invoice_submission_on_success,
 )
+from ...doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
 from ...utils import extract_document_series_number, get_taxation_types, quantize_number
 
 endpoints_builder = EndpointsBuilder()
@@ -55,6 +56,10 @@ def validate(doc: Document, method: str) -> None:
 def on_submit(doc: Document, method: str) -> None:
     if doc.is_return == 0 and doc.update_stock == 1:
         # TODO: Handle cases when item tax templates have not been picked
+
+        if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+            return
+
         company_name = (
             doc.company
             or frappe.defaults.get_user_default("Company")
