@@ -7,10 +7,9 @@
  "engine": "InnoDB",
  "field_order": [
   "environment_section",
-  "vendor",
+  "env",
   "sandbox",
   "column_break_swix",
-  "env",
   "is_active",
   "autocreate_branch_dimension",
   "settings_section",
@@ -21,10 +20,8 @@
   "column_break_mmvk",
   "bhfid",
   "department",
+  "workstation",
   "dvcsrlno",
-  "sales_control_unit_id",
-  "communication_key_section",
-  "communication_key",
   "request_frequency_tab",
   "frequency_of_communication_with_etims_servers_section",
   "sales_information_submission",
@@ -57,7 +54,6 @@
   "auth_password",
   "column_break_cgts",
   "etims_user",
-  "workstation",
   "section_break_eqay",
   "access_token",
   "column_break_clyl",
@@ -151,18 +147,6 @@
    "in_list_view": 1,
    "label": "Is Active",
    "options": "1"
-  },
-  {
-   "fieldname": "communication_key_section",
-   "fieldtype": "Section Break",
-   "label": "Communication Key"
-  },
-  {
-   "fieldname": "communication_key",
-   "fieldtype": "Data",
-   "label": "Communication Key",
-   "no_copy": 1,
-   "read_only": 1
   },
   {
    "fieldname": "request_frequency_tab",
@@ -316,19 +300,6 @@
    "mandatory_depends_on": "eval:doc.notices_refresh_frequency === \"Cron\";"
   },
   {
-   "fieldname": "sales_control_unit_id",
-   "fieldtype": "Data",
-   "label": "Sales Control Unit Id",
-   "read_only": 1
-  },
-  {
-   "fieldname": "vendor",
-   "fieldtype": "Select",
-   "label": "API Provider",
-   "options": "\nOSCU KRA\nVSCU Slade 360\nPergamon",
-   "reqd": 1
-  },
-  {
    "fieldname": "auth_details_tab",
    "fieldtype": "Tab Break",
    "label": "Auth Details"
@@ -441,7 +412,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-01-16 07:38:38.280383",
+ "modified": "2025-01-20 09:05:53.084339",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",

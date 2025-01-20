@@ -17,6 +17,8 @@ endpoints_builder = EndpointsBuilder()
 
 
 def validate(doc: Document, method: str) -> None:
+    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+        return
     get_itemised_tax_breakup_data(doc)
     if not doc.branch:
         frappe.throw("Please ensure the branch is set before submitting the document")

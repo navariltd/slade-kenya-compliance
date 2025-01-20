@@ -545,6 +545,8 @@ A classic example usecase is Apex tevin typecase where the tax rate is fetched f
 
 
 def before_save_(doc: "Document", method: str | None = None) -> None:
+    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+        return
     calculate_tax(doc)
 
 
