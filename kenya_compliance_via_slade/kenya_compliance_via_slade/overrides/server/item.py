@@ -57,6 +57,8 @@ def after_insert(doc: Document, method: str) -> None:
 
 def validate(doc: Document, method: str) -> None:
     # Check if the tax type field has changed
+    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+        return
     is_tax_type_changed = doc.has_value_changed("custom_taxation_type")
     if doc.custom_taxation_type and is_tax_type_changed:
         relevant_tax_templates = frappe.get_all(
@@ -114,6 +116,8 @@ def validate(doc: Document, method: str) -> None:
 
 @frappe.whitelist()
 def prevent_item_deletion(doc: dict) -> None:
+    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
+        return
     if doc.custom_item_registered == 1:  # Assuming 1 means registered, adjust as needed
         frappe.throw(_("Cannot delete registered items"))
     pass
