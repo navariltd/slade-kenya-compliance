@@ -4,7 +4,7 @@ import frappe
 from frappe.model.document import Document
 
 from ...apis.api_builder import EndpointsBuilder
-from ...apis.apis import process_request
+from ...apis.process_request import process_request
 from ...apis.remote_response_status_handlers import (
     sales_information_submission_on_success,
 )

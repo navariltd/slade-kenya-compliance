@@ -210,7 +210,7 @@ def imported_item_submission_on_success(
 
 def submit_inventory_on_success(response: dict, document_name: str, **kwargs) -> None:
     bin = frappe.get_doc("Bin", document_name)
-    from .apis import process_request
+    from .process_request import process_request
 
     requset_data = {
         "document_name": bin.item_code,
@@ -234,7 +234,7 @@ def submit_inventory_on_success(response: dict, document_name: str, **kwargs) ->
 def submit_inventory_item_on_success(
     response: dict, document_name: str, **kwargs
 ) -> None:
-    from .apis import process_request
+    from .process_request import process_request
 
     doc = frappe.get_doc("Item", document_name)
     requset_data = {
@@ -288,7 +288,7 @@ def process_invoice_items(
     Retrieves the specific invoice, extracts all items, and sends each
     item separately.
     """
-    from .apis import process_request
+    from .process_request import process_request
 
     invoice = frappe.get_doc(doctype, document_name)
 
@@ -325,7 +325,7 @@ def process_invoice_items(
 def process_sales_transition(
     document_name: str, doctype: str, invoice_slade_id: str
 ) -> None:
-    from .apis import process_request
+    from .process_request import process_request
 
     def handle_transition_success(response: dict, document_name: str, **kwargs) -> None:
         # process_sales_sign(document_name, doctype, invoice_slade_id)
@@ -349,7 +349,7 @@ def process_sales_transition(
 
 
 def process_sales_sign(document_name: str, doctype: str, invoice_slade_id: str) -> None:
-    from .apis import process_request
+    from .process_request import process_request
 
     def handle_invoice_sign_success(
         response: dict, document_name: str, **kwargs
@@ -480,7 +480,7 @@ def purchase_search_on_success(response: dict, **kwargs) -> None:
 
 
 def fetch_purchase_items(registered_purchase: str) -> None:
-    from .apis import process_request
+    from .process_request import process_request
 
     payload = {
         "purchase_invoice": registered_purchase,

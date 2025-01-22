@@ -4,7 +4,7 @@ import frappe
 from frappe.model.document import Document
 
 from ...apis.api_builder import EndpointsBuilder
-from ...apis.apis import process_request
+from ...apis.process_request import process_request
 from ...doctype.doctype_names_mapping import (
     OPERATION_TYPE_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,

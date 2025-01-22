@@ -6,7 +6,7 @@ from frappe.model.document import Document
 from erpnext.controllers.taxes_and_totals import get_itemised_tax_breakup_data
 
 from ...apis.api_builder import EndpointsBuilder
-from ...apis.apis import process_request
+from ...apis.process_request import process_request
 from ...apis.remote_response_status_handlers import (
     purchase_invoice_submission_on_success,
 )
@@ -83,7 +83,6 @@ def build_purchase_invoice_payload(doc: Document, company_name: str) -> dict:
         "total_taxable_amount": round(doc.base_total, 2),
         "total_tax_amount": round(doc.total_taxes_and_charges, 2),
         "supplier_name": doc.supplier_name,
-        "organisation": doc.custom_slade_organisation,
     }
 
     return payload
