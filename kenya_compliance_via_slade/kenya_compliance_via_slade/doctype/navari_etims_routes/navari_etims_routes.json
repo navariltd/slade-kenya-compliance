@@ -7,8 +7,6 @@
  "engine": "InnoDB",
  "field_order": [
   "vendor_settings_section",
-  "company",
-  "column_break_rgwp",
   "vendor",
   "routes_mapping_section",
   "routes_table"
@@ -18,18 +16,6 @@
    "fieldname": "vendor_settings_section",
    "fieldtype": "Section Break",
    "label": "Vendor Settings"
-  },
-  {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Company",
-   "options": "Company",
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_rgwp",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "vendor",
@@ -53,7 +39,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-13 08:39:24.815453",
+ "modified": "2025-01-22 12:16:09.762656",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Routes",

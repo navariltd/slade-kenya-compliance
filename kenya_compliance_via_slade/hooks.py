@@ -293,27 +293,25 @@ doc_events = {
         ],
         "on_trash": "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.prevent_item_deletion",
     },
+    "Stock Ledger Entry": {
+        "after_insert": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.stock_ledger_entry.on_update"
+        ]
+    },
 }
 
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
-    "all": [
-        # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_stock_information",
-        # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_item_inventory_information",
+    "daily": [
+        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_notices",
     ],
-    # 	"daily": [
-    # 		"kenya_compliance_via_slade.tasks.daily"
-    # 	],
     "hourly": [
         "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_sales_invoices_information",
         "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_purchase_information",
-        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_notices",
+        # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_stock_information",
     ],
-    # 	"weekly": [
-    # 		"kenya_compliance_via_slade.tasks.weekly"
-    # 	],
     "monthly": [
         "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_code_lists",
         # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.search_organisations_request",

@@ -18,36 +18,6 @@ from ..doctype.doctype_names_mapping import (
 from ..utils import get_link_value
 
 
-def refresh_notices() -> None:
-    from ..apis.apis import perform_notice_search
-
-    company = frappe.defaults.get_user_default("Company")
-
-    perform_notice_search(json.dumps({"company_name": company}))
-
-
-def send_sales_invoices_information() -> None:
-    from ..overrides.server.sales_invoice import on_submit
-
-    all_submitted_unsent: list[Document] = frappe.get_all(
-        "Sales Invoice", {"docstatus": 1, "custom_successfully_submitted": 0}, ["name"]
-    )  # Fetch all Sales Invoice records according to filter
-
-    if all_submitted_unsent:
-        for sales_invoice in all_submitted_unsent:
-            doc = frappe.get_doc(
-                "Sales Invoice", sales_invoice.name, for_update=False
-            )  # Refetch to get the document representation of the record
-
-            try:
-                on_submit(
-                    doc, method=None
-                )  # Delegate to the on_submit method for sales invoices
-
-            except TypeError:
-                continue
-
-
 def send_pos_invoices_information() -> None:
     from ..overrides.server.sales_invoice import on_submit
 
@@ -68,61 +38,6 @@ def send_pos_invoices_information() -> None:
 
             except TypeError:
                 continue
-
-
-def send_purchase_information() -> None:
-    from ..overrides.server.purchase_invoice import on_submit
-
-    all_submitted_purchase_invoices: list[Document] = frappe.get_all(
-        "Purchase Invoice",
-        {"docstatus": 1, "custom_submitted_successfully": 0},
-        ["name"],
-    )
-
-    for invoice in all_submitted_purchase_invoices:
-        doc = frappe.get_doc(
-            "Purchase Invoice", invoice.name, for_update=False
-        )  # Refetch to get the document representation of the record
-
-        try:
-            on_submit(doc, method=None)
-
-        except TypeError:
-            continue
-
-
-def send_item_inventory_information() -> None:
-    from ..apis.apis import submit_inventory
-
-    query = """
-        SELECT sle.name as name,
-            sle.owner,
-            sle.custom_submitted_successfully,
-            sle.custom_inventory_submitted_successfully,
-            qty_after_transaction as residual_qty,
-            sle.warehouse,
-            w.custom_branch as branch_id,
-            i.item_code as item,
-            custom_item_code_etims as item_code
-        FROM `tabStock Ledger Entry` sle
-            INNER JOIN tabItem i ON sle.item_code = i.item_code
-            INNER JOIN tabWarehouse w ON sle.warehouse = w.name
-        WHERE sle.custom_submitted_successfully = '1'
-            AND sle.custom_inventory_submitted_successfully = '0'
-        ORDER BY sle.creation DESC;
-        """
-
-    sles = frappe.db.sql(query, as_dict=True)
-
-    for stock_ledger in sles:
-        response = json.dumps(stock_ledger)
-
-        try:
-            submit_inventory(response)
-
-        except Exception as error:
-            # TODO: Suspicious looking type(error)
-            frappe.throw("Error Encountered", type(error), title="Error")
 
 
 def update_documents(
