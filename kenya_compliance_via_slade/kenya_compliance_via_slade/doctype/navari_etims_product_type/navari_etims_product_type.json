@@ -9,7 +9,6 @@
  "field_order": [
   "products_type_section",
   "code",
-  "slade_id",
   "sort_order",
   "column_break_njjb",
   "code_name",
@@ -56,18 +55,11 @@
    "fieldname": "remark",
    "fieldtype": "Data",
    "label": "Remark"
-  },
-  {
-   "fieldname": "slade_id",
-   "fieldtype": "Data",
-   "in_standard_filter": 1,
-   "label": "Slade ID",
-   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-07 06:58:41.774086",
+ "modified": "2025-01-22 19:09:43.410952",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Product Type",

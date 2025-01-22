@@ -1,7 +1,6 @@
 import asyncio
 import json
 from functools import partial
-from secrets import token_hex
 from typing import Callable
 
 import aiohttp
@@ -35,7 +34,6 @@ from ..utils import (
 from .api_builder import EndpointsBuilder
 from .remote_response_status_handlers import (
     customer_branch_details_submission_on_success,
-    customer_insurance_details_submission_on_success,
     customer_search_on_success,
     customers_search_on_success,
     imported_item_submission_on_success,
@@ -50,7 +48,6 @@ from .remote_response_status_handlers import (
     pricelist_update_on_success,
     purchase_search_on_success,
     search_branch_request_on_success,
-    stock_mvt_search_on_success,
     submit_inventory_on_success,
     update_invoice_info,
     user_details_fetch_on_success,
@@ -284,45 +281,6 @@ def fetch_item_details(request_data: str) -> None:
 
 
 @frappe.whitelist()
-def send_insurance_details(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-    company_name = data["company_name"]
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
-    route_path, last_request_date = get_route_path("BhfInsuranceSaveReq")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-        payload = {
-            "isrccCd": data["insurance_code"],
-            "isrccNm": data["insurance_name"],
-            "isrcRt": round(data["premium_rate"], 0),
-            "useYn": "Y",
-            "regrNm": data["registration_id"],
-            "regrId": split_user_email(data["registration_id"]),
-            "modrNm": data["modifier_id"],
-            "modrId": split_user_email(data["modifier_id"]),
-        }
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = partial(
-            customer_insurance_details_submission_on_success, document_name=data["name"]
-        )
-        endpoints_builder.error_callback = on_error
-
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="default",
-            timeout=300,
-            doctype="Customer",
-            document_name=data["name"],
-        )
-
-
-@frappe.whitelist()
 def send_branch_customer_details(request_data: str) -> None:
     data = json.loads(request_data)
     phone_number = (data.get("phone_number") or "").replace(" ", "").strip()
@@ -546,37 +504,6 @@ def update_imported_item_request(request_data: str) -> None:
         method="PUT",
         doctype="Item",
     )
-
-
-@frappe.whitelist()
-def perform_stock_movement_search(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-
-    company_name = data["company_name"]
-
-    headers = build_headers(company_name, data["branch_id"])
-    server_url = get_server_url(company_name, data["branch_id"])
-
-    route_path, last_request_date = get_route_path("StockMoveReq")
-    request_date = last_request_date.strftime("%Y%m%d%H%M%S")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-        payload = {"lastReqDt": request_date}
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = stock_mvt_search_on_success
-        endpoints_builder.error_callback = on_error
-
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="default",
-            timeout=300,
-            job_name=token_hex(100),
-        )
 
 
 @frappe.whitelist()

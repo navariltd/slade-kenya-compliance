@@ -142,28 +142,6 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         },
         __("eTims Actions")
       );
-
-      // frm.add_custom_button(
-      //   __("Get Stock Movements"),
-      //   function () {
-      //     frappe.call({
-      //       method:
-      //         "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_stock_movement_search",
-      //       args: {
-      //         request_data: {
-      //           name: frm.doc.name,
-      //           company_name: companyName,
-      //           branch_id: frm.doc.bhfid,
-      //         },
-      //       },
-      //       callback: (response) => {},
-      //       error: (error) => {
-      //         // Error Handling is Defered to the Server
-      //       },
-      //     });
-      //   },
-      //   __("eTims Actions")
-      // );
     }
 
     frm.add_custom_button(

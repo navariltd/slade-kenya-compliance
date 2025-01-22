@@ -52,14 +52,14 @@
    "fieldname": "slade_id",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "slade_id",
+   "label": "Slade ID",
    "unique": 1
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-13 08:39:20.050442",
+ "modified": "2025-01-22 18:59:46.928728",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Packaging Unit",

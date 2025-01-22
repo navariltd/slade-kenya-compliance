@@ -1,6 +1,7 @@
 {
  "actions": [],
- "autoname": "format:{company} - {vendor}",
+ "allow_rename": 1,
+ "autoname": "format:{vendor}",
  "creation": "2024-11-28 10:25:37.185527",
  "default_view": "List",
  "doctype": "DocType",
@@ -39,7 +40,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-22 12:16:09.762656",
+ "modified": "2025-01-22 19:01:59.722447",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Routes",

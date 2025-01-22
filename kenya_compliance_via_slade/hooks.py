@@ -59,20 +59,13 @@ fixtures = [
     },
     {"dt": TRANSACTION_TYPE_DOCTYPE_NAME},
     {"dt": PURCHASE_RECEIPT_DOCTYPE_NAME},
-    {"dt": UNIT_OF_QUANTITY_DOCTYPE_NAME},
     {"dt": IMPORTED_ITEMS_STATUS_DOCTYPE_NAME},
     {"dt": ROUTES_TABLE_DOCTYPE_NAME},
     {"dt": COUNTRIES_DOCTYPE_NAME},
-    {"dt": ITEM_CLASSIFICATIONS_DOCTYPE_NAME},
     {"dt": ITEM_TYPE_DOCTYPE_NAME},
-    {
-        "dt": TAXATION_TYPE_DOCTYPE_NAME,
-        "filters": [["name", "in", ("A", "B", "C", "D", "E")]],
-    },
     {
         "dt": PRODUCT_TYPE_DOCTYPE_NAME,
     },
-    {"dt": PACKAGING_UNIT_DOCTYPE_NAME},
     {"dt": STOCK_MOVEMENT_TYPE_DOCTYPE_NAME},
     {
         "dt": PAYMENT_TYPE_DOCTYPE_NAME,
