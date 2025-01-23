@@ -27,7 +27,6 @@ from .task_response_handlers import (
     update_item_classification_codes,
     update_organisations,
     update_packaging_units,
-    update_payment_methods,
     update_taxation_type,
     update_unit_of_quantity,
     update_workstations,
@@ -91,7 +90,7 @@ def refresh_code_lists(request_data: str) -> str:
         ("PackagingUnitSearchReq", update_packaging_units),
         ("QuantityUnitsSearchReq", update_unit_of_quantity),
         ("TaxSearchReq", update_taxation_type),
-        ("PaymentMtdSearchReq", update_payment_methods),
+        # ("PaymentMtdSearchReq", update_payment_methods),
     ]
 
     messages = [process_request(request_data, task[0], task[1]) for task in tasks]

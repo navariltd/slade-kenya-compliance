@@ -920,6 +920,13 @@ def sync_warehouse_details(request_data: str, type: str = "warehouse") -> None:
 
 
 @frappe.whitelist()
+def submit_warehouse_list() -> None:
+    warehouses = frappe.get_all("Warehouse", fields=["name"])
+    for warehouse in warehouses:
+        save_warehouse_details(warehouse.name)
+
+
+@frappe.whitelist()
 def save_warehouse_details(name: str) -> dict | None:
     item = frappe.get_doc("Warehouse", name)
     slade_id = item.get("custom_slade_id", None)

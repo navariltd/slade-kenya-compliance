@@ -2,11 +2,9 @@ from .kenya_compliance_via_slade.doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
     ITEM_TYPE_DOCTYPE_NAME,
-    PAYMENT_TYPE_DOCTYPE_NAME,
     PRODUCT_TYPE_DOCTYPE_NAME,
     PURCHASE_RECEIPT_DOCTYPE_NAME,
     ROUTES_TABLE_DOCTYPE_NAME,
-    STOCK_MOVEMENT_TYPE_DOCTYPE_NAME,
     TRANSACTION_PROGRESS_DOCTYPE_NAME,
     TRANSACTION_TYPE_DOCTYPE_NAME,
 )
@@ -61,25 +59,6 @@ fixtures = [
     {"dt": ITEM_TYPE_DOCTYPE_NAME},
     {
         "dt": PRODUCT_TYPE_DOCTYPE_NAME,
-    },
-    {"dt": STOCK_MOVEMENT_TYPE_DOCTYPE_NAME},
-    {
-        "dt": PAYMENT_TYPE_DOCTYPE_NAME,
-        "filters": [
-            [
-                "name",
-                "in",
-                (
-                    "CASH",
-                    "CREDIT",
-                    "CASH/CREDIT",
-                    "BANK CHECK",
-                    "DEBIT&CREDIT CARD",
-                    "MOBILE MONEY",
-                    "OTHER",
-                ),
-            ]
-        ],
     },
     {
         "dt": TRANSACTION_PROGRESS_DOCTYPE_NAME,
