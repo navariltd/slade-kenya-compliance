@@ -51,33 +51,6 @@ def generic_invoices_on_submit_override(
         doctype=invoice_type,
     )
 
-    # if headers and server_url and route_path:
-    #     url = f"{server_url}{route_path}"
-
-    #     endpoints_builder.headers = headers
-    #     endpoints_builder.url = url
-    #     endpoints_builder.payload = payload
-    #     endpoints_builder.success_callback = partial(
-    #         sales_information_submission_on_success,
-    #         document_name=doc.name,
-    #         invoice_type=invoice_type,
-    #         company_name=company_name,
-    #         invoice_number=payload["invcNo"],
-    #         pin=headers.get("tin"),
-    #         branch_id=headers.get("bhfId"),
-    #     )
-    #     endpoints_builder.error_callback = on_error
-
-    #     frappe.enqueue(
-    #         endpoints_builder.make_remote_call,
-    #         is_async=True,
-    #         queue="default",
-    #         timeout=300,
-    #         job_name=f"{doc.name}_send_sales_request",
-    #         doctype=invoice_type,
-    #         document_name=doc.name,
-    #     )
-
 
 def validate(doc: Document, method: str) -> None:
     pass

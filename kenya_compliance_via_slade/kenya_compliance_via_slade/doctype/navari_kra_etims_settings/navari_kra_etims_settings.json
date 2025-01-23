@@ -231,11 +231,11 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "CASH",
+   "default": "Cash",
    "fieldname": "sales_payment_type",
    "fieldtype": "Link",
    "label": "Payment Type",
-   "options": "Navari KRA eTims Payment Type"
+   "options": "Mode of Payment"
   },
   {
    "default": "Approved",
@@ -268,11 +268,11 @@
    "options": "Navari eTims Purchase Receipt Type"
   },
   {
-   "default": "CASH",
+   "default": "Cash",
    "fieldname": "purchases_payment_type",
    "fieldtype": "Link",
    "label": "Payment Type",
-   "options": "Navari KRA eTims Payment Type"
+   "options": "Mode of Payment"
   },
   {
    "default": "Approved",
@@ -412,7 +412,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-01-20 09:05:53.084339",
+ "modified": "2025-01-23 10:11:38.430204",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",

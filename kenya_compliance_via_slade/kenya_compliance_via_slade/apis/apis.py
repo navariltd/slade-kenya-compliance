@@ -43,6 +43,7 @@ from .remote_response_status_handlers import (
     item_price_update_on_success,
     item_registration_on_success,
     item_search_on_success,
+    mode_of_payment_on_success,
     on_error,
     operation_type_create_on_success,
     pricelist_update_on_success,
@@ -1169,4 +1170,65 @@ def sync_operation_type(request_data: str) -> None:
         "OperationTypeReq",
         operation_types_search_on_success,
         doctype=OPERATION_TYPE_DOCTYPE_NAME,
+    )
+
+
+@frappe.whitelist()
+def send_all_mode_of_payments() -> None:
+    mode_of_payments = frappe.get_all(
+        "Mode of Payment",
+        filters={"custom_slade_id": ["is", "not set"]},
+        fields=["name"],
+    )
+    for mop in mode_of_payments:
+        send_mode_of_payment_details(mop.name)
+
+
+@frappe.whitelist()
+def send_mode_of_payment_details(name: str) -> dict | None:
+    route_key = "AccountsSearchReq"
+    on_success = reaceavable_accouct_search_on_success
+    # fetch the reaceavable account to link to the mode of payment
+    request_data = {
+        "number": "1000-0001",
+        "document_name": name,
+    }
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        request_method="GET",
+        doctype="Mode of Payment",
+    )
+
+
+def reaceavable_accouct_search_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    if isinstance(response, str):
+        try:
+            response = json.loads(response)
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON string: {response}")
+
+    account = (
+        response if isinstance(response, list) else response.get("results", [response])
+    )[0]
+
+    mode_of_payment = frappe.get_doc("Mode of Payment", document_name)
+
+    request_data = {
+        "account": account.get("id"),
+        "name": mode_of_payment.get("mode_of_payment"),
+        "organisation": account.get("organisation"),
+        "document_name": document_name,
+    }
+
+    process_request(
+        request_data,
+        route_key="PaymentMtdSearchReq",
+        handler_function=mode_of_payment_on_success,
+        request_method="POST",
+        doctype="Mode of Payment",
     )

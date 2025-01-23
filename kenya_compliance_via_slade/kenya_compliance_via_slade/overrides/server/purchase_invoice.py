@@ -11,7 +11,7 @@ from ...apis.remote_response_status_handlers import (
     purchase_invoice_submission_on_success,
 )
 from ...doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
-from ...utils import get_taxation_types
+from ...utils import get_settings, get_taxation_types
 
 endpoints_builder = EndpointsBuilder()
 
@@ -44,6 +44,10 @@ def validate(doc: Document, method: str) -> None:
 
 
 def on_submit(doc: Document, method: str) -> None:
+    submit_purchase_invoice(doc)
+
+
+def submit_purchase_invoice(doc: Document) -> None:
     if doc.is_return == 0 and doc.update_stock == 1:
         # TODO: Handle cases when item tax templates have not been picked
 
@@ -55,7 +59,23 @@ def on_submit(doc: Document, method: str) -> None:
             or frappe.defaults.get_user_default("Company")
             or frappe.get_value("Company", {}, "name")
         )
-        payload = payload = build_purchase_invoice_payload(doc, company_name)
+        settings = get_settings(company_name, doc.branch)
+
+        if settings:
+            if not doc.custom_purchase_type:
+                doc.custom_purchase_type = settings.get("purchases_purchase_type")
+            if not doc.custom_receipt_type:
+                doc.custom_receipt_type = settings.get("purchases_receipt_type")
+            if not doc.custom_purchase_status:
+                doc.custom_purchase_status = settings.get("purchases_purchase_status")
+            if not doc.custom_payment_type:
+                doc.custom_payment_type = settings.get("purchases_payment_type")
+
+            doc.flags.ignore_permissions = True
+
+            doc.save()
+
+        payload = build_purchase_invoice_payload(doc, company_name)
         process_request(
             payload,
             "TrnsPurchaseSaveReq",
@@ -65,15 +85,18 @@ def on_submit(doc: Document, method: str) -> None:
         )
 
 
+@frappe.whitelist()
+def send_purchase_details(name: str) -> None:
+    doc = frappe.get_doc("Purchase Invoice", name)
+    submit_purchase_invoice(doc)
+
+
 def build_purchase_invoice_payload(doc: Document, company_name: str) -> dict:
     taxation_type = get_taxation_types(doc)
     payload = {
-        "made_by": doc.owner,
         "document_name": doc.name,
-        "branch": doc.branch,
         "company_name": company_name,
         "can_send_to_etims": True,
-        "updated_by_name": doc.modified_by,
         "paid_invoice_amount": round(doc.grand_total - doc.outstanding_amount, 2),
         "total_amount": round(doc.grand_total, 2),
         "taxable_rate_A": taxation_type.get("A", {}).get("tax_rate", 0),

@@ -2,7 +2,7 @@
  {
   "docstatus": 0,
   "doctype": "Navari eTims Routes",
-  "modified": "2025-01-13 14:12:10.785969",
+  "modified": "2025-01-23 09:44:51.964075",
   "name": "VSCU Slade 360",
   "routes_table": [
    {
@@ -490,6 +490,15 @@
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryoperation/{id}/transition/DRAFT_SUBMIT_APPROVE/",
     "url_path_function": "StockOperationTransitionReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/financial_accounts/accounts/",
+    "url_path_function": "AccountsSearchReq"
    }
   ],
   "vendor": "VSCU Slade 360"

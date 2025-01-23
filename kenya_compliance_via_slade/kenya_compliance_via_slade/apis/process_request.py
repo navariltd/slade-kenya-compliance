@@ -5,7 +5,14 @@ import frappe
 import frappe.defaults
 
 from ..doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
-from ..utils import build_headers, get_route_path, get_server_url, process_dynamic_url
+from ..utils import (
+    build_headers,
+    get_link_value,
+    get_route_path,
+    get_server_url,
+    get_settings,
+    process_dynamic_url,
+)
 from .api_builder import EndpointsBuilder
 
 endpoints_builder = EndpointsBuilder()
@@ -30,9 +37,10 @@ def process_request(
     server_url = get_server_url(company_name, branch_id)
     route_path, _ = get_route_path(route_key, "VSCU Slade 360")
     route_path = process_dynamic_url(route_path, request_data)
-
-    if request_method == "GET":
-        clean_data_for_get_request(data)
+    if request_method != "GET":
+        settings = get_settings(company_name, branch_id)
+        updates = add_organisation_branch_department(settings)
+        # data.update(updates)
 
     if headers and server_url and route_path:
         return execute_request(
@@ -48,6 +56,27 @@ def process_request(
         )
     else:
         return f"Failed to process {route_key}. Missing required configuration."
+
+
+def add_organisation_branch_department(settings: dict) -> dict:
+    organisation = settings.get("company")
+    branch = settings.get("bhfid")
+    source_organisation = settings.get("department")
+
+    result = {}
+
+    if organisation:
+        result["organisation"] = get_link_value(
+            "Company", "name", organisation, "custom_slade_id"
+        )
+    if branch:
+        result["branch"] = get_link_value("Branch", "name", branch, "slade_id")
+    if source_organisation:
+        result["source_organisation_unit"] = get_link_value(
+            "Department", "name", source_organisation, "custom_slade_id"
+        )
+
+    return result
 
 
 def parse_request_data(request_data: str | dict) -> dict:

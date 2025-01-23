@@ -18,7 +18,6 @@ from frappe.model.document import Document
 
 from .doctype.doctype_names_mapping import (
     ENVIRONMENT_SPECIFICATION_DOCTYPE_NAME,
-    PAYMENT_TYPE_DOCTYPE_NAME,
     ROUTES_TABLE_CHILD_DOCTYPE_NAME,
     ROUTES_TABLE_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,
@@ -230,17 +229,7 @@ def get_current_environment_state(
 
 
 def get_server_url(company_name: str, branch_id: str = "00") -> str | None:
-    settings = frappe.db.get_value(
-        SETTINGS_DOCTYPE_NAME,
-        {"bhfid": branch_id, "company": company_name, "is_active": 1},
-        ["server_url"],
-        as_dict=True,
-    ) or frappe.db.get_value(
-        SETTINGS_DOCTYPE_NAME,
-        {"company": company_name, "is_active": 1},
-        ["server_url"],
-        as_dict=True,
-    )
+    settings = get_settings(company_name, branch_id)
 
     if settings:
         server_url = settings.get("server_url")
@@ -250,7 +239,7 @@ def get_server_url(company_name: str, branch_id: str = "00") -> str | None:
     return
 
 
-def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | None:
+def build_headers(company_name: str, branch_id: str) -> dict[str, str] | None:
     """
     Build headers for Slade360 API requests.
     Checks for token validity and refreshes the token if expired.
@@ -262,17 +251,7 @@ def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | 
     Returns:
         dict[str, str] | None: The headers including the refreshed token or None if failed.
     """
-    settings = frappe.db.get_value(
-        SETTINGS_DOCTYPE_NAME,
-        {"bhfid": branch_id, "company": company_name, "is_active": 1},
-        ["access_token", "token_expiry", "name", "workstation"],
-        as_dict=True,
-    ) or frappe.db.get_value(
-        SETTINGS_DOCTYPE_NAME,
-        {"company": company_name, "is_active": 1},
-        ["access_token", "token_expiry", "name", "workstation"],
-        as_dict=True,
-    )
+    settings = get_settings(company_name, branch_id)
 
     if settings:
         access_token = settings.get("access_token")
@@ -319,6 +298,45 @@ def build_headers(company_name: str, branch_id: str = "00") -> dict[str, str] | 
     return None
 
 
+def get_settings(company_name: str = None, branch_id: str = None) -> dict | None:
+    """Fetch settings for a given company and branch.
+
+    Args:
+        company_name (str, optional): The name of the company. Defaults to None.
+        branch_id (str, optional): The branch ID. Defaults to None.
+
+    Returns:
+        dict | None: The settings if found, otherwise None.
+    """
+    company_name = (
+        company_name
+        or frappe.defaults.get_user_default("Company")
+        or frappe.get_value("Company", {}, "name")
+    )
+    branch_id = (
+        branch_id
+        or frappe.defaults.get_user_default("Branch")
+        or frappe.get_value("Branch", {}, "name")
+    )
+
+    settings = frappe.db.get_value(
+        SETTINGS_DOCTYPE_NAME,
+        {"company": company_name, "bhfid": branch_id, "is_active": 1},
+        "*",
+        as_dict=True,
+    )
+
+    if not settings:
+        settings = frappe.db.get_value(
+            SETTINGS_DOCTYPE_NAME,
+            {"company": company_name, "is_active": 1},
+            "*",
+            as_dict=True,
+        )
+
+    return settings
+
+
 def get_branch_id(company_name: str, vendor: str) -> str | None:
     settings = get_curr_env_etims_settings(company_name, vendor)
 
@@ -359,13 +377,32 @@ def build_invoice_payload(
     if invoice.amended_from:
         invoice_name = clean_invc_no(invoice_name)
 
+    settings = get_settings(company_name, invoice.branch)
+    if settings:
+        payment_type = None
+        if invoice.payments:
+            payment_type = invoice.payments[0].payment_type
+
+        if not invoice.custom_transaction_progres:
+            invoice.custom_transaction_progres = settings.get(
+                "sales_transaction_progress"
+            )
+        if not invoice.custom_payment_type:
+            invoice.custom_payment_type = payment_type or settings.get(
+                "purchases_payment_type"
+            )
+
+        invoice.flags.ignore_permissions = True
+
+        invoice.save()
+
     payload = {
         "document_name": invoice.name,
         "branch_id": invoice.branch,
         "company_name": company_name,
         "description": invoice.remarks or "New",
         "payment_method": frappe.get_value(
-            PAYMENT_TYPE_DOCTYPE_NAME, invoice.custom_payment_type, "slade_id"
+            "Mode of Payment", invoice.custom_payment_type, "custom_slade_id"
         ),
         "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
         "invoice_date": str(invoice.posting_date),

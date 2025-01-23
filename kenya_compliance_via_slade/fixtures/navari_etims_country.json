@@ -6,7 +6,7 @@
   "currency_code": "SHP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:23.989146",
+  "modified": "2025-01-23 07:38:30.735101",
   "name": "ASCENSION ISLAND",
   "sort_order": "0"
  },
@@ -17,7 +17,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.004005",
+  "modified": "2025-01-23 07:38:30.753264",
   "name": "ANDORRA",
   "sort_order": "0"
  },
@@ -28,7 +28,7 @@
   "currency_code": "AED",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.009750",
+  "modified": "2025-01-23 07:38:30.762969",
   "name": "UNITED ARAB EMIRATES",
   "sort_order": "0"
  },
@@ -39,7 +39,7 @@
   "currency_code": "XCD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.020388",
+  "modified": "2025-01-23 07:38:30.785126",
   "name": "ANTIGUA AND BARBUDA",
   "sort_order": "0"
  },
@@ -50,7 +50,7 @@
   "currency_code": "XCD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.026052",
+  "modified": "2025-01-23 07:38:30.795685",
   "name": "ANGUILLA",
   "sort_order": "0"
  },
@@ -61,7 +61,7 @@
   "currency_code": "ALL",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.031177",
+  "modified": "2025-01-23 07:38:30.805398",
   "name": "ALBANIA",
   "sort_order": "0"
  },
@@ -72,7 +72,7 @@
   "currency_code": "AMD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.036653",
+  "modified": "2025-01-23 07:38:30.816361",
   "name": "ARMENIA",
   "sort_order": "0"
  },
@@ -83,7 +83,7 @@
   "currency_code": "ANG",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.042365",
+  "modified": "2025-01-23 07:38:30.826159",
   "name": "NETHERLANDS ANTILLES",
   "sort_order": "0"
  },
@@ -94,7 +94,7 @@
   "currency_code": "AOA",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.047547",
+  "modified": "2025-01-23 07:38:30.835891",
   "name": "ANGOLA",
   "sort_order": "0"
  },
@@ -105,7 +105,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.052985",
+  "modified": "2025-01-23 07:38:30.845828",
   "name": "ANTARCTICA",
   "sort_order": "0"
  },
@@ -116,7 +116,7 @@
   "currency_code": "ARS",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.058324",
+  "modified": "2025-01-23 07:38:30.855233",
   "name": "ARGENTINA",
   "sort_order": "0"
  },
@@ -127,7 +127,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.063530",
+  "modified": "2025-01-23 07:38:30.865060",
   "name": "AMERICAN SAMOA",
   "sort_order": "0"
  },
@@ -138,7 +138,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.068794",
+  "modified": "2025-01-23 07:38:30.875035",
   "name": "AUSTRIA",
   "sort_order": "0"
  },
@@ -149,7 +149,7 @@
   "currency_code": "AWG",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.080162",
+  "modified": "2025-01-23 07:38:30.894841",
   "name": "ARUBA",
   "sort_order": "0"
  },
@@ -160,7 +160,7 @@
   "currency_code": "AZN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.091213",
+  "modified": "2025-01-23 07:38:30.913995",
   "name": "AZERBAIJAN",
   "sort_order": "0"
  },
@@ -171,7 +171,7 @@
   "currency_code": "BAM",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.096696",
+  "modified": "2025-01-23 07:38:30.923443",
   "name": "BOSNIA AND HERZEGOVINA",
   "sort_order": "0"
  },
@@ -182,7 +182,7 @@
   "currency_code": "BBD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.101950",
+  "modified": "2025-01-23 07:38:30.933060",
   "name": "BARBADOS",
   "sort_order": "0"
  },
@@ -193,7 +193,7 @@
   "currency_code": "BDT",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.107850",
+  "modified": "2025-01-23 07:38:30.943166",
   "name": "BANGLADESH",
   "sort_order": "0"
  },
@@ -204,7 +204,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.113426",
+  "modified": "2025-01-23 07:38:30.952789",
   "name": "BELGIUM",
   "sort_order": "0"
  },
@@ -215,7 +215,7 @@
   "currency_code": "XOF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.119443",
+  "modified": "2025-01-23 07:38:30.962480",
   "name": "BURKINA FASO",
   "sort_order": "0"
  },
@@ -226,7 +226,7 @@
   "currency_code": "BGN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.125028",
+  "modified": "2025-01-23 07:38:30.972163",
   "name": "BULGARIA",
   "sort_order": "0"
  },
@@ -237,7 +237,7 @@
   "currency_code": "BHD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.130876",
+  "modified": "2025-01-23 07:38:30.982069",
   "name": "BAHRAIN",
   "sort_order": "0"
  },
@@ -248,7 +248,7 @@
   "currency_code": "BIF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.136473",
+  "modified": "2025-01-23 07:38:30.992305",
   "name": "BURUNDI",
   "sort_order": "0"
  },
@@ -259,7 +259,7 @@
   "currency_code": "XOF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.142714",
+  "modified": "2025-01-23 07:38:31.002787",
   "name": "BENIN",
   "sort_order": "0"
  },
@@ -270,7 +270,7 @@
   "currency_code": "BMD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.148812",
+  "modified": "2025-01-23 07:38:31.012630",
   "name": "BERMUDA",
   "sort_order": "0"
  },
@@ -281,7 +281,7 @@
   "currency_code": "BND",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.155253",
+  "modified": "2025-01-23 07:38:31.022676",
   "name": "BRUNEI DARUSSALAM",
   "sort_order": "0"
  },
@@ -292,7 +292,7 @@
   "currency_code": "BOB",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.161645",
+  "modified": "2025-01-23 07:38:31.033523",
   "name": "BOLIVIA",
   "sort_order": "0"
  },
@@ -303,7 +303,7 @@
   "currency_code": "BRL",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.168099",
+  "modified": "2025-01-23 07:38:31.044511",
   "name": "BRAZIL",
   "sort_order": "0"
  },
@@ -314,7 +314,7 @@
   "currency_code": "BSD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.174675",
+  "modified": "2025-01-23 07:38:31.055359",
   "name": "BAHAMAS",
   "sort_order": "0"
  },
@@ -325,7 +325,7 @@
   "currency_code": "BTN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.180823",
+  "modified": "2025-01-23 07:38:31.066598",
   "name": "BHUTAN",
   "sort_order": "0"
  },
@@ -336,7 +336,7 @@
   "currency_code": "NOK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.186900",
+  "modified": "2025-01-23 07:38:31.077291",
   "name": "BOUVET ISLAND",
   "sort_order": "0"
  },
@@ -347,7 +347,7 @@
   "currency_code": "BWP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.193289",
+  "modified": "2025-01-23 07:38:31.088391",
   "name": "BOTSWANA",
   "sort_order": "0"
  },
@@ -358,7 +358,7 @@
   "currency_code": "BYN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.199431",
+  "modified": "2025-01-23 07:38:31.099408",
   "name": "BELARUS",
   "sort_order": "0"
  },
@@ -369,7 +369,7 @@
   "currency_code": "BZD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.205914",
+  "modified": "2025-01-23 07:38:31.109848",
   "name": "BELIZE",
   "sort_order": "0"
  },
@@ -380,7 +380,7 @@
   "currency_code": "CAD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.213682",
+  "modified": "2025-01-23 07:38:31.119401",
   "name": "CANADA",
   "sort_order": "0"
  },
@@ -391,7 +391,7 @@
   "currency_code": "AUD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.218859",
+  "modified": "2025-01-23 07:38:31.129676",
   "name": "COCOS (KEELING) ISLANDS",
   "sort_order": "0"
  },
@@ -413,7 +413,7 @@
   "currency_code": "XAF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.230463",
+  "modified": "2025-01-23 07:38:31.149899",
   "name": "CENTRAL AFRICAN REPUBLIC",
   "sort_order": "0"
  },
@@ -424,7 +424,7 @@
   "currency_code": "XAF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.236210",
+  "modified": "2025-01-23 07:38:31.160072",
   "name": "CONGO",
   "sort_order": "0"
  },
@@ -435,7 +435,7 @@
   "currency_code": "CHE",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.242600",
+  "modified": "2025-01-23 07:38:31.170153",
   "name": "SWITZERLAND",
   "sort_order": "0"
  },
@@ -446,7 +446,7 @@
   "currency_code": "XOF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.248223",
+  "modified": "2025-01-23 07:38:31.180010",
   "name": "COTE D'IVOIRE (IVORY COAST)",
   "sort_order": "0"
  },
@@ -457,7 +457,7 @@
   "currency_code": "NZD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.253392",
+  "modified": "2025-01-23 07:38:31.190122",
   "name": "COOK ISLANDS",
   "sort_order": "0"
  },
@@ -468,7 +468,7 @@
   "currency_code": "CLF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.259532",
+  "modified": "2025-01-23 07:38:31.200092",
   "name": "CHILE",
   "sort_order": "0"
  },
@@ -479,7 +479,7 @@
   "currency_code": "XAF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.265053",
+  "modified": "2025-01-23 07:38:31.209883",
   "name": "CAMEROON",
   "sort_order": "0"
  },
@@ -490,7 +490,7 @@
   "currency_code": "CNY",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.270757",
+  "modified": "2025-01-23 07:38:31.232084",
   "name": "CHINA",
   "sort_order": "0"
  },
@@ -501,7 +501,7 @@
   "currency_code": "COP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.277189",
+  "modified": "2025-01-23 07:38:31.250572",
   "name": "COLOMBIA",
   "sort_order": "0"
  },
@@ -512,7 +512,7 @@
   "currency_code": "CRC",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.283549",
+  "modified": "2025-01-23 07:38:31.269860",
   "name": "COSTA RICA",
   "sort_order": "0"
  },
@@ -534,7 +534,7 @@
   "currency_code": "CUP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.289952",
+  "modified": "2025-01-23 07:38:31.281846",
   "name": "CUBA",
   "sort_order": "0"
  },
@@ -545,7 +545,7 @@
   "currency_code": "CVE",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.297533",
+  "modified": "2025-01-23 07:38:31.293950",
   "name": "CAPE VERDE",
   "sort_order": "0"
  },
@@ -556,7 +556,7 @@
   "currency_code": "AUD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.303190",
+  "modified": "2025-01-23 07:38:31.303771",
   "name": "CHRISTMAS ISLAND",
   "sort_order": "0"
  },
@@ -567,7 +567,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.309571",
+  "modified": "2025-01-23 07:38:31.313522",
   "name": "CYPRUS",
   "sort_order": "0"
  },
@@ -578,7 +578,7 @@
   "currency_code": "CZK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.316238",
+  "modified": "2025-01-23 07:38:31.323031",
   "name": "CZECH REPUBLIC",
   "sort_order": "0"
  },
@@ -589,7 +589,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.322840",
+  "modified": "2025-01-23 07:38:31.332535",
   "name": "GERMANY",
   "sort_order": "0"
  },
@@ -600,7 +600,7 @@
   "currency_code": "DJF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.329519",
+  "modified": "2025-01-23 07:38:31.342063",
   "name": "DJIBOUTI",
   "sort_order": "0"
  },
@@ -611,7 +611,7 @@
   "currency_code": "DKK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.335970",
+  "modified": "2025-01-23 07:38:31.351393",
   "name": "DENMARK",
   "sort_order": "0"
  },
@@ -622,7 +622,7 @@
   "currency_code": "XCD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.342855",
+  "modified": "2025-01-23 07:38:31.360505",
   "name": "DOMINICA",
   "sort_order": "0"
  },
@@ -633,7 +633,7 @@
   "currency_code": "DOP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.349473",
+  "modified": "2025-01-23 07:38:31.369637",
   "name": "DOMINICAN REPUBLIC",
   "sort_order": "0"
  },
@@ -644,7 +644,7 @@
   "currency_code": "DZD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.356298",
+  "modified": "2025-01-23 07:38:31.378762",
   "name": "ALGERIA",
   "sort_order": "0"
  },
@@ -655,7 +655,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.363013",
+  "modified": "2025-01-23 07:38:31.387658",
   "name": "ECUADOR",
   "sort_order": "0"
  },
@@ -666,7 +666,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.369668",
+  "modified": "2025-01-23 07:38:31.396398",
   "name": "ESTONIA",
   "sort_order": "0"
  },
@@ -677,7 +677,7 @@
   "currency_code": "EGP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.376650",
+  "modified": "2025-01-23 07:38:31.405208",
   "name": "EGYPT",
   "sort_order": "0"
  },
@@ -688,7 +688,7 @@
   "currency_code": "MAD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.383388",
+  "modified": "2025-01-23 07:38:31.414280",
   "name": "WESTERN SAHARA",
   "sort_order": "0"
  },
@@ -699,7 +699,7 @@
   "currency_code": "ERN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.389996",
+  "modified": "2025-01-23 07:38:31.423175",
   "name": "ERITREA",
   "sort_order": "0"
  },
@@ -710,7 +710,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.396783",
+  "modified": "2025-01-23 07:38:31.432129",
   "name": "SPAIN",
   "sort_order": "0"
  },
@@ -721,7 +721,7 @@
   "currency_code": "ETB",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.403357",
+  "modified": "2025-01-23 07:38:31.440971",
   "name": "ETHIOPIA",
   "sort_order": "0"
  },
@@ -732,7 +732,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.410124",
+  "modified": "2025-01-23 07:38:31.449958",
   "name": "EUROPEAN UNION",
   "sort_order": "0"
  },
@@ -743,7 +743,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.416854",
+  "modified": "2025-01-23 07:38:31.458748",
   "name": "FINLAND",
   "sort_order": "0"
  },
@@ -754,7 +754,7 @@
   "currency_code": "FJD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.424006",
+  "modified": "2025-01-23 07:38:31.467911",
   "name": "FIJI",
   "sort_order": "0"
  },
@@ -765,7 +765,7 @@
   "currency_code": "FKP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.430329",
+  "modified": "2025-01-23 07:38:31.476269",
   "name": "FALKLAND ISLANDS (MALVINAS)",
   "sort_order": "0"
  },
@@ -776,7 +776,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.436714",
+  "modified": "2025-01-23 07:38:31.484616",
   "name": "MICRONESIA",
   "sort_order": "0"
  },
@@ -787,7 +787,7 @@
   "currency_code": "DKK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.444583",
+  "modified": "2025-01-23 07:38:31.492868",
   "name": "FAROE ISLANDS",
   "sort_order": "0"
  },
@@ -798,7 +798,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.451368",
+  "modified": "2025-01-23 07:38:31.501172",
   "name": "FRANCE",
   "sort_order": "0"
  },
@@ -820,7 +820,7 @@
   "currency_code": "XAF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.458952",
+  "modified": "2025-01-23 07:38:31.509460",
   "name": "GABON",
   "sort_order": "0"
  },
@@ -831,7 +831,7 @@
   "currency_code": "GBP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.466519",
+  "modified": "2025-01-23 07:38:31.517913",
   "name": "GREAT BRITAIN (UK)",
   "sort_order": "0"
  },
@@ -842,7 +842,7 @@
   "currency_code": "XCD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.473239",
+  "modified": "2025-01-23 07:38:31.526245",
   "name": "GRENADA",
   "sort_order": "0"
  },
@@ -853,7 +853,7 @@
   "currency_code": "GEL",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.479645",
+  "modified": "2025-01-23 07:38:31.534474",
   "name": "GEORGIA",
   "sort_order": "0"
  },
@@ -864,7 +864,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.485644",
+  "modified": "2025-01-23 07:38:31.543189",
   "name": "FRENCH GUIANA",
   "sort_order": "0"
  },
@@ -875,7 +875,7 @@
   "currency_code": "GBP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.492009",
+  "modified": "2025-01-23 07:38:31.551634",
   "name": "GUERNSEY",
   "sort_order": "0"
  },
@@ -886,7 +886,7 @@
   "currency_code": "GHS",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.498275",
+  "modified": "2025-01-23 07:38:31.559920",
   "name": "GHANA",
   "sort_order": "0"
  },
@@ -897,7 +897,7 @@
   "currency_code": "GIP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.504297",
+  "modified": "2025-01-23 07:38:31.568169",
   "name": "GIBRALTAR",
   "sort_order": "0"
  },
@@ -908,7 +908,7 @@
   "currency_code": "DKK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.510384",
+  "modified": "2025-01-23 07:38:31.576535",
   "name": "GREENLAND",
   "sort_order": "0"
  },
@@ -919,7 +919,7 @@
   "currency_code": "GMD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.516323",
+  "modified": "2025-01-23 07:38:31.584868",
   "name": "GAMBIA",
   "sort_order": "0"
  },
@@ -930,7 +930,7 @@
   "currency_code": "GNF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.522471",
+  "modified": "2025-01-23 07:38:31.593164",
   "name": "GUINEA",
   "sort_order": "0"
  },
@@ -941,7 +941,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.528471",
+  "modified": "2025-01-23 07:38:31.601585",
   "name": "GUADELOUPE",
   "sort_order": "0"
  },
@@ -952,7 +952,7 @@
   "currency_code": "XAF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.534654",
+  "modified": "2025-01-23 07:38:31.610060",
   "name": "EQUATORIAL GUINEA",
   "sort_order": "0"
  },
@@ -963,7 +963,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.540738",
+  "modified": "2025-01-23 07:38:31.618509",
   "name": "GREECE",
   "sort_order": "0"
  },
@@ -985,7 +985,7 @@
   "currency_code": "GTQ",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.547202",
+  "modified": "2025-01-23 07:38:31.627190",
   "name": "GUATEMALA",
   "sort_order": "0"
  },
@@ -996,7 +996,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.553300",
+  "modified": "2025-01-23 07:38:31.635754",
   "name": "GUAM",
   "sort_order": "0"
  },
@@ -1018,7 +1018,7 @@
   "currency_code": "GYD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.566000",
+  "modified": "2025-01-23 07:38:31.652628",
   "name": "GUYANA",
   "sort_order": "0"
  },
@@ -1029,7 +1029,7 @@
   "currency_code": "HKD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.572688",
+  "modified": "2025-01-23 07:38:31.661017",
   "name": "HONG KONG",
   "sort_order": "0"
  },
@@ -1051,7 +1051,7 @@
   "currency_code": "HNL",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.587107",
+  "modified": "2025-01-23 07:38:31.678699",
   "name": "HONDURAS",
   "sort_order": "0"
  },
@@ -1062,7 +1062,7 @@
   "currency_code": "HRK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.593642",
+  "modified": "2025-01-23 07:38:31.687708",
   "name": "CROATIA (HRVATSKA)",
   "sort_order": "0"
  },
@@ -1073,7 +1073,7 @@
   "currency_code": "HTG",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.599701",
+  "modified": "2025-01-23 07:38:31.696643",
   "name": "HAITI",
   "sort_order": "0"
  },
@@ -1084,7 +1084,7 @@
   "currency_code": "HUF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.606322",
+  "modified": "2025-01-23 07:38:31.707535",
   "name": "HUNGARY",
   "sort_order": "0"
  },
@@ -1095,7 +1095,7 @@
   "currency_code": "IDR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.612463",
+  "modified": "2025-01-23 07:38:31.719951",
   "name": "INDONESIA",
   "sort_order": "0"
  },
@@ -1106,7 +1106,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.618793",
+  "modified": "2025-01-23 07:38:31.732177",
   "name": "IRELAND",
   "sort_order": "0"
  },
@@ -1117,7 +1117,7 @@
   "currency_code": "ILS",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.625932",
+  "modified": "2025-01-23 07:38:31.744283",
   "name": "ISRAEL",
   "sort_order": "0"
  },
@@ -1128,7 +1128,7 @@
   "currency_code": "GBP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.632453",
+  "modified": "2025-01-23 07:38:31.755813",
   "name": "ISLE OF MAN",
   "sort_order": "0"
  },
@@ -1139,7 +1139,7 @@
   "currency_code": "INR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.639094",
+  "modified": "2025-01-23 07:38:31.767980",
   "name": "INDIA",
   "sort_order": "0"
  },
@@ -1150,7 +1150,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.645360",
+  "modified": "2025-01-23 07:38:31.780026",
   "name": "BRITISH INDIAN OCEAN TERRITORY",
   "sort_order": "0"
  },
@@ -1161,7 +1161,7 @@
   "currency_code": "IQD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.651649",
+  "modified": "2025-01-23 07:38:31.792431",
   "name": "IRAQ",
   "sort_order": "0"
  },
@@ -1172,7 +1172,7 @@
   "currency_code": "IRR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.657432",
+  "modified": "2025-01-23 07:38:31.802013",
   "name": "IRAN",
   "sort_order": "0"
  },
@@ -1183,7 +1183,7 @@
   "currency_code": "ISK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.663310",
+  "modified": "2025-01-23 07:38:31.811918",
   "name": "ICELAND",
   "sort_order": "0"
  },
@@ -1194,7 +1194,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.669116",
+  "modified": "2025-01-23 07:38:31.820936",
   "name": "ITALY",
   "sort_order": "0"
  },
@@ -1205,7 +1205,7 @@
   "currency_code": "GBP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.675365",
+  "modified": "2025-01-23 07:38:31.830240",
   "name": "JERSEY",
   "sort_order": "0"
  },
@@ -1216,7 +1216,7 @@
   "currency_code": "JMD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.681376",
+  "modified": "2025-01-23 07:38:31.839306",
   "name": "JAMAICA",
   "sort_order": "0"
  },
@@ -1227,7 +1227,7 @@
   "currency_code": "JOD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.687323",
+  "modified": "2025-01-23 07:38:31.848522",
   "name": "JORDAN",
   "sort_order": "0"
  },
@@ -1238,7 +1238,7 @@
   "currency_code": "JPY",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.693221",
+  "modified": "2025-01-23 07:38:31.857110",
   "name": "JAPAN",
   "sort_order": "0"
  },
@@ -1249,7 +1249,7 @@
   "currency_code": "KGS",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.706137",
+  "modified": "2025-01-23 07:38:31.874800",
   "name": "KYRGYZSTAN",
   "sort_order": "0"
  },
@@ -1260,7 +1260,7 @@
   "currency_code": "KHR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.712791",
+  "modified": "2025-01-23 07:38:31.883772",
   "name": "CAMBODIA",
   "sort_order": "0"
  },
@@ -1271,7 +1271,7 @@
   "currency_code": "AUD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.718847",
+  "modified": "2025-01-23 07:38:31.892815",
   "name": "KIRIBATI",
   "sort_order": "0"
  },
@@ -1282,7 +1282,7 @@
   "currency_code": "KMF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.725103",
+  "modified": "2025-01-23 07:38:31.901860",
   "name": "COMOROS",
   "sort_order": "0"
  },
@@ -1293,7 +1293,7 @@
   "currency_code": "XCD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.731318",
+  "modified": "2025-01-23 07:38:31.910824",
   "name": "SAINT KITTS AND NEVIS",
   "sort_order": "0"
  },
@@ -1304,7 +1304,7 @@
   "currency_code": "KPW",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.737806",
+  "modified": "2025-01-23 07:38:31.919861",
   "name": "NORTH KOREA",
   "sort_order": "0"
  },
@@ -1315,7 +1315,7 @@
   "currency_code": "KRW",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.746578",
+  "modified": "2025-01-23 07:38:31.928800",
   "name": "SOUTH KOREA",
   "sort_order": "0"
  },
@@ -1326,7 +1326,7 @@
   "currency_code": "KWD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.753260",
+  "modified": "2025-01-23 07:38:31.937262",
   "name": "KUWAIT",
   "sort_order": "0"
  },
@@ -1337,7 +1337,7 @@
   "currency_code": "KYD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.760059",
+  "modified": "2025-01-23 07:38:31.945472",
   "name": "CAYMAN ISLANDS",
   "sort_order": "0"
  },
@@ -1348,7 +1348,7 @@
   "currency_code": "KZT",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.766519",
+  "modified": "2025-01-23 07:38:31.953787",
   "name": "KAZAKHSTAN",
   "sort_order": "0"
  },
@@ -1359,7 +1359,7 @@
   "currency_code": "LAK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.773335",
+  "modified": "2025-01-23 07:38:31.962172",
   "name": "LAOS",
   "sort_order": "0"
  },
@@ -1370,7 +1370,7 @@
   "currency_code": "XCD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.786514",
+  "modified": "2025-01-23 07:38:31.978831",
   "name": "SAINT LUCIA",
   "sort_order": "0"
  },
@@ -1392,7 +1392,7 @@
   "currency_code": "LKR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.793530",
+  "modified": "2025-01-23 07:38:31.987155",
   "name": "SRI LANKA",
   "sort_order": "0"
  },
@@ -1403,7 +1403,7 @@
   "currency_code": "LRD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.800132",
+  "modified": "2025-01-23 07:38:31.995462",
   "name": "LIBERIA",
   "sort_order": "0"
  },
@@ -1414,7 +1414,7 @@
   "currency_code": "LSL",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.806827",
+  "modified": "2025-01-23 07:38:32.003819",
   "name": "LESOTHO",
   "sort_order": "0"
  },
@@ -1425,7 +1425,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.813386",
+  "modified": "2025-01-23 07:38:32.012311",
   "name": "LITHUANIA",
   "sort_order": "0"
  },
@@ -1436,7 +1436,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.819986",
+  "modified": "2025-01-23 07:38:32.020715",
   "name": "LUXEMBOURG",
   "sort_order": "0"
  },
@@ -1447,7 +1447,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.826642",
+  "modified": "2025-01-23 07:38:32.029289",
   "name": "LATVIA",
   "sort_order": "0"
  },
@@ -1458,7 +1458,7 @@
   "currency_code": "LYD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.833356",
+  "modified": "2025-01-23 07:38:32.037687",
   "name": "LIBYA",
   "sort_order": "0"
  },
@@ -1469,7 +1469,7 @@
   "currency_code": "MAD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.840167",
+  "modified": "2025-01-23 07:38:32.046666",
   "name": "MOROCCO",
   "sort_order": "0"
  },
@@ -1480,7 +1480,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.847102",
+  "modified": "2025-01-23 07:38:32.055518",
   "name": "MONACO",
   "sort_order": "0"
  },
@@ -1491,7 +1491,7 @@
   "currency_code": "MDL",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.853557",
+  "modified": "2025-01-23 07:38:32.064220",
   "name": "MOLDOVA",
   "sort_order": "0"
  },
@@ -1502,7 +1502,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.860332",
+  "modified": "2025-01-23 07:38:32.073086",
   "name": "MONTENEGRO",
   "sort_order": "0"
  },
@@ -1513,7 +1513,7 @@
   "currency_code": "MGA",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.866811",
+  "modified": "2025-01-23 07:38:32.082313",
   "name": "MADAGASCAR",
   "sort_order": "0"
  },
@@ -1524,7 +1524,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.873474",
+  "modified": "2025-01-23 07:38:32.091078",
   "name": "MARSHALL ISLANDS",
   "sort_order": "0"
  },
@@ -1535,7 +1535,7 @@
   "currency_code": "MKD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.879656",
+  "modified": "2025-01-23 07:38:32.100025",
   "name": "F.Y.R.O.M. (MACEDONIA)",
   "sort_order": "0"
  },
@@ -1546,7 +1546,7 @@
   "currency_code": "XOF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.885085",
+  "modified": "2025-01-23 07:38:32.108525",
   "name": "MALI",
   "sort_order": "0"
  },
@@ -1557,7 +1557,7 @@
   "currency_code": "MMK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.891062",
+  "modified": "2025-01-23 07:38:32.117325",
   "name": "MYANMAR",
   "sort_order": "0"
  },
@@ -1568,7 +1568,7 @@
   "currency_code": "MNT",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.896559",
+  "modified": "2025-01-23 07:38:32.125872",
   "name": "MONGOLIA",
   "sort_order": "0"
  },
@@ -1579,7 +1579,7 @@
   "currency_code": "MOP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.901961",
+  "modified": "2025-01-23 07:38:32.134483",
   "name": "MACAU",
   "sort_order": "0"
  },
@@ -1590,7 +1590,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.907976",
+  "modified": "2025-01-23 07:38:32.143095",
   "name": "NORTHERN MARIANA ISLANDS",
   "sort_order": "0"
  },
@@ -1601,7 +1601,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.913663",
+  "modified": "2025-01-23 07:38:32.151873",
   "name": "MARTINIQUE",
   "sort_order": "0"
  },
@@ -1612,7 +1612,7 @@
   "currency_code": "MRO",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.919144",
+  "modified": "2025-01-23 07:38:32.161149",
   "name": "MAURITANIA",
   "sort_order": "0"
  },
@@ -1623,7 +1623,7 @@
   "currency_code": "XCD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.925078",
+  "modified": "2025-01-23 07:38:32.169693",
   "name": "MONTSERRAT",
   "sort_order": "0"
  },
@@ -1634,7 +1634,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.930159",
+  "modified": "2025-01-23 07:38:32.178182",
   "name": "MALTA",
   "sort_order": "0"
  },
@@ -1645,7 +1645,7 @@
   "currency_code": "MUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.935568",
+  "modified": "2025-01-23 07:38:32.186681",
   "name": "MAURITIUS",
   "sort_order": "0"
  },
@@ -1656,7 +1656,7 @@
   "currency_code": "MVR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.940926",
+  "modified": "2025-01-23 07:38:32.195442",
   "name": "MALDIVES",
   "sort_order": "0"
  },
@@ -1667,7 +1667,7 @@
   "currency_code": "MWK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.946572",
+  "modified": "2025-01-23 07:38:32.204042",
   "name": "MALAWI",
   "sort_order": "0"
  },
@@ -1678,7 +1678,7 @@
   "currency_code": "MXN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.951784",
+  "modified": "2025-01-23 07:38:32.212921",
   "name": "MEXICO",
   "sort_order": "0"
  },
@@ -1689,7 +1689,7 @@
   "currency_code": "MYR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.959189",
+  "modified": "2025-01-23 07:38:32.221927",
   "name": "MALAYSIA",
   "sort_order": "0"
  },
@@ -1700,7 +1700,7 @@
   "currency_code": "MZN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.964933",
+  "modified": "2025-01-23 07:38:32.230965",
   "name": "MOZAMBIQUE",
   "sort_order": "0"
  },
@@ -1711,7 +1711,7 @@
   "currency_code": "NAD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.970243",
+  "modified": "2025-01-23 07:38:32.239876",
   "name": "NAMIBIA",
   "sort_order": "0"
  },
@@ -1722,7 +1722,7 @@
   "currency_code": "XPF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.976370",
+  "modified": "2025-01-23 07:38:32.249473",
   "name": "NEW CALEDONIA",
   "sort_order": "0"
  },
@@ -1733,7 +1733,7 @@
   "currency_code": "XOF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.981859",
+  "modified": "2025-01-23 07:38:32.258909",
   "name": "NIGER",
   "sort_order": "0"
  },
@@ -1755,7 +1755,7 @@
   "currency_code": "NGN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.992834",
+  "modified": "2025-01-23 07:38:32.277638",
   "name": "NIGERIA",
   "sort_order": "0"
  },
@@ -1766,7 +1766,7 @@
   "currency_code": "NIO",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.998374",
+  "modified": "2025-01-23 07:38:32.287201",
   "name": "NICARAGUA",
   "sort_order": "0"
  },
@@ -1777,7 +1777,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.003779",
+  "modified": "2025-01-23 07:38:32.298113",
   "name": "NETHERLANDS",
   "sort_order": "0"
  },
@@ -1788,7 +1788,7 @@
   "currency_code": "NOK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.009251",
+  "modified": "2025-01-23 07:38:32.307433",
   "name": "NORWAY",
   "sort_order": "0"
  },
@@ -1799,7 +1799,7 @@
   "currency_code": "NPR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.014376",
+  "modified": "2025-01-23 07:38:32.316989",
   "name": "NEPAL",
   "sort_order": "0"
  },
@@ -1810,7 +1810,7 @@
   "currency_code": "AUD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.019441",
+  "modified": "2025-01-23 07:38:32.325731",
   "name": "NAURU",
   "sort_order": "0"
  },
@@ -1832,7 +1832,7 @@
   "currency_code": "NZD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.024859",
+  "modified": "2025-01-23 07:38:32.334702",
   "name": "NIUE",
   "sort_order": "0"
  },
@@ -1843,7 +1843,7 @@
   "currency_code": "NZD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.030072",
+  "modified": "2025-01-23 07:38:32.343397",
   "name": "NEW ZEALAND (AOTEAROA)",
   "sort_order": "0"
  },
@@ -1854,7 +1854,7 @@
   "currency_code": "OMR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.035278",
+  "modified": "2025-01-23 07:38:32.351859",
   "name": "OMAN",
   "sort_order": "0"
  },
@@ -1865,7 +1865,7 @@
   "currency_code": "PAB",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.040468",
+  "modified": "2025-01-23 07:38:32.360380",
   "name": "PANAMA",
   "sort_order": "0"
  },
@@ -1876,7 +1876,7 @@
   "currency_code": "PEN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.045640",
+  "modified": "2025-01-23 07:38:32.369256",
   "name": "PERU",
   "sort_order": "0"
  },
@@ -1887,7 +1887,7 @@
   "currency_code": "XPF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.050690",
+  "modified": "2025-01-23 07:38:32.378042",
   "name": "FRENCH POLYNESIA",
   "sort_order": "0"
  },
@@ -1898,7 +1898,7 @@
   "currency_code": "PGK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.055748",
+  "modified": "2025-01-23 07:38:32.386240",
   "name": "PAPUA NEW GUINEA",
   "sort_order": "0"
  },
@@ -1909,7 +1909,7 @@
   "currency_code": "PHP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.061979",
+  "modified": "2025-01-23 07:38:32.394628",
   "name": "PHILIPPINES",
   "sort_order": "0"
  },
@@ -1920,7 +1920,7 @@
   "currency_code": "PKR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.067170",
+  "modified": "2025-01-23 07:38:32.403064",
   "name": "PAKISTAN",
   "sort_order": "0"
  },
@@ -1931,7 +1931,7 @@
   "currency_code": "PLN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.072569",
+  "modified": "2025-01-23 07:38:32.411273",
   "name": "POLAND",
   "sort_order": "0"
  },
@@ -1942,7 +1942,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.078069",
+  "modified": "2025-01-23 07:38:32.420006",
   "name": "ST. PIERRE AND MIQUELON",
   "sort_order": "0"
  },
@@ -1953,7 +1953,7 @@
   "currency_code": "NZD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.083621",
+  "modified": "2025-01-23 07:38:32.428468",
   "name": "PITCAIRN",
   "sort_order": "0"
  },
@@ -1964,7 +1964,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.089062",
+  "modified": "2025-01-23 07:38:32.437070",
   "name": "PUERTO RICO",
   "sort_order": "0"
  },
@@ -1986,7 +1986,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.094920",
+  "modified": "2025-01-23 07:38:32.445374",
   "name": "PORTUGAL",
   "sort_order": "0"
  },
@@ -1997,7 +1997,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.100702",
+  "modified": "2025-01-23 07:38:32.454069",
   "name": "PALAU",
   "sort_order": "0"
  },
@@ -2008,7 +2008,7 @@
   "currency_code": "PYG",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.106372",
+  "modified": "2025-01-23 07:38:32.462567",
   "name": "PARAGUAY",
   "sort_order": "0"
  },
@@ -2019,7 +2019,7 @@
   "currency_code": "QAR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.112166",
+  "modified": "2025-01-23 07:38:32.471802",
   "name": "QATAR",
   "sort_order": "0"
  },
@@ -2030,7 +2030,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.117490",
+  "modified": "2025-01-23 07:38:32.481154",
   "name": "REUNION",
   "sort_order": "0"
  },
@@ -2041,7 +2041,7 @@
   "currency_code": "RON",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.123423",
+  "modified": "2025-01-23 07:38:32.490694",
   "name": "ROMANIA",
   "sort_order": "0"
  },
@@ -2052,7 +2052,7 @@
   "currency_code": "RSG",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.128590",
+  "modified": "2025-01-23 07:38:32.500227",
   "name": "SERBIA",
   "sort_order": "0"
  },
@@ -2063,7 +2063,7 @@
   "currency_code": "RUB",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.133718",
+  "modified": "2025-01-23 07:38:32.510458",
   "name": "RUSSIAN FEDERATION",
   "sort_order": "0"
  },
@@ -2074,7 +2074,7 @@
   "currency_code": "RWF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.138791",
+  "modified": "2025-01-23 07:38:32.520289",
   "name": "RWANDA",
   "sort_order": "0"
  },
@@ -2085,7 +2085,7 @@
   "currency_code": "SAR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.144052",
+  "modified": "2025-01-23 07:38:32.530568",
   "name": "SAUDI ARABIA",
   "sort_order": "0"
  },
@@ -2096,7 +2096,7 @@
   "currency_code": "SBD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.149545",
+  "modified": "2025-01-23 07:38:32.540635",
   "name": "SOLOMON ISLANDS",
   "sort_order": "0"
  },
@@ -2107,7 +2107,7 @@
   "currency_code": "SCR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.154616",
+  "modified": "2025-01-23 07:38:32.550187",
   "name": "SEYCHELLES",
   "sort_order": "0"
  },
@@ -2118,7 +2118,7 @@
   "currency_code": "SDG",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.159952",
+  "modified": "2025-01-23 07:38:32.559328",
   "name": "SUDAN",
   "sort_order": "0"
  },
@@ -2129,7 +2129,7 @@
   "currency_code": "SEK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.165377",
+  "modified": "2025-01-23 07:38:32.568456",
   "name": "SWEDEN",
   "sort_order": "0"
  },
@@ -2140,7 +2140,7 @@
   "currency_code": "SGD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.170402",
+  "modified": "2025-01-23 07:38:32.577225",
   "name": "SINGAPORE",
   "sort_order": "0"
  },
@@ -2151,7 +2151,7 @@
   "currency_code": "SHP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.175555",
+  "modified": "2025-01-23 07:38:32.585744",
   "name": "ST. HELENA",
   "sort_order": "0"
  },
@@ -2162,7 +2162,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.180890",
+  "modified": "2025-01-23 07:38:32.594498",
   "name": "SLOVENIA",
   "sort_order": "0"
  },
@@ -2173,7 +2173,7 @@
   "currency_code": "NOK",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.186143",
+  "modified": "2025-01-23 07:38:32.603479",
   "name": "SVALBARD & JAN MAYEN ISLANDS",
   "sort_order": "0"
  },
@@ -2184,7 +2184,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.191402",
+  "modified": "2025-01-23 07:38:32.612884",
   "name": "SLOVAK REPUBLIC",
   "sort_order": "0"
  },
@@ -2195,7 +2195,7 @@
   "currency_code": "SLL",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.196683",
+  "modified": "2025-01-23 07:38:32.621991",
   "name": "SIERRA LEONE",
   "sort_order": "0"
  },
@@ -2206,7 +2206,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.202314",
+  "modified": "2025-01-23 07:38:32.630904",
   "name": "SAN MARINO",
   "sort_order": "0"
  },
@@ -2217,7 +2217,7 @@
   "currency_code": "XOF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.208577",
+  "modified": "2025-01-23 07:38:32.639961",
   "name": "SENEGAL",
   "sort_order": "0"
  },
@@ -2228,7 +2228,7 @@
   "currency_code": "SOS",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.213640",
+  "modified": "2025-01-23 07:38:32.649620",
   "name": "SOMALIA",
   "sort_order": "0"
  },
@@ -2239,7 +2239,7 @@
   "currency_code": "SRD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.224158",
+  "modified": "2025-01-23 07:38:32.668568",
   "name": "SURINAME",
   "sort_order": "0"
  },
@@ -2272,7 +2272,7 @@
   "currency_code": "SVC",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.234816",
+  "modified": "2025-01-23 07:38:32.686235",
   "name": "EL SALVADOR",
   "sort_order": "0"
  },
@@ -2283,7 +2283,7 @@
   "currency_code": "SYP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.239832",
+  "modified": "2025-01-23 07:38:32.695382",
   "name": "SYRIA",
   "sort_order": "0"
  },
@@ -2294,7 +2294,7 @@
   "currency_code": "SZL",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.245301",
+  "modified": "2025-01-23 07:38:32.704682",
   "name": "SWAZILAND",
   "sort_order": "0"
  },
@@ -2305,7 +2305,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.250607",
+  "modified": "2025-01-23 07:38:32.713487",
   "name": "TURKS AND CAICOS ISLANDS",
   "sort_order": "0"
  },
@@ -2316,7 +2316,7 @@
   "currency_code": "XAF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.256077",
+  "modified": "2025-01-23 07:38:32.722666",
   "name": "CHAD",
   "sort_order": "0"
  },
@@ -2327,7 +2327,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.261235",
+  "modified": "2025-01-23 07:38:32.732235",
   "name": "FRENCH SOUTHERN TERRITORIES",
   "sort_order": "0"
  },
@@ -2338,7 +2338,7 @@
   "currency_code": "XOF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.266341",
+  "modified": "2025-01-23 07:38:32.742519",
   "name": "TOGO",
   "sort_order": "0"
  },
@@ -2349,7 +2349,7 @@
   "currency_code": "THB",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.271533",
+  "modified": "2025-01-23 07:38:32.751878",
   "name": "THAILAND",
   "sort_order": "0"
  },
@@ -2360,7 +2360,7 @@
   "currency_code": "TJS",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.277526",
+  "modified": "2025-01-23 07:38:32.761138",
   "name": "TAJIKISTAN",
   "sort_order": "0"
  },
@@ -2371,7 +2371,7 @@
   "currency_code": "NZD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.283683",
+  "modified": "2025-01-23 07:38:32.771020",
   "name": "TOKELAU",
   "sort_order": "0"
  },
@@ -2382,7 +2382,7 @@
   "currency_code": "TMT",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.289421",
+  "modified": "2025-01-23 07:38:32.780077",
   "name": "TURKMENISTAN",
   "sort_order": "0"
  },
@@ -2393,7 +2393,7 @@
   "currency_code": "TND",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.295050",
+  "modified": "2025-01-23 07:38:32.789331",
   "name": "TUNISIA",
   "sort_order": "0"
  },
@@ -2404,7 +2404,7 @@
   "currency_code": "TOP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.300425",
+  "modified": "2025-01-23 07:38:32.798775",
   "name": "TONGA",
   "sort_order": "0"
  },
@@ -2415,7 +2415,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.305900",
+  "modified": "2025-01-23 07:38:32.807884",
   "name": "EAST TIMOR",
   "sort_order": "0"
  },
@@ -2426,7 +2426,7 @@
   "currency_code": "TRY",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.311496",
+  "modified": "2025-01-23 07:38:32.817073",
   "name": "TURKEY",
   "sort_order": "0"
  },
@@ -2437,7 +2437,7 @@
   "currency_code": "TTD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.317269",
+  "modified": "2025-01-23 07:38:32.826169",
   "name": "TRINIDAD AND TOBAGO",
   "sort_order": "0"
  },
@@ -2448,7 +2448,7 @@
   "currency_code": "AUD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.322940",
+  "modified": "2025-01-23 07:38:32.835506",
   "name": "TUVALU",
   "sort_order": "0"
  },
@@ -2459,7 +2459,7 @@
   "currency_code": "TWD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.328726",
+  "modified": "2025-01-23 07:38:32.845346",
   "name": "TAIWAN",
   "sort_order": "0"
  },
@@ -2470,7 +2470,7 @@
   "currency_code": "TZS",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.334298",
+  "modified": "2025-01-23 07:38:32.855151",
   "name": "TANZANIA",
   "sort_order": "0"
  },
@@ -2481,7 +2481,7 @@
   "currency_code": "UAH",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.340404",
+  "modified": "2025-01-23 07:38:32.864798",
   "name": "UKRAINE",
   "sort_order": "0"
  },
@@ -2492,7 +2492,7 @@
   "currency_code": "UGX",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.346086",
+  "modified": "2025-01-23 07:38:32.874252",
   "name": "UGANDA",
   "sort_order": "0"
  },
@@ -2536,7 +2536,7 @@
   "currency_code": "AFN",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.015009",
+  "modified": "2025-01-23 07:38:30.774804",
   "name": "Afghanistan",
   "sort_order": "0"
  },
@@ -2547,7 +2547,7 @@
   "currency_code": "CDF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.225026",
+  "modified": "2025-01-23 07:38:31.139690",
   "name": "Congo, Democratic Republic of the",
   "sort_order": "0"
  },
@@ -2558,7 +2558,7 @@
   "currency_code": "XOF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.559729",
+  "modified": "2025-01-23 07:38:31.644183",
   "name": "Guinea Bissau",
   "sort_order": "0"
  },
@@ -2569,7 +2569,7 @@
   "currency_code": "AUD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.579929",
+  "modified": "2025-01-23 07:38:31.669907",
   "name": "Heard and McDonald Islands.",
   "sort_order": "0"
  },
@@ -2580,7 +2580,7 @@
   "currency_code": "AUD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.987194",
+  "modified": "2025-01-23 07:38:32.268251",
   "name": "Norfolk Islands",
   "sort_order": "0"
  },
@@ -2591,7 +2591,7 @@
   "currency_code": "SSP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.218802",
+  "modified": "2025-01-23 07:38:32.659260",
   "name": "South Sudan",
   "sort_order": "0"
  },
@@ -2602,7 +2602,7 @@
   "currency_code": "STD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.229359",
+  "modified": "2025-01-23 07:38:32.677503",
   "name": "Sao Tome and  Principe",
   "sort_order": "0"
  },
@@ -2613,7 +2613,7 @@
   "currency_code": "GBP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.351424",
+  "modified": "2025-01-23 07:38:32.883347",
   "name": "United Kingdom",
   "sort_order": "0"
  },
@@ -2624,7 +2624,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.356987",
+  "modified": "2025-01-23 07:38:32.892343",
   "name": "US Minor Outlying Islands",
   "sort_order": "0"
  },
@@ -2635,7 +2635,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.362698",
+  "modified": "2025-01-23 07:38:32.901354",
   "name": "United States",
   "sort_order": "0"
  },
@@ -2646,7 +2646,7 @@
   "currency_code": "UYI",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.368227",
+  "modified": "2025-01-23 07:38:32.910382",
   "name": "Uruguay",
   "sort_order": "0"
  },
@@ -2657,7 +2657,7 @@
   "currency_code": "UZS",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.373955",
+  "modified": "2025-01-23 07:38:32.919624",
   "name": "Uzbekistan",
   "sort_order": "0"
  },
@@ -2668,7 +2668,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.379980",
+  "modified": "2025-01-23 07:38:32.928860",
   "name": "Vatican City State (Holy See)",
   "sort_order": "0"
  },
@@ -2679,7 +2679,7 @@
   "currency_code": "XCD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.385979",
+  "modified": "2025-01-23 07:38:32.938664",
   "name": "Saint Vincent & the Grenadines",
   "sort_order": "0"
  },
@@ -2690,7 +2690,7 @@
   "currency_code": "VEF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.391918",
+  "modified": "2025-01-23 07:38:32.948688",
   "name": "Venezuela",
   "sort_order": "0"
  },
@@ -2701,7 +2701,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.397115",
+  "modified": "2025-01-23 07:38:32.958412",
   "name": "British Virgin Islands",
   "sort_order": "0"
  },
@@ -2712,7 +2712,7 @@
   "currency_code": "USD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.402389",
+  "modified": "2025-01-23 07:38:32.968290",
   "name": "Virgin Islands (U.S.)",
   "sort_order": "0"
  },
@@ -2723,7 +2723,7 @@
   "currency_code": "VND",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.408322",
+  "modified": "2025-01-23 07:38:32.978520",
   "name": "Vietnam",
   "sort_order": "0"
  },
@@ -2734,7 +2734,7 @@
   "currency_code": "VUV",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.414041",
+  "modified": "2025-01-23 07:38:32.988230",
   "name": "Vanuatu",
   "sort_order": "0"
  },
@@ -2745,7 +2745,7 @@
   "currency_code": "XPF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.419662",
+  "modified": "2025-01-23 07:38:32.997687",
   "name": "Wallis and Futuna Islands",
   "sort_order": "0"
  },
@@ -2756,7 +2756,7 @@
   "currency_code": "YER",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.431257",
+  "modified": "2025-01-23 07:38:33.017350",
   "name": "Yemen",
   "sort_order": "0"
  },
@@ -2767,7 +2767,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.436887",
+  "modified": "2025-01-23 07:38:33.026841",
   "name": "Mayotte",
   "sort_order": "0"
  },
@@ -2778,7 +2778,7 @@
   "currency_code": "ZAR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.443281",
+  "modified": "2025-01-23 07:38:33.040827",
   "name": "South Africa",
   "sort_order": "0"
  },
@@ -2789,7 +2789,7 @@
   "currency_code": "ZMW",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.449248",
+  "modified": "2025-01-23 07:38:33.055469",
   "name": "Zambia",
   "sort_order": "0"
  },
@@ -2800,7 +2800,7 @@
   "currency_code": "XAF",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.455348",
+  "modified": "2025-01-23 07:38:33.068862",
   "name": "(Zaire) Congo, Democratic Republic",
   "sort_order": "0"
  },
@@ -2811,7 +2811,7 @@
   "currency_code": "ZWL",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.461892",
+  "modified": "2025-01-23 07:38:33.077896",
   "name": "Zimbabwe",
   "sort_order": "0"
  },
@@ -2822,7 +2822,7 @@
   "currency_code": "WST",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:25.425827",
+  "modified": "2025-01-23 07:38:33.007640",
   "name": "Samoa",
   "sort_order": "0"
  },
@@ -2833,7 +2833,7 @@
   "currency_code": "EUR",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.085394",
+  "modified": "2025-01-23 07:38:30.904214",
   "name": "ALAND ISLANDS",
   "sort_order": "0"
  },
@@ -2844,7 +2844,7 @@
   "currency_code": "LBP",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.779863",
+  "modified": "2025-01-23 07:38:31.970524",
   "name": "LEBANON",
   "sort_order": "0"
  },
@@ -2855,7 +2855,7 @@
   "currency_code": "AUD",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.074869",
+  "modified": "2025-01-23 07:38:30.884901",
   "name": "AUSTRALIA",
   "sort_order": "0"
  },
@@ -2866,7 +2866,7 @@
   "currency_code": "KES",
   "docstatus": 0,
   "doctype": "Navari eTims Country",
-  "modified": "2025-01-12 21:30:24.699241",
+  "modified": "2025-01-23 07:38:31.866000",
   "name": "KENYA",
   "sort_order": "0"
  }

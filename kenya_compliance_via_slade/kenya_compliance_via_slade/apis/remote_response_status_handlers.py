@@ -1011,3 +1011,9 @@ def operation_type_create_on_success(
     frappe.db.set_value(
         OPERATION_TYPE_DOCTYPE_NAME, document_name, {"slade_id": response.get("id")}
     )
+
+
+def mode_of_payment_on_success(response: dict, document_name: str, **kwargs) -> None:
+    frappe.db.set_value(
+        "Mode of Payment", document_name, {"custom_slade_id": response.get("id")}
+    )

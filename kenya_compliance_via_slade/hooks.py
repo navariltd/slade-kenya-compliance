@@ -1,18 +1,14 @@
 from .kenya_compliance_via_slade.doctype.doctype_names_mapping import (
     COUNTRIES_DOCTYPE_NAME,
     IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
-    ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
     ITEM_TYPE_DOCTYPE_NAME,
-    PACKAGING_UNIT_DOCTYPE_NAME,
     PAYMENT_TYPE_DOCTYPE_NAME,
     PRODUCT_TYPE_DOCTYPE_NAME,
     PURCHASE_RECEIPT_DOCTYPE_NAME,
     ROUTES_TABLE_DOCTYPE_NAME,
     STOCK_MOVEMENT_TYPE_DOCTYPE_NAME,
-    TAXATION_TYPE_DOCTYPE_NAME,
     TRANSACTION_PROGRESS_DOCTYPE_NAME,
     TRANSACTION_TYPE_DOCTYPE_NAME,
-    UNIT_OF_QUANTITY_DOCTYPE_NAME,
 )
 
 app_name = "kenya_compliance_via_slade"
@@ -135,6 +131,7 @@ doctype_js = {
     "Branch": "kenya_compliance_via_slade/overrides/client/branch.js",
     "UOM": "kenya_compliance_via_slade/overrides/client/uom.js",
     "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse.js",
+    "Mode of Payment": "kenya_compliance_via_slade/overrides/client/mode_of_payment.js",
     # "Price List": "kenya_compliance_via_slade/overrides/client/price_list.js",
     # "Item Price": "kenya_compliance_via_slade/overrides/client/item_price.js",
 }
@@ -146,6 +143,7 @@ doctype_list_js = {
     "Customer": "kenya_compliance_via_slade/overrides/client/customer_list.js",
     "UOM": "kenya_compliance_via_slade/overrides/client/uom_list.js",
     "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse_list.js",
+    "Mode of Payment": "kenya_compliance_via_slade/overrides/client/mode_of_payment_list.js",
     # "Price List": "kenya_compliance_via_slade/overrides/client/price_list_list.js",
     # "Item Price": "kenya_compliance_via_slade/overrides/client/item_price_list.js",
 }
