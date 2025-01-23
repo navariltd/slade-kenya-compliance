@@ -34,6 +34,7 @@ def process_request(
     company_name, branch_id, document_name = extract_metadata(data)
 
     headers = build_headers(company_name, branch_id)
+
     server_url = get_server_url(company_name, branch_id)
     route_path, _ = get_route_path(route_key, "VSCU Slade 360")
     route_path = process_dynamic_url(route_path, request_data)

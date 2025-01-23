@@ -21,6 +21,7 @@ from .doctype.doctype_names_mapping import (
     ROUTES_TABLE_CHILD_DOCTYPE_NAME,
     ROUTES_TABLE_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,
+    WORKSTATION_DOCTYPE_NAME,
 )
 from .logger import etims_logger
 
@@ -329,7 +330,7 @@ def get_settings(company_name: str = None, branch_id: str = None) -> dict | None
     if not settings:
         settings = frappe.db.get_value(
             SETTINGS_DOCTYPE_NAME,
-            {"company": company_name, "is_active": 1},
+            {"is_active": 1},
             "*",
             as_dict=True,
         )
@@ -655,7 +656,6 @@ def authenticate_and_get_token(
         "client_id": client_id,
         "client_secret": client_secret,
     }
-    print(payload)
     encoded_payload = urlencode(payload)
 
     headers = {
@@ -709,10 +709,63 @@ def update_navari_settings_with_token(docname: str) -> str:
     settings_doc.token_expiry = datetime.now() + timedelta(
         seconds=token_details["expires_in"]
     )
-
     settings_doc.save()
 
-    return settings_doc
+    from .apis.process_request import process_request
+
+    request_data = {"document_name": docname}
+
+    return process_request(
+        request_data,
+        "BhfUserSearchReq",
+        user_details_fetch_on_success,
+        request_method="GET",
+        doctype=SETTINGS_DOCTYPE_NAME,
+    )
+
+
+@frappe.whitelist()
+def user_details_fetch_on_success(response: dict, document_name: str, **kwargs) -> None:
+    settings_doc = frappe.get_doc(SETTINGS_DOCTYPE_NAME, document_name)
+    result = response.get("results", [])[0] if response.get("results") else response
+
+    workstation = (
+        result.get("user_workstations")[0]["workstation"]
+        if result.get("user_workstations") and len(result.get("user_workstations")) > 0
+        else None
+    )
+
+    branch_id = (
+        result.get("user_workstations")[0]["workstation__org_unit__parent"]
+        if result.get("user_workstations") and len(result.get("user_workstations")) > 0
+        else None
+    )
+
+    department = (
+        result.get("user_workstations")[0]["workstation__org_unit"]
+        if result.get("user_workstations") and len(result.get("user_workstations")) > 0
+        else None
+    )
+
+    company = get_link_value(
+        "Company", "custom_slade_id", result.get("organisation_id")
+    )
+    if company:
+        settings_doc.company = company
+
+    workstation_link = get_link_value(WORKSTATION_DOCTYPE_NAME, "slade_id", workstation)
+    if workstation_link:
+        settings_doc.workstation = workstation_link
+
+    branch_link = get_link_value("Branch", "slade_id", branch_id)
+    if branch_link:
+        settings_doc.bhfid = branch_link
+
+    department_link = get_link_value("Department", "slade_id", department)
+    if department_link:
+        settings_doc.department = department_link
+
+    settings_doc.save()
 
 
 def get_link_value(
