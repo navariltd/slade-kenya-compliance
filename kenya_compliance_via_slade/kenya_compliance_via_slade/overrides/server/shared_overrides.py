@@ -21,12 +21,20 @@ def generic_invoices_on_submit_override(
 
     Args:
         doc (Document): The doctype object or record
-        invoice_type (Literal[&quot;Sales Invoice&quot;, &quot;POS Invoice&quot;]):
+        invoice_type (Literal["Sales Invoice", "POS Invoice"]):
         The Type of the invoice. Either Sales, or POS
     """
 
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
         return
+
+    for item in doc.items:
+        item_doc = frappe.get_doc("Item", item.item_code)
+        if not item_doc.custom_slade_id:
+            frappe.msgprint(
+                f"Item {item.item_code} is not registered. Cannot send invoice to eTims."
+            )
+            return
 
     company_name = (
         doc.company
