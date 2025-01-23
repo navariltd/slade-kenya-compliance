@@ -1,4 +1,5 @@
 const doctypeName = "Item Price";
+const settingsDoctypeName = "Navari KRA eTims Settings";
 
 frappe.listview_settings[doctypeName] = {
   onload: async function (listview) {

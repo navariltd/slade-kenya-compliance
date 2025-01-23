@@ -2,6 +2,7 @@
 // For license information, please see license.txt
 
 const doctypeName = "Price List";
+const settingsDoctypeName = "Navari KRA eTims Settings";
 
 frappe.ui.form.on(doctypeName, {
   refresh: async function (frm) {

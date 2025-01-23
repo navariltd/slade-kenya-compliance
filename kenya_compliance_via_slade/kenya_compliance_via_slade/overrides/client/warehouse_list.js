@@ -1,4 +1,5 @@
 const doctypeName = "Warehouse";
+const settingsDoctypeName = "Navari KRA eTims Settings";
 
 frappe.listview_settings[doctypeName] = {
   onload: async function (listview) {
@@ -30,21 +31,21 @@ frappe.listview_settings[doctypeName] = {
         __("eTims Actions")
       );
 
-      // listview.page.add_inner_button(
-      //   __("Submit all Warehouses to eTims"),
-      //   function (listview) {
-      //     frappe.call({
-      //       method:
-      //         "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_warehouse_list",
-      //       args: {},
-      //       callback: (response) => {},
-      //       error: (error) => {
-      //         // Error Handling is Defered to the Server
-      //       },
-      //     });
-      //   },
-      //   __("eTims Actions")
-      // );
+      listview.page.add_inner_button(
+        __("Submit all Warehouses to eTims"),
+        function (listview) {
+          frappe.call({
+            method:
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_warehouse_list",
+            args: {},
+            callback: (response) => {},
+            error: (error) => {
+              // Error Handling is Defered to the Server
+            },
+          });
+        },
+        __("eTims Actions")
+      );
     }
   },
 };

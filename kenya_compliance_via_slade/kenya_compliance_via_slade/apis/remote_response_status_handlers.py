@@ -17,7 +17,6 @@ from ..doctype.doctype_names_mapping import (
     REGISTERED_IMPORTED_ITEM_DOCTYPE_NAME,
     REGISTERED_PURCHASES_DOCTYPE_NAME,
     REGISTERED_PURCHASES_DOCTYPE_NAME_ITEM,
-    REGISTERED_STOCK_MOVEMENTS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
@@ -104,16 +103,6 @@ def item_registration_on_success(response: dict, document_name: str, **kwargs) -
         "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_inventory",
         name=document_name,
         queue="long",
-    )
-
-
-def customer_insurance_details_submission_on_success(
-    response: dict, document_name: str, **kwargs
-) -> None:
-    frappe.db.set_value(
-        "Customer",
-        document_name,
-        {"custom_insurance_details_submitted_successfully": 1},
     )
 
 
@@ -221,7 +210,7 @@ def imported_item_submission_on_success(
 
 def submit_inventory_on_success(response: dict, document_name: str, **kwargs) -> None:
     bin = frappe.get_doc("Bin", document_name)
-    from .apis import process_request
+    from .process_request import process_request
 
     requset_data = {
         "document_name": bin.item_code,
@@ -245,7 +234,7 @@ def submit_inventory_on_success(response: dict, document_name: str, **kwargs) ->
 def submit_inventory_item_on_success(
     response: dict, document_name: str, **kwargs
 ) -> None:
-    from .apis import process_request
+    from .process_request import process_request
 
     doc = frappe.get_doc("Item", document_name)
     requset_data = {
@@ -299,7 +288,7 @@ def process_invoice_items(
     Retrieves the specific invoice, extracts all items, and sends each
     item separately.
     """
-    from .apis import process_request
+    from .process_request import process_request
 
     invoice = frappe.get_doc(doctype, document_name)
 
@@ -336,7 +325,7 @@ def process_invoice_items(
 def process_sales_transition(
     document_name: str, doctype: str, invoice_slade_id: str
 ) -> None:
-    from .apis import process_request
+    from .process_request import process_request
 
     def handle_transition_success(response: dict, document_name: str, **kwargs) -> None:
         # process_sales_sign(document_name, doctype, invoice_slade_id)
@@ -360,7 +349,7 @@ def process_sales_transition(
 
 
 def process_sales_sign(document_name: str, doctype: str, invoice_slade_id: str) -> None:
-    from .apis import process_request
+    from .process_request import process_request
 
     def handle_invoice_sign_success(
         response: dict, document_name: str, **kwargs
@@ -491,7 +480,7 @@ def purchase_search_on_success(response: dict, **kwargs) -> None:
 
 
 def fetch_purchase_items(registered_purchase: str) -> None:
-    from .apis import process_request
+    from .process_request import process_request
 
     payload = {
         "purchase_invoice": registered_purchase,
@@ -700,51 +689,6 @@ def create_notice_if_new(notice: dict) -> None:
             title="Notice Creation Failed",
             message=f"Error creating notice {notice.get('notice_number')}: {str(e)}",
         )
-
-
-def stock_mvt_search_on_success(response: dict, **kwargs) -> None:
-    stock_list = response["data"]["stockList"]
-
-    for stock in stock_list:
-        doc = frappe.new_doc(REGISTERED_STOCK_MOVEMENTS_DOCTYPE_NAME)
-
-        doc.customer_pin = stock["custTin"]
-        doc.customer_branch_id = stock["custBhfId"]
-        doc.stored_and_released_number = stock["sarNo"]
-        doc.occurred_date = stock["ocrnDt"]
-        doc.total_item_count = stock["totItemCnt"]
-        doc.total_supply_price = stock["totTaxblAmt"]
-        doc.total_vat = stock["totTaxAmt"]
-        doc.total_amount = stock["totAmt"]
-        doc.remark = stock["remark"]
-
-        doc.set("items", [])
-
-        for item in stock["itemList"]:
-            doc.append(
-                "items",
-                {
-                    "item_name": item["itemNm"],
-                    "item_sequence": item["itemSeq"],
-                    "item_code": item["itemCd"],
-                    "barcode": item["bcd"],
-                    "item_classification_code": item["itemClsCd"],
-                    "packaging_unit_code": item["pkgUnitCd"],
-                    "unit_of_quantity_code": item["qtyUnitCd"],
-                    "package": item["pkg"],
-                    "quantity": item["qty"],
-                    "item_expiry_date": item["itemExprDt"],
-                    "unit_price": item["prc"],
-                    "supply_amount": item["splyAmt"],
-                    "discount_rate": item["totDcAmt"],
-                    "taxable_amount": item["taxblAmt"],
-                    "tax_amount": item["taxAmt"],
-                    "taxation_type_code": item["taxTyCd"],
-                    "total_amount": item["totAmt"],
-                },
-            )
-
-        doc.save()
 
 
 def imported_items_search_on_success(response: dict, **kwargs) -> None:
@@ -1066,4 +1010,10 @@ def operation_type_create_on_success(
 ) -> None:
     frappe.db.set_value(
         OPERATION_TYPE_DOCTYPE_NAME, document_name, {"slade_id": response.get("id")}
+    )
+
+
+def mode_of_payment_on_success(response: dict, document_name: str, **kwargs) -> None:
+    frappe.db.set_value(
+        "Mode of Payment", document_name, {"custom_slade_id": response.get("id")}
     )

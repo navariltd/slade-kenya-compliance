@@ -1,7 +1,6 @@
 import asyncio
 import json
 from functools import partial
-from secrets import token_hex
 from typing import Callable
 
 import aiohttp
@@ -29,13 +28,12 @@ from ..utils import (
     get_route_path,
     get_server_url,
     make_get_request,
-    process_dynamic_url,
     split_user_email,
 )
 from .api_builder import EndpointsBuilder
+from .process_request import process_request
 from .remote_response_status_handlers import (
     customer_branch_details_submission_on_success,
-    customer_insurance_details_submission_on_success,
     customer_search_on_success,
     customers_search_on_success,
     imported_item_submission_on_success,
@@ -45,12 +43,12 @@ from .remote_response_status_handlers import (
     item_price_update_on_success,
     item_registration_on_success,
     item_search_on_success,
+    mode_of_payment_on_success,
     on_error,
     operation_type_create_on_success,
     pricelist_update_on_success,
     purchase_search_on_success,
     search_branch_request_on_success,
-    stock_mvt_search_on_success,
     submit_inventory_on_success,
     update_invoice_info,
     user_details_fetch_on_success,
@@ -66,89 +64,6 @@ from ..background_tasks.task_response_handlers import (
     uom_search_on_success,
     warehouse_search_on_success,
 )
-from .remote_response_status_handlers import on_slade_error
-
-
-def process_request(
-    request_data: str | dict,
-    route_key: str,
-    handler_function: Callable,
-    request_method: str = "GET",
-    doctype: str = SETTINGS_DOCTYPE_NAME,
-) -> str:
-    """Reusable function to process requests with common logic."""
-    if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
-        return
-
-    if isinstance(request_data, str):
-        data = json.loads(request_data)
-    elif isinstance(request_data, (dict, list)):
-        data = request_data
-
-    if isinstance(data, list) and data:
-        first_entry = data[0]
-        company_name = (
-            first_entry.get("company_name", None)
-            or frappe.defaults.get_user_default("Company")
-            or frappe.get_value("Company", {}, "name")
-        )
-        branch_id = (
-            first_entry.get("branch_id", None)
-            or frappe.defaults.get_user_default("Branch")
-            or frappe.get_value("Branch", "name")
-        )
-        document_name = first_entry.get("document_name", None)
-    else:
-        company_name = (
-            data.get("company_name", None)
-            or frappe.defaults.get_user_default("Company")
-            or frappe.get_value("Company", {}, "name")
-        )
-        branch_id = (
-            data.get("branch_id", None)
-            or frappe.defaults.get_user_default("Branch")
-            or frappe.get_value("Branch", "name")
-        )
-        document_name = data.get("document_name", None)
-
-    headers = build_headers(company_name, branch_id)
-    server_url = get_server_url(company_name, branch_id)
-    route_path, _ = get_route_path(route_key, "VSCU Slade 360")
-
-    route_path = process_dynamic_url(route_path, request_data)
-
-    if request_method == "GET":
-        if "document_name" in data and data["document_name"]:
-            data.pop("document_name")
-
-        if "company_name" in data and data["company_name"]:
-            data.pop("company_name")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-
-        while url:
-            endpoints_builder.headers = headers
-            endpoints_builder.url = url
-            endpoints_builder.payload = data
-            endpoints_builder.request_description = route_key
-            endpoints_builder.method = request_method
-            endpoints_builder.success_callback = handler_function
-            endpoints_builder.error_callback = on_slade_error
-
-            response = endpoints_builder.make_remote_call(
-                doctype=doctype,
-                document_name=document_name,
-            )
-
-            if isinstance(response, dict) and "next" in response:
-                url = response["next"]
-            else:
-                url = None
-
-        return f"{route_key} completed successfully."
-    else:
-        return f"Failed to process {route_key}. Missing required configuration."
 
 
 @frappe.whitelist()
@@ -281,45 +196,6 @@ def fetch_item_details(request_data: str) -> None:
     process_request(
         request_data, "ItemSearchReq", item_search_on_success, doctype="Item"
     )
-
-
-@frappe.whitelist()
-def send_insurance_details(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-    company_name = data["company_name"]
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
-    route_path, last_request_date = get_route_path("BhfInsuranceSaveReq")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-        payload = {
-            "isrccCd": data["insurance_code"],
-            "isrccNm": data["insurance_name"],
-            "isrcRt": round(data["premium_rate"], 0),
-            "useYn": "Y",
-            "regrNm": data["registration_id"],
-            "regrId": split_user_email(data["registration_id"]),
-            "modrNm": data["modifier_id"],
-            "modrId": split_user_email(data["modifier_id"]),
-        }
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = partial(
-            customer_insurance_details_submission_on_success, document_name=data["name"]
-        )
-        endpoints_builder.error_callback = on_error
-
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="default",
-            timeout=300,
-            doctype="Customer",
-            document_name=data["name"],
-        )
 
 
 @frappe.whitelist()
@@ -546,37 +422,6 @@ def update_imported_item_request(request_data: str) -> None:
         method="PUT",
         doctype="Item",
     )
-
-
-@frappe.whitelist()
-def perform_stock_movement_search(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-
-    company_name = data["company_name"]
-
-    headers = build_headers(company_name, data["branch_id"])
-    server_url = get_server_url(company_name, data["branch_id"])
-
-    route_path, last_request_date = get_route_path("StockMoveReq")
-    request_date = last_request_date.strftime("%Y%m%d%H%M%S")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-        payload = {"lastReqDt": request_date}
-
-        endpoints_builder.headers = headers
-        endpoints_builder.url = url
-        endpoints_builder.payload = payload
-        endpoints_builder.success_callback = stock_mvt_search_on_success
-        endpoints_builder.error_callback = on_error
-
-        frappe.enqueue(
-            endpoints_builder.make_remote_call,
-            is_async=True,
-            queue="default",
-            timeout=300,
-            job_name=token_hex(100),
-        )
 
 
 @frappe.whitelist()
@@ -1075,6 +920,13 @@ def sync_warehouse_details(request_data: str, type: str = "warehouse") -> None:
 
 
 @frappe.whitelist()
+def submit_warehouse_list() -> None:
+    warehouses = frappe.get_all("Warehouse", fields=["name"])
+    for warehouse in warehouses:
+        save_warehouse_details(warehouse.name)
+
+
+@frappe.whitelist()
 def save_warehouse_details(name: str) -> dict | None:
     item = frappe.get_doc("Warehouse", name)
     slade_id = item.get("custom_slade_id", None)
@@ -1325,4 +1177,65 @@ def sync_operation_type(request_data: str) -> None:
         "OperationTypeReq",
         operation_types_search_on_success,
         doctype=OPERATION_TYPE_DOCTYPE_NAME,
+    )
+
+
+@frappe.whitelist()
+def send_all_mode_of_payments() -> None:
+    mode_of_payments = frappe.get_all(
+        "Mode of Payment",
+        filters={"custom_slade_id": ["is", "not set"]},
+        fields=["name"],
+    )
+    for mop in mode_of_payments:
+        send_mode_of_payment_details(mop.name)
+
+
+@frappe.whitelist()
+def send_mode_of_payment_details(name: str) -> dict | None:
+    route_key = "AccountsSearchReq"
+    on_success = reaceavable_accouct_search_on_success
+    # fetch the reaceavable account to link to the mode of payment
+    request_data = {
+        "number": "1000-0001",
+        "document_name": name,
+    }
+
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        request_method="GET",
+        doctype="Mode of Payment",
+    )
+
+
+def reaceavable_accouct_search_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    if isinstance(response, str):
+        try:
+            response = json.loads(response)
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON string: {response}")
+
+    account = (
+        response if isinstance(response, list) else response.get("results", [response])
+    )[0]
+
+    mode_of_payment = frappe.get_doc("Mode of Payment", document_name)
+
+    request_data = {
+        "account": account.get("id"),
+        "name": mode_of_payment.get("mode_of_payment"),
+        "organisation": account.get("organisation"),
+        "document_name": document_name,
+    }
+
+    process_request(
+        request_data,
+        route_key="PaymentMtdSearchReq",
+        handler_function=mode_of_payment_on_success,
+        request_method="POST",
+        doctype="Mode of Payment",
     )

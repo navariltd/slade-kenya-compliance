@@ -1,13 +1,8 @@
-const parentDoctype = "Purchase Invoice";
+const doctypeName = "Mode of Payment";
 const settingsDoctypeName = "Navari KRA eTims Settings";
 
-frappe.ui.form.on(parentDoctype, {
+frappe.ui.form.on(doctypeName, {
   refresh: async function (frm) {
-    frm.set_value("update_stock", 1);
-    if (frm.doc.update_stock === 1) {
-      frm.toggle_reqd("set_warehouse", true);
-    }
-
     const { message: activeSetting } = await frappe.db.get_value(
       settingsDoctypeName,
       { is_active: 1 },
@@ -17,11 +12,11 @@ frappe.ui.form.on(parentDoctype, {
     if (activeSetting?.name) {
       if (!frm.doc.custom_submitted_successfully) {
         frm.add_custom_button(
-          __("Send Invoice"),
+          __("Submit to eTims"),
           function () {
             frappe.call({
               method:
-                "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.purchase_invoice.send_purchase_details",
+                "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_mode_of_payment_details",
               args: {
                 name: frm.doc.name,
               },

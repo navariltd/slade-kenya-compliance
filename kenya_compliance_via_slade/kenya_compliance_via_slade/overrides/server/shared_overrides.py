@@ -4,7 +4,7 @@ import frappe
 from frappe.model.document import Document
 
 from ...apis.api_builder import EndpointsBuilder
-from ...apis.apis import process_request
+from ...apis.process_request import process_request
 from ...apis.remote_response_status_handlers import (
     sales_information_submission_on_success,
 )
@@ -21,12 +21,20 @@ def generic_invoices_on_submit_override(
 
     Args:
         doc (Document): The doctype object or record
-        invoice_type (Literal[&quot;Sales Invoice&quot;, &quot;POS Invoice&quot;]):
+        invoice_type (Literal["Sales Invoice", "POS Invoice"]):
         The Type of the invoice. Either Sales, or POS
     """
 
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
         return
+
+    for item in doc.items:
+        item_doc = frappe.get_doc("Item", item.item_code)
+        if not item_doc.custom_slade_id:
+            frappe.msgprint(
+                f"Item {item.item_code} is not registered. Cannot send invoice to eTims."
+            )
+            return
 
     company_name = (
         doc.company
@@ -50,33 +58,6 @@ def generic_invoices_on_submit_override(
         request_method="POST",
         doctype=invoice_type,
     )
-
-    # if headers and server_url and route_path:
-    #     url = f"{server_url}{route_path}"
-
-    #     endpoints_builder.headers = headers
-    #     endpoints_builder.url = url
-    #     endpoints_builder.payload = payload
-    #     endpoints_builder.success_callback = partial(
-    #         sales_information_submission_on_success,
-    #         document_name=doc.name,
-    #         invoice_type=invoice_type,
-    #         company_name=company_name,
-    #         invoice_number=payload["invcNo"],
-    #         pin=headers.get("tin"),
-    #         branch_id=headers.get("bhfId"),
-    #     )
-    #     endpoints_builder.error_callback = on_error
-
-    #     frappe.enqueue(
-    #         endpoints_builder.make_remote_call,
-    #         is_async=True,
-    #         queue="default",
-    #         timeout=300,
-    #         job_name=f"{doc.name}_send_sales_request",
-    #         doctype=invoice_type,
-    #         document_name=doc.name,
-    #     )
 
 
 def validate(doc: Document, method: str) -> None:

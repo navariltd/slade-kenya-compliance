@@ -1,14 +1,13 @@
 {
  "actions": [],
- "autoname": "format:{company} - {vendor}",
+ "allow_rename": 1,
+ "autoname": "format:{vendor}",
  "creation": "2024-11-28 10:25:37.185527",
  "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "vendor_settings_section",
-  "company",
-  "column_break_rgwp",
   "vendor",
   "routes_mapping_section",
   "routes_table"
@@ -18,18 +17,6 @@
    "fieldname": "vendor_settings_section",
    "fieldtype": "Section Break",
    "label": "Vendor Settings"
-  },
-  {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Company",
-   "options": "Company",
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_rgwp",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "vendor",
@@ -53,7 +40,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-13 08:39:24.815453",
+ "modified": "2025-01-22 19:01:59.722447",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Routes",

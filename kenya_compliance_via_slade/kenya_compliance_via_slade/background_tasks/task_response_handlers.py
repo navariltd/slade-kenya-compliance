@@ -18,36 +18,6 @@ from ..doctype.doctype_names_mapping import (
 from ..utils import get_link_value
 
 
-def refresh_notices() -> None:
-    from ..apis.apis import perform_notice_search
-
-    company = frappe.defaults.get_user_default("Company")
-
-    perform_notice_search(json.dumps({"company_name": company}))
-
-
-def send_sales_invoices_information() -> None:
-    from ..overrides.server.sales_invoice import on_submit
-
-    all_submitted_unsent: list[Document] = frappe.get_all(
-        "Sales Invoice", {"docstatus": 1, "custom_successfully_submitted": 0}, ["name"]
-    )  # Fetch all Sales Invoice records according to filter
-
-    if all_submitted_unsent:
-        for sales_invoice in all_submitted_unsent:
-            doc = frappe.get_doc(
-                "Sales Invoice", sales_invoice.name, for_update=False
-            )  # Refetch to get the document representation of the record
-
-            try:
-                on_submit(
-                    doc, method=None
-                )  # Delegate to the on_submit method for sales invoices
-
-            except TypeError:
-                continue
-
-
 def send_pos_invoices_information() -> None:
     from ..overrides.server.sales_invoice import on_submit
 
@@ -68,61 +38,6 @@ def send_pos_invoices_information() -> None:
 
             except TypeError:
                 continue
-
-
-def send_purchase_information() -> None:
-    from ..overrides.server.purchase_invoice import on_submit
-
-    all_submitted_purchase_invoices: list[Document] = frappe.get_all(
-        "Purchase Invoice",
-        {"docstatus": 1, "custom_submitted_successfully": 0},
-        ["name"],
-    )
-
-    for invoice in all_submitted_purchase_invoices:
-        doc = frappe.get_doc(
-            "Purchase Invoice", invoice.name, for_update=False
-        )  # Refetch to get the document representation of the record
-
-        try:
-            on_submit(doc, method=None)
-
-        except TypeError:
-            continue
-
-
-def send_item_inventory_information() -> None:
-    from ..apis.apis import submit_inventory
-
-    query = """
-        SELECT sle.name as name,
-            sle.owner,
-            sle.custom_submitted_successfully,
-            sle.custom_inventory_submitted_successfully,
-            qty_after_transaction as residual_qty,
-            sle.warehouse,
-            w.custom_branch as branch_id,
-            i.item_code as item,
-            custom_item_code_etims as item_code
-        FROM `tabStock Ledger Entry` sle
-            INNER JOIN tabItem i ON sle.item_code = i.item_code
-            INNER JOIN tabWarehouse w ON sle.warehouse = w.name
-        WHERE sle.custom_submitted_successfully = '1'
-            AND sle.custom_inventory_submitted_successfully = '0'
-        ORDER BY sle.creation DESC;
-        """
-
-    sles = frappe.db.sql(query, as_dict=True)
-
-    for stock_ledger in sles:
-        response = json.dumps(stock_ledger)
-
-        try:
-            submit_inventory(response)
-
-        except Exception as error:
-            # TODO: Suspicious looking type(error)
-            frappe.throw("Error Encountered", type(error), title="Error")
 
 
 def update_documents(
@@ -312,94 +227,101 @@ def update_organisations(response: dict, **kwargs) -> None:
         except json.JSONDecodeError:
             raise ValueError(f"Invalid JSON string: {response}")
 
-    doc_list = (
-        response
-        if isinstance(response, list)
-        else response.get("results", response)[:10]
+    record = (
+        response if isinstance(response, list) else response.get("results", response)
+    )[0]
+
+    company_name = frappe.defaults.get_user_default("Company") or frappe.get_value(
+        "Company", {}, "name"
     )
 
-    for record in doc_list:
-        if isinstance(record, str):
-            continue
+    doc = frappe.get_doc("Company", company_name)
 
-        filter_value = record.get("organisation_name")
-        company_name = frappe.db.get_value(
-            "Company", {"company_name": filter_value}, "name"
-        )
-
-        if company_name:
-            doc = frappe.get_doc("Company", company_name)
-        else:
-            doc = frappe.new_doc("Company")
-
-            doc.company_name = record.get("organisation_name", "")
-
-            generated_abbr = "".join(
-                [word[0] for word in doc.company_name.split()]
-            ).upper()[:5]
-            existing_abbr = frappe.db.exists("Company", {"abbr": generated_abbr})
-
-            if existing_abbr:
-                counter = 1
-                unique_abbr = generated_abbr
-                while frappe.db.exists("Company", {"abbr": unique_abbr}):
-                    unique_abbr = f"{generated_abbr}{counter}"
-                    counter += 1
-                doc.abbr = unique_abbr
-            else:
-                doc.abbr = generated_abbr
-
-        if record.get("default_currency"):
-            doc.default_currency = (
-                get_link_value(
-                    "Currency", "custom_slade_id", record.get("default_currency")
-                )
-                or "KES"
+    if record.get("default_currency"):
+        doc.default_currency = (
+            get_link_value(
+                "Currency", "custom_slade_id", record.get("default_currency")
             )
-        if record.get("web_address"):
-            doc.website = record.get("web_address", "")
-        if record.get("phone_number"):
-            doc.phone_no = record.get("phone_number", "")
-        if record.get("description"):
-            doc.company_description = record.get("description", "")
-        if record.get("id"):
-            doc.custom_slade_id = record.get("id", "")
-        if record.get("email_address"):
-            doc.email = record.get("email_address", "")
-        if record.get("tax_payer_pin"):
-            doc.tax_id = record.get("tax_payer_pin", "")
-        doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
+            or "KES"
+        )
+    if record.get("web_address"):
+        doc.website = record.get("web_address", "")
+    if record.get("phone_number"):
+        doc.phone_no = record.get("phone_number", "")
+    if record.get("description"):
+        doc.company_description = record.get("description", "")
+    if record.get("id"):
+        doc.custom_slade_id = record.get("id", "")
+    if record.get("email_address"):
+        doc.email = record.get("email_address", "")
+    if record.get("tax_payer_pin"):
+        doc.tax_id = record.get("tax_payer_pin", "")
+    doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
 
-        doc.save()
+    doc.save()
 
     frappe.db.commit()
 
 
 def update_branches(response: dict, **kwargs) -> None:
-    field_mapping = {
-        "slade_id": "id",
-        "tax_id": "organisation_tax_pin",
-        "branch": "name",
-        "custom_etims_device_serial_no": "etims_device_serial_no",
-        "custom_branch_code": "etims_branch_id",
-        "custom_pin": "organisation_tax_pin",
-        "custom_branch_name": "name",
-        "custom_county_name": "county_name",
-        "custom_tax_locality_name": "tax_locality_name",
-        "custom_sub_county_name": "sub_county_name",
-        "custom_manager_name": "manager_name",
-        "custom_location_description": "location_description",
-        "custom_is_head_office": lambda x: 1 if x.get("is_headquater") else 0,
-        "custom_company": {
-            "doctype": "Company",
-            "link_field": "organisation",
-            "filter_field": "custom_slade_id",
-            "extract_field": "name",
-        },
-        "custom_is_etims_branch": lambda x: 1 if x.get("branch_status") else 0,
-        "custom_is_etims_verified": lambda x: 1 if x.get("is_etims_verified") else 0,
-    }
-    update_documents(response, "Branch", field_mapping, filter_field="branch")
+    if isinstance(response, str):
+        try:
+            response = json.loads(response)
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON string: {response}")
+
+    doc_list = (
+        response if isinstance(response, list) else response.get("results", response)
+    )
+    if len(doc_list) == 1:
+        branch_name = "eTims Branch"
+        existing_branch = frappe.db.get_value("Branch", {"branch": branch_name}, "name")
+
+        if existing_branch:
+            doc = frappe.get_doc("Branch", existing_branch)
+        else:
+            doc = frappe.new_doc("Branch")
+            doc.branch = branch_name
+
+        doc.custom_slade_id = doc_list[0].get("id")
+        doc.is_etims_verified = 1 if doc_list[0].get("is_etims_verified") else 0
+        doc.is_head_office = 1 if doc_list[0].get("is_headquater") else 0
+        doc.custom_company = get_link_value(
+            "Company", "custom_slade_id", doc_list[0].get("organisation")
+        )
+        doc.custom_etims_device_serial_no = doc_list[0].get("etims_device_serial_no")
+        doc.custom_branch_code = doc_list[0].get("etims_branch_id")
+        doc.custom_pin = doc_list[0].get("organisation_tax_pin")
+        doc.is_etims_branch = 1
+        doc.flags.ignore_permissions = True
+        doc.save()
+    else:
+        field_mapping = {
+            "slade_id": "id",
+            "tax_id": "organisation_tax_pin",
+            "branch": "name",
+            "custom_etims_device_serial_no": "etims_device_serial_no",
+            "custom_branch_code": "etims_branch_id",
+            "custom_pin": "organisation_tax_pin",
+            "custom_branch_name": "name",
+            "custom_county_name": "county_name",
+            "custom_tax_locality_name": "tax_locality_name",
+            "custom_sub_county_name": "sub_county_name",
+            "custom_manager_name": "manager_name",
+            "custom_location_description": "location_description",
+            "custom_is_head_office": lambda x: 1 if x.get("is_headquater") else 0,
+            "custom_company": {
+                "doctype": "Company",
+                "link_field": "organisation",
+                "filter_field": "custom_slade_id",
+                "extract_field": "name",
+            },
+            "custom_is_etims_branch": lambda x: 1 if x.get("branch_status") else 0,
+            "custom_is_etims_verified": lambda x: (
+                1 if x.get("is_etims_verified") else 0
+            ),
+        }
+        update_documents(response, "Branch", field_mapping, filter_field="branch")
 
 
 def update_departments(response: dict, **kwargs) -> None:
@@ -409,50 +331,43 @@ def update_departments(response: dict, **kwargs) -> None:
         except json.JSONDecodeError:
             raise ValueError(f"Invalid JSON string: {response}")
 
-    doc_list = (
+    record = (
         response if isinstance(response, list) else response.get("results", [response])
+    )[0]
+
+    department_name = "eTims Department"
+    existing_department = frappe.db.get_value(
+        "Department", {"department_name": department_name}, "name"
     )
-
-    for record in doc_list:
-        if isinstance(record, str):
-            continue
-
-        existing_department = frappe.db.get_value(
-            "Department", {"custom_slade_id": record.get("id")}, "name"
+    if existing_department:
+        doc = frappe.get_doc("Department", existing_department)
+    else:
+        matching_department = frappe.db.get_value(
+            "Department", {"department_name": department_name}, "name"
         )
-        if existing_department:
-            doc = frappe.get_doc("Department", existing_department)
-        else:
-            department_name = record.get("name")
-            matching_department = frappe.db.get_value(
-                "Department", {"department_name": department_name}, "name"
+        if matching_department:
+            branch_name = record.get("parent_name", "")
+            department_name = (
+                f"{department_name} - {branch_name}" if branch_name else department_name
             )
-            if matching_department:
-                branch_name = record.get("parent_name", "")
-                department_name = (
-                    f"{department_name} - {branch_name}"
-                    if branch_name
-                    else department_name
-                )
 
-            doc = frappe.new_doc("Department")
-            doc.department_name = department_name
+        doc = frappe.new_doc("Department")
+        doc.department_name = department_name
 
-        if record.get("organisation"):
-            doc.company = (
-                get_link_value("Company", "custom_slade_id", record.get("organisation"))
-                or frappe.defaults.get_user_default("Company")
-                or frappe.get_value("Company", {}, "name")
-            )
-        if record.get("parent"):
-            doc.custom_branch = get_link_value(
-                "Branch", "slade_id", record.get("parent")
-            )
-        if record.get("id"):
-            doc.custom_slade_id = record.get("id")
-        doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
+    if record.get("organisation"):
+        doc.company = (
+            get_link_value("Company", "custom_slade_id", record.get("organisation"))
+            or frappe.defaults.get_user_default("Company")
+            or frappe.get_value("Company", {}, "name")
+        )
+    if record.get("parent"):
+        doc.custom_branch = get_link_value("Branch", "slade_id", record.get("parent"))
+    if record.get("id"):
+        doc.custom_slade_id = record.get("id")
+    doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
+    doc.custom_is_etims_department = 1
 
-        doc.save()
+    doc.save()
 
     frappe.db.commit()
 

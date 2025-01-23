@@ -41,7 +41,23 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
                 branch_id: frm.doc.bhfid,
               },
             },
-            callback: (response) => {},
+            callback: (response) => {
+              frappe.call({
+                method:
+                  "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.get_item_classification_codes",
+                args: {
+                  request_data: {
+                    document_name: frm.doc.name,
+                    company_name: companyName,
+                    branch_id: frm.doc.bhfid,
+                  },
+                },
+                callback: (response) => {},
+                error: (error) => {
+                  // Error Handling is Defered to the Server
+                },
+              });
+            },
             error: (error) => {
               // Error Handling is Defered to the Server
             },
@@ -49,9 +65,8 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         },
         __("eTims Actions")
       );
-
       frm.add_custom_button(
-        __("Get Organisation Units"),
+        __("Sync Organisation Units"),
         function () {
           frappe.call({
             method:
@@ -73,18 +88,12 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
       );
 
       frm.add_custom_button(
-        __("Get Item Classification Codes"),
+        __("Submit Mode of Payments"),
         function () {
           frappe.call({
             method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.get_item_classification_codes",
-            args: {
-              request_data: {
-                document_name: frm.doc.name,
-                company_name: companyName,
-                branch_id: frm.doc.bhfid,
-              },
-            },
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_all_mode_of_payments",
+            args: {},
 
             callback: (response) => {},
             error: (error) => {
@@ -96,47 +105,16 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
       );
 
       frm.add_custom_button(
-        __("Initialize device"),
+        __("Submit Warehouses"),
         function () {
           frappe.call({
-            method: "frappe.client.get_value",
-            args: {
-              doctype: "Branch",
-              fieldname: "custom_branch_code",
-              filters: { name: frm.doc.bhfid },
-            },
-            callback: function (res) {
-              if (res.message) {
-                const custom_branch_code = res.message.custom_branch_code;
+            method:
+              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_warehouse_list",
+            args: {},
 
-                frappe.call({
-                  method:
-                    "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.initialize_device",
-                  args: {
-                    request_data: {
-                      document_name: frm.doc.name,
-                      etims_branch_id: custom_branch_code,
-                      username: frm.doc.auth_username,
-                      password: frm.doc.auth_password,
-                      vscu_url: frm.doc.server_url,
-                      etims_web_address:
-                        "https://etims-api-sbx.kra.go.ke/etims-api",
-                      organisation_tax_pin: frm.doc.tin,
-                      etims_device_serial_no: frm.doc.dvcsrlno,
-                      company_name: companyName,
-                      branch_id: frm.doc.bhfid,
-                    },
-                  },
-                  callback: (response) => {
-                    // console.log(response);
-                  },
-                  error: (error) => {
-                    // Error handling
-                  },
-                });
-              } else {
-                frappe.msgprint(__("Failed to fetch slade_id for the branch."));
-              }
+            callback: (response) => {},
+            error: (error) => {
+              // Error Handling is Defered to the Server
             },
           });
         },
@@ -144,21 +122,47 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
       );
 
       // frm.add_custom_button(
-      //   __("Get Stock Movements"),
+      //   __("Initialize device"),
       //   function () {
       //     frappe.call({
-      //       method:
-      //         "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.perform_stock_movement_search",
+      //       method: "frappe.client.get_value",
       //       args: {
-      //         request_data: {
-      //           name: frm.doc.name,
-      //           company_name: companyName,
-      //           branch_id: frm.doc.bhfid,
-      //         },
+      //         doctype: "Branch",
+      //         fieldname: "custom_branch_code",
+      //         filters: { name: frm.doc.bhfid },
       //       },
-      //       callback: (response) => {},
-      //       error: (error) => {
-      //         // Error Handling is Defered to the Server
+      //       callback: function (res) {
+      //         if (res.message) {
+      //           const custom_branch_code = res.message.custom_branch_code;
+
+      //           frappe.call({
+      //             method:
+      //               "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.initialize_device",
+      //             args: {
+      //               request_data: {
+      //                 document_name: frm.doc.name,
+      //                 etims_branch_id: custom_branch_code,
+      //                 username: frm.doc.auth_username,
+      //                 password: frm.doc.auth_password,
+      //                 vscu_url: frm.doc.server_url,
+      //                 etims_web_address:
+      //                   "https://etims-api-sbx.kra.go.ke/etims-api",
+      //                 organisation_tax_pin: frm.doc.tin,
+      //                 etims_device_serial_no: frm.doc.dvcsrlno,
+      //                 company_name: companyName,
+      //                 branch_id: frm.doc.bhfid,
+      //               },
+      //             },
+      //             callback: (response) => {
+      //               // console.log(response);
+      //             },
+      //             error: (error) => {
+      //               // Error handling
+      //             },
+      //           });
+      //         } else {
+      //           frappe.msgprint(__("Failed to fetch slade_id for the branch."));
+      //         }
       //       },
       //     });
       //   },

@@ -1,15 +1,14 @@
 [
  {
-  "company": "Theluji",
   "docstatus": 0,
   "doctype": "Navari eTims Routes",
-  "modified": "2025-01-13 14:12:10.785969",
-  "name": "Theluji - VSCU Slade 360",
+  "modified": "2025-01-23 09:44:51.964075",
+  "name": "VSCU Slade 360",
   "routes_table": [
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/etims_notices/",
@@ -18,7 +17,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/item_classifications/",
@@ -27,7 +26,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/taxes/",
@@ -36,7 +35,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/etims_currencies/get_currencies",
@@ -45,7 +44,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/financial_accounts/paymentmethods/",
@@ -54,7 +53,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/common/currencys/",
@@ -63,7 +62,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/packaging_units/",
@@ -72,7 +71,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/quantity_units/",
@@ -81,7 +80,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/products/",
@@ -90,7 +89,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/products/",
@@ -99,7 +98,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/etims_imports/",
@@ -108,7 +107,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/branches/branches",
@@ -117,7 +116,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/business_partners/customers/search_customer_on_kra/",
@@ -126,7 +125,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/business_partners/customers/",
@@ -135,7 +134,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/branches/branches/initialize_etims_device/",
@@ -144,7 +143,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/common/organisations/",
@@ -153,7 +152,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/branches/departments/",
@@ -162,7 +161,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/purchases/",
@@ -171,7 +170,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/sales/salesinvoices/",
@@ -180,7 +179,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/sales/salesinvoicelines/",
@@ -189,7 +188,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/sales/salesinvoices/{invoice_id}/transition/DRAFT_SUBMIT_APPROVE/",
@@ -198,7 +197,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/sales/salesinvoices/{invoice_id}/sign_sales_invoice/",
@@ -207,7 +206,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/purchases/",
@@ -216,7 +215,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/purchasesitems/",
@@ -225,7 +224,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/auth/users/",
@@ -234,7 +233,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/me",
@@ -243,7 +242,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/etims_imports/{id}/",
@@ -252,7 +251,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/business_partners/customers",
@@ -261,7 +260,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/business_partners/customers/{id}",
@@ -270,7 +269,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/etims/purchases/{id}",
@@ -279,7 +278,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/branches/workstations/",
@@ -288,7 +287,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/sales/salesinvoices/{id}/",
@@ -297,7 +296,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/products/{id}/",
@@ -306,7 +305,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/uom_category/",
@@ -315,7 +314,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/uom_category/{id}/",
@@ -324,7 +323,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/uom/",
@@ -333,7 +332,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/uom/{id}/",
@@ -342,7 +341,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventorylocation/",
@@ -351,7 +350,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventorylocation/{id}/",
@@ -360,7 +359,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/warehouse/",
@@ -369,7 +368,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/warehouse/{id}/",
@@ -378,7 +377,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/pricelists/",
@@ -387,7 +386,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/pricelists/{id}/",
@@ -396,7 +395,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/pricelist_products/{id}/",
@@ -405,7 +404,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/pricelist_products/",
@@ -414,7 +413,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryoperation/",
@@ -423,7 +422,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryoperationline/",
@@ -432,7 +431,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryoperation/create_inventory_transfer/",
@@ -441,7 +440,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryadjustment/",
@@ -450,7 +449,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryadjustmentline/",
@@ -459,7 +458,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryoperationtype/",
@@ -468,7 +467,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryoperationtype/{id}/",
@@ -477,7 +476,7 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryadjustment/{id}/transition/DRAFT_SUBMIT_APPROVE/",
@@ -486,11 +485,20 @@
    {
     "description": null,
     "last_request_date": null,
-    "parent": "Theluji - VSCU Slade 360",
+    "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/inventory/inventoryoperation/{id}/transition/DRAFT_SUBMIT_APPROVE/",
     "url_path_function": "StockOperationTransitionReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/financial_accounts/accounts/",
+    "url_path_function": "AccountsSearchReq"
    }
   ],
   "vendor": "VSCU Slade 360"

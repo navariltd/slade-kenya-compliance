@@ -8,7 +8,6 @@
   "modified": "2025-01-07 06:59:49.594619",
   "name": "service",
   "remark": null,
-  "slade_id": null,
   "sort_order": "3"
  },
  {
@@ -20,7 +19,6 @@
   "modified": "2025-01-07 06:59:49.537136",
   "name": "consu",
   "remark": null,
-  "slade_id": "consu",
   "sort_order": "1"
  },
  {
@@ -32,7 +30,6 @@
   "modified": "2025-01-07 06:59:49.618533",
   "name": "sku",
   "remark": null,
-  "slade_id": null,
   "sort_order": "2"
  }
 ]

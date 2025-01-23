@@ -1,4 +1,5 @@
 const doctypeName = "Sales Invoice";
+const settingsDoctypeName = "Navari KRA eTims Settings";
 
 frappe.listview_settings[doctypeName].onload = async function (listview) {
   const { message: activeSetting } = await frappe.db.get_value(

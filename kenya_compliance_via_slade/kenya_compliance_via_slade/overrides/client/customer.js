@@ -1,4 +1,5 @@
 const doctype = "Customer";
+const settingsDoctypeName = "Navari KRA eTims Settings";
 
 frappe.ui.form.on(doctype, {
   refresh: async function (frm) {
