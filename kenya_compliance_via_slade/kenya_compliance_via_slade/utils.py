@@ -283,13 +283,17 @@ def build_headers(company_name: str, branch_id: str) -> dict[str, str] | None:
             as_dict=True,
         )
 
-        workstation = settings.get("workstation") or user_data.get("workstation")
-
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
+
+        workstation = None
+        if settings and settings.get("workstation"):
+            workstation = settings.get("workstation")
+        elif user_data and user_data.get("workstation"):
+            workstation = user_data.get("workstation")
 
         if workstation:
             headers["X-Workstation"] = workstation
@@ -399,6 +403,7 @@ def build_invoice_payload(
 
     payload = {
         "document_name": invoice.name,
+        "document_number": invoice.name,
         "branch_id": invoice.branch,
         "company_name": company_name,
         "description": invoice.remarks or "New",

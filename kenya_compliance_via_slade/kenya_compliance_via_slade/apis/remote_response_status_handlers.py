@@ -987,7 +987,7 @@ def customers_search_on_success(response: dict, **kwargs) -> None:
         frappe.db.commit()
 
 
-def warehouse_update_on_success(response: dict, document_name: str, **kwargs) -> None:
+def location_update_on_success(response: dict, document_name: str, **kwargs) -> None:
     frappe.db.set_value(
         "Warehouse", document_name, {"custom_slade_id": response.get("id")}
     )
