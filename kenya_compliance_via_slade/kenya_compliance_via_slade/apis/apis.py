@@ -87,13 +87,21 @@ def bulk_register_item(docs_list: str) -> None:
     data = json.loads(docs_list)
 
     for record in data:
-        is_registered = frappe.db.get_value("Item", record, "custom_item_registered")
+        is_registered = frappe.db.get_value("Item", record, "custom_sent_to_slade")
         if is_registered == 0:
             item_name = frappe.db.get_value("Item", record, "name")
             perform_item_registration(item_name=str(item_name))
-            print(f"Registered item: {record}")
-        else:
-            print(f"Item {record} is already registered.")
+
+
+@frappe.whitelist()
+def register_all_items() -> None:
+    data = frappe.db.get_all(
+        "Item", filters={"custom_sent_to_slade": 0}, fields=["name"]
+    )
+
+    for record in data:
+        item_name = frappe.db.get_value("Item", record, "name")
+        perform_item_registration(item_name=str(item_name))
 
 
 @frappe.whitelist()
@@ -123,8 +131,8 @@ def perform_item_registration(item_name: str) -> dict | None:
 
     if missing_fields:
         frappe.throw(
-            _("The following required fields are missing: {0}").format(
-                ", ".join(missing_fields)
+            _("The following required fields are missing for item {0}: {1}").format(
+                item_name, ", ".join(missing_fields)
             )
         )
 

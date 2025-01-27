@@ -26,7 +26,8 @@ frappe.listview_settings[doctypeName].onload = async function (listview) {
             // Error Handling is Defered to the Server
           },
         });
-      }
+      },
+      __("eTims Actions")
     );
 
     listview.page.add_inner_button(
@@ -46,7 +47,24 @@ frappe.listview_settings[doctypeName].onload = async function (listview) {
             // Error Handling is Defered to the Server
           },
         });
-      }
+      },
+      __("eTims Actions")
+    );
+
+    listview.page.add_inner_button(
+      __("Register all Items"),
+      function (listview) {
+        frappe.call({
+          method:
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.register_all_items",
+          args: {},
+          callback: (response) => {},
+          error: (r) => {
+            // Error Handling is Defered to the Server
+          },
+        });
+      },
+      __("eTims Actions")
     );
 
     listview.page.add_action_item(__("Bulk Register Items"), function () {

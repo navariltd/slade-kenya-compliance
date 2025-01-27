@@ -100,11 +100,10 @@ def validate(doc: Document, method: str) -> None:
             LIMIT 1
             """,
             (doc.custom_item_classification,),
-            as_dict=True,
         )
-
+        last_code = last_code[0][0] if last_code else None
         if last_code:
-            last_suffix = int(last_code[0]["custom_item_code_etims"][-7:])
+            last_suffix = int(last_code[-7:])
             existing_suffix = str(last_suffix + 1).zfill(7)
         else:
             # Start from '0000001' if no matching classification item exists

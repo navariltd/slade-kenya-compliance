@@ -720,13 +720,14 @@ def update_navari_settings_with_token(docname: str) -> str:
 
     request_data = {"document_name": docname}
 
-    return process_request(
+    process_request(
         request_data,
         "BhfUserSearchReq",
         user_details_fetch_on_success,
         request_method="GET",
         doctype=SETTINGS_DOCTYPE_NAME,
     )
+    return settings_doc
 
 
 @frappe.whitelist()
