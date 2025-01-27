@@ -43,6 +43,7 @@ from .remote_response_status_handlers import (
     item_price_update_on_success,
     item_registration_on_success,
     item_search_on_success,
+    location_update_on_success,
     mode_of_payment_on_success,
     on_error,
     operation_type_create_on_success,
@@ -53,7 +54,6 @@ from .remote_response_status_handlers import (
     update_invoice_info,
     user_details_fetch_on_success,
     user_details_submission_on_success,
-    warehouse_update_on_success,
 )
 
 endpoints_builder = EndpointsBuilder()
@@ -921,20 +921,23 @@ def sync_warehouse_details(request_data: str, type: str = "warehouse") -> None:
 
 @frappe.whitelist()
 def submit_warehouse_list() -> None:
-    warehouses = frappe.get_all("Warehouse", fields=["name"])
+    warehouses = frappe.get_all("Warehouse", filters={"is_group": 1}, fields=["name"])
     for warehouse in warehouses:
-        save_warehouse_details(warehouse.name)
+        submit_warehouse(warehouse.name)
 
 
 @frappe.whitelist()
 def save_warehouse_details(name: str) -> dict | None:
+    is_group = frappe.db.get_value("Warehouse", name, "is_group")
+    submit_warehouse(name) if is_group == 1 else submit_location(name)
+
+
+@frappe.whitelist()
+def submit_warehouse(name: str) -> dict | None:
     item = frappe.get_doc("Warehouse", name)
     slade_id = item.get("custom_slade_id", None)
-    is_group = item.get("is_group", 0)
-
     route_key = "WarehousesSearchReq"
     on_success = warehouse_update_on_success
-
     request_data = {
         "name": item.get("warehouse_name"),
         "document_name": item.get("name"),
@@ -946,15 +949,54 @@ def save_warehouse_details(name: str) -> dict | None:
         ),
         "active": False if item.get("disabled") == 1 else True,
     }
+    if slade_id:
+        request_data["id"] = slade_id
+        method = "PATCH"
+    else:
+        method = "POST"
 
-    if not is_group:
-        request_data["branch"] = get_link_value(
-            "Branch", "name", item.get("branch"), "slade_id"
-        )
-        request_data["warehouse"] = get_link_value(
+    process_request(
+        request_data,
+        route_key=route_key,
+        handler_function=on_success,
+        request_method=method,
+        doctype="Warehouse",
+    )
+
+
+def warehouse_update_on_success(response: dict, document_name: str, **kwargs) -> None:
+    frappe.db.set_value(
+        "Warehouse", document_name, {"custom_slade_id": response.get("id")}
+    )
+    warehouses = frappe.get_all(
+        "Warehouse", filters={"parent_warehouse": document_name}, fields=["name"]
+    )
+    for warehouse in warehouses:
+        submit_location(warehouse.name)
+
+
+@frappe.whitelist()
+def submit_location(name: str) -> dict | None:
+    item = frappe.get_doc("Warehouse", name)
+    slade_id = item.get("custom_slade_id", None)
+    route_key = "LocationsSearchReq"
+    on_success = location_update_on_success
+
+    request_data = {
+        "name": item.get("warehouse_name"),
+        "document_name": item.get("name"),
+        "organisation": get_link_value(
+            "Company",
+            "name",
+            item.get("company"),
+            "custom_slade_id",
+        ),
+        "warehouse": get_link_value(
             "Warehouse", "name", item.get("parent_warehouse"), "custom_slade_id"
-        )
-        route_key = "LocationsSearchReq"
+        ),
+        "branch": get_link_value("Branch", "name", item.get("branch"), "slade_id"),
+        "active": False if item.get("disabled") == 1 else True,
+    }
 
     if slade_id:
         request_data["id"] = slade_id

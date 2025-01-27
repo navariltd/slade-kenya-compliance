@@ -46,6 +46,7 @@ fixtures = [
                     "Company",
                     "UOM",
                     "Currency",
+                    "Mode of Payment",
                 ),
             ],
             ["is_system_generated", "=", 0],
