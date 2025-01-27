@@ -28,7 +28,10 @@ An overview of ERPNext's Architecture
 ![ERPNext Architectural Overview](/kenya_compliance_via_slade/docs/images/erpnext_instance_architecture.PNG)
 
 An overview of an ERPNext Instance's communication with the eTims servers
-![Architectural Overview](/kenya_compliance_via_slade/docs/images/architectural_overview.jpg)
+![Architectural Overview](/kenya_compliance_via_slade/docs/images/architectural_overview.png)
+
+The customer journey illustration toward achieving real-time tax compliance
+![Customer Journey](/kenya_compliance_via_slade/docs/images/slade-process.png)
 
 Once the application is [installed](#installation) and [configured](#environment-settings) in an ERPNext instance, communication to the ETims servers takes place through background jobs executed by [Redis Queue](https://redis.com/glossary/redis-queue/). The eTims response Information is stored in the relevant [customised DocType's](#customisations) tables in the [site's database](https://frappeframework.com/docs/user/en/basics/sites).
 
