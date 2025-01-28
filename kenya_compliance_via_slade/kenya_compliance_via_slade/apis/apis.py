@@ -6,7 +6,6 @@ import aiohttp
 
 import frappe
 import frappe.defaults
-from frappe import _
 from frappe.model.document import Document
 
 from ..doctype.doctype_names_mapping import (
@@ -116,16 +115,23 @@ def perform_item_registration(item_name: str) -> dict | None:
     item = frappe.get_doc("Item", item_name)
     missing_fields = []
 
-    for field in item.meta.fields:
-        if field.reqd and not item.get(field.fieldname):
-            missing_fields.append(field.label)
+    required_fields = [
+        "custom_item_code_etims",
+        "custom_item_classification",
+        "custom_product_type",
+        "custom_item_type",
+        "custom_etims_country_of_origin_code",
+        "custom_packaging_unit",
+        "custom_unit_of_quantity",
+        "custom_taxation_type",
+    ]
+
+    for field in required_fields:
+        if not item.get(field):
+            missing_fields.append(field)
 
     if missing_fields:
-        frappe.throw(
-            _("The following required fields are missing for item {0}: {1}").format(
-                item_name, ", ".join(missing_fields)
-            )
-        )
+        return
 
     tax = get_link_value(
         TAXATION_TYPE_DOCTYPE_NAME, "cd", item.get("custom_taxation_type"), "slade_id"
