@@ -2761,17 +2761,6 @@
   "sort_order": "0"
  },
  {
-  "code": "YT",
-  "code_description": "",
-  "code_name": "Mayotte",
-  "currency_code": "EUR",
-  "docstatus": 0,
-  "doctype": "Navari eTims Country",
-  "modified": "2025-01-23 13:24:50.695392",
-  "name": "Mayotte",
-  "sort_order": "0"
- },
- {
   "code": "ZA",
   "code_description": "",
   "code_name": "South Africa",
@@ -2868,6 +2857,17 @@
   "doctype": "Navari eTims Country",
   "modified": "2025-01-23 13:24:50.042990",
   "name": "KENYA",
+  "sort_order": "0"
+ },
+ {
+  "code": "YT",
+  "code_description": "",
+  "code_name": "Mayotte",
+  "currency_code": "EUR",
+  "docstatus": 0,
+  "doctype": "Navari eTims Country",
+  "modified": "2025-01-23 13:24:50.695392",
+  "name": "Mayotte",
   "sort_order": "0"
  }
 ]
