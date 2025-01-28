@@ -33,25 +33,6 @@
    "type": "Link"
   },
   {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Stock Movements",
-   "link_count": 1,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "eTims Registered Stock Movement",
-   "link_count": 0,
-   "link_to": "Navari eTims Registered Stock Movement",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
    "description": "These DocTypes hold error logs to assist in troubleshooting and debugging",
    "hidden": 0,
    "is_query_report": 0,
@@ -328,9 +309,38 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Stock Movements",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "eTims Registered Stock Movement",
+   "link_count": 0,
+   "link_to": "Navari eTims Registered Stock Movement",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "eTims Stock Operation Type",
+   "link_count": 0,
+   "link_to": "Navari eTims Stock Operation Type",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2025-01-23 10:07:50.558878",
+ "modified": "2025-01-28 17:04:19.502293",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "eTims Integration",

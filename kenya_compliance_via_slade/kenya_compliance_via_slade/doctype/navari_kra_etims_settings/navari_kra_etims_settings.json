@@ -26,12 +26,15 @@
   "frequency_of_communication_with_etims_servers_section",
   "sales_information_submission",
   "sales_info_cron_format",
+  "sales_information_submission_timeframe",
   "column_break_ukgx",
   "stock_information_submission",
   "stock_info_cron_format",
+  "stock_information_submission_timeframe",
   "column_break_ifui",
   "purchase_information_submission",
   "purchase_info_cron_format",
+  "purchase_information_submission_timeframe",
   "column_break_fsjl",
   "notices_refresh_frequency",
   "notices_refresh_freq_cron_format",
@@ -402,6 +405,21 @@
    "label": "Department",
    "no_copy": 1,
    "options": "Department"
+  },
+  {
+   "fieldname": "sales_information_submission_timeframe",
+   "fieldtype": "Duration",
+   "label": "Sales Information Submission Timeframe"
+  },
+  {
+   "fieldname": "stock_information_submission_timeframe",
+   "fieldtype": "Duration",
+   "label": "Stock Information Submission Timeframe"
+  },
+  {
+   "fieldname": "purchase_information_submission_timeframe",
+   "fieldtype": "Duration",
+   "label": "Purchase Information Submission Timeframe"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -412,7 +430,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-01-23 10:11:38.430204",
+ "modified": "2025-01-28 15:38:23.811843",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",

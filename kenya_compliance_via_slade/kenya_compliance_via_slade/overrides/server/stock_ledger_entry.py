@@ -4,6 +4,7 @@ import frappe
 from frappe.model.document import Document
 
 from ...apis.api_builder import EndpointsBuilder
+from ...apis.apis import save_operation_type
 from ...apis.process_request import process_request
 from ...doctype.doctype_names_mapping import (
     OPERATION_TYPE_DOCTYPE_NAME,
@@ -57,7 +58,6 @@ def prepare_payload(doc: dict, record: dict) -> dict:
     payload = {
         "name": doc.name,
         "document_name": doc.name,
-        "branch": frappe.get_value("Branch", branch_name, "slade_id"),
         "organisation": frappe.get_value("Company", company_name, "custom_slade_id"),
         "source_organisation_unit": frappe.get_value(
             "Department", department_name, "custom_slade_id"
@@ -202,12 +202,11 @@ def create_and_enqueue_operation(
     new_operation_type.insert()
 
     frappe.enqueue(
-        "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.save_operation_type",
+        save_operation_type,
         name=new_operation_type.name,
         on_success=lambda response, **kwargs: stock_operation_type_submit_on_success(
             response, doc_name=doc.name, **kwargs
         ),
-        queue="long",
     )
 
 
@@ -303,11 +302,6 @@ def stock_mvt_submit_items_on_success(
     frappe.enqueue(
         process_request,
         queue="default",
-        is_async=True,
-        timeout=300,
-        job_name=sha256(
-            f"{doc.name}{doc.creation}{doc.modified}".encode(), usedforsecurity=False
-        ).hexdigest(),
         doctype="Stock Ledger Entry",
         request_data=requset_data,
         route_key=route_key,

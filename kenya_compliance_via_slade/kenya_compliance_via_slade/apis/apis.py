@@ -955,6 +955,12 @@ def submit_warehouse(name: str) -> dict | None:
             item.get("company"),
             "custom_slade_id",
         ),
+        "branch": get_link_value(
+            "Branch",
+            "name",
+            item.get("custom_branch"),
+            "slade_id",
+        ),
         "active": False if item.get("disabled") == 1 else True,
     }
     if slade_id:
@@ -1002,8 +1008,14 @@ def submit_location(name: str) -> dict | None:
         "warehouse": get_link_value(
             "Warehouse", "name", item.get("parent_warehouse"), "custom_slade_id"
         ),
-        "branch": get_link_value("Branch", "name", item.get("branch"), "slade_id"),
+        "branch": get_link_value(
+            "Branch",
+            "name",
+            item.get("custom_branch"),
+            "slade_id",
+        ),
         "active": False if item.get("disabled") == 1 else True,
+        "location_type": "virtual",
     }
 
     if slade_id:
