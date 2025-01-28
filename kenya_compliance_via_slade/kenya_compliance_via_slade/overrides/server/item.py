@@ -1,21 +1,12 @@
-import deprecation
-
 import frappe
 import frappe.defaults
 from frappe import _
 from frappe.model.document import Document
 
-from .... import __version__
 from ...apis.apis import perform_item_registration
 from ...doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
 
 
-@deprecation.deprecated(
-    deprecated_in="0.6.2",
-    removed_in="1.0.0",
-    current_version=__version__,
-    details="Use the Register Item button in Item record",
-)
 def after_insert(doc: Document, method: str) -> None:
     """Item doctype before insertion hook"""
 
@@ -81,8 +72,6 @@ def validate(doc: Document, method: str) -> None:
 
     # Combine the new prefix with the existing or new suffix
     doc.custom_item_code_etims = f"{new_prefix}{existing_suffix}"
-    if not doc.custom_sent_to_slade:
-        perform_item_registration(doc.name)
 
 
 @frappe.whitelist()
