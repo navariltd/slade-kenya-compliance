@@ -13,6 +13,7 @@ from ..doctype.doctype_names_mapping import (
     UOM_CATEGORY_DOCTYPE_NAME,
 )
 from ..overrides.server.stock_ledger_entry import on_update
+from ..utils import get_settings
 from .task_response_handlers import (
     itemprice_search_on_success,
     location_search_on_success,
@@ -45,14 +46,17 @@ def refresh_notices() -> None:
 def send_sales_invoices_information() -> None:
     from ..overrides.server.sales_invoice import on_submit
 
-    # Limit to only sales invoices that were created in the last 12 hours
-    twelve_hours_ago = datetime.now() - timedelta(hours=12)
+    settings = get_settings()
+    # Get the timeframe from kwargs or default to 24 hours
+    timeframe = settings.get("sales_information_submission_timeframe", 86400)
+    duration = timedelta(seconds=timeframe)
+    timeframe_ago = datetime.now() - duration
     all_submitted_unsent: list[Document] = frappe.get_all(
         "Sales Invoice",
         {
             "docstatus": 1,
             "custom_successfully_submitted": 0,
-            "creation": [">=", twelve_hours_ago],
+            "creation": [">=", timeframe_ago],
         },
         ["name"],
     )  # Fetch all Sales Invoice records according to filter
@@ -195,14 +199,17 @@ def fetch_etims_operation_types(request_data: str) -> None:
 
 
 def send_stock_information() -> None:
-    # Limit to only ledgers that were created in the last 12 hours
-    twelve_hours_ago = datetime.now() - timedelta(hours=12)
+    settings = get_settings()
+    timeframe = settings.get("stock_information_submission_timeframe", 86400)
+    duration = timedelta(seconds=timeframe)
+
+    timeframe_ago = datetime.now() - duration
     all_stock_ledger_entries: list[Document] = frappe.get_all(
         "Stock Ledger Entry",
         {
             "docstatus": 1,
             "custom_submitted_successfully": 0,
-            "creation": [">=", twelve_hours_ago],
+            "creation": [">=", timeframe_ago],
         },
         ["name"],
     )
@@ -223,14 +230,16 @@ def send_stock_information() -> None:
 def send_purchase_information() -> None:
     from ..overrides.server.purchase_invoice import on_submit
 
-    # Limit to only purchase invoices that were created in the last 12 hours
-    twelve_hours_ago = datetime.now() - timedelta(hours=12)
+    settings = get_settings()
+    timeframe = settings.get("purchase_information_submission_timeframe", 86400)
+    duration = timedelta(seconds=timeframe)
+    timeframe_ago = datetime.now() - duration
     all_submitted_purchase_invoices: list[Document] = frappe.get_all(
         "Purchase Invoice",
         {
             "docstatus": 1,
             "custom_submitted_successfully": 0,
-            "creation": [">=", twelve_hours_ago],
+            "creation": [">=", timeframe_ago],
         },
         ["name"],
     )

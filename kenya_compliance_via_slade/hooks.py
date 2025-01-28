@@ -264,9 +264,9 @@ doc_events = {
         ],
         "on_trash": "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.prevent_item_deletion",
     },
-    "Stock Ledger Entry": {
-        "after_insert": [
-            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.stock_ledger_entry.on_update"
+    "BOM": {
+        "on_submit": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.bom.on_submit"
         ]
     },
 }

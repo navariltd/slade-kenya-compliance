@@ -1,6 +1,5 @@
 import asyncio
 import json
-from functools import partial
 from typing import Callable
 
 import aiohttp
@@ -22,14 +21,7 @@ from ..doctype.doctype_names_mapping import (
     UOM_CATEGORY_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
 )
-from ..utils import (
-    build_headers,
-    get_link_value,
-    get_route_path,
-    get_server_url,
-    make_get_request,
-    split_user_email,
-)
+from ..utils import get_link_value, make_get_request
 from .api_builder import EndpointsBuilder
 from .process_request import process_request
 from .remote_response_status_handlers import (
@@ -45,7 +37,6 @@ from .remote_response_status_handlers import (
     item_search_on_success,
     location_update_on_success,
     mode_of_payment_on_success,
-    on_error,
     operation_type_create_on_success,
     pricelist_update_on_success,
     purchase_search_on_success,
@@ -433,72 +424,19 @@ def update_imported_item_request(request_data: str) -> None:
 
 
 @frappe.whitelist()
-def submit_item_composition(request_data: str) -> None:
-    data: dict = json.loads(request_data)
-
-    company_name = data["company_name"]
-
-    headers = build_headers(company_name)
-    server_url = get_server_url(company_name)
-    route_path, last_request_date = get_route_path("SaveItemComposition")
-
-    if headers and server_url and route_path:
-        url = f"{server_url}{route_path}"
-
-        all_items = frappe.db.get_all("Item", ["*"])
-
-        # Check if item to manufacture is registered before proceeding
-        manufactured_item = frappe.get_value(
-            "Item",
-            {"name": data["item_name"]},
-            ["custom_item_registered", "name"],
-            as_dict=True,
-        )
-
-        if not manufactured_item.custom_item_registered:
-            frappe.throw(
-                f"Please register item: <b>{manufactured_item.name}</b> first to proceed.",
-                title="Integration Error",
-            )
-
-        for item in data["items"]:
-            for fetched_item in all_items:
-                if item["item_code"] == fetched_item.item_code:
-                    if fetched_item.custom_item_registered == 1:
-                        payload = {
-                            "itemCd": data["item_code"],
-                            "cpstItemCd": fetched_item.custom_item_code_etims,
-                            "cpstQty": item["qty"],
-                            "regrId": split_user_email(data["registration_id"]),
-                            "regrNm": data["registration_id"],
-                        }
-
-                        endpoints_builder.headers = headers
-                        endpoints_builder.url = url
-                        endpoints_builder.payload = payload
-                        endpoints_builder.success_callback = partial(
-                            item_composition_submission_on_success,
-                            document_name=data["name"],
-                        )
-                        endpoints_builder.error_callback = on_error
-
-                        frappe.enqueue(
-                            endpoints_builder.make_remote_call,
-                            is_async=True,
-                            queue="default",
-                            timeout=300,
-                            job_name=f"{data['name']}_submit_item_composition",
-                            doctype="BOM",
-                            document_name=data["name"],
-                        )
-
-                    else:
-                        frappe.throw(
-                            f"""
-                            Item: <b>{fetched_item.name}</b> is not registered.
-                            <b>Ensure ALL Items are registered first to submit this composition</b>""",
-                            title="Integration Error",
-                        )
+def submit_item_composition(name: str) -> None:
+    item = frappe.get_doc("BOM", name)
+    request_data = {
+        "final_product": get_link_value("Item", "name", item.item, "custom_slade_id"),
+        "document_name": name,
+    }
+    process_request(
+        request_data,
+        "BOMReq",
+        item_composition_submission_on_success,
+        request_method="POST",
+        doctype="BOM",
+    )
 
 
 @frappe.whitelist()
@@ -955,6 +893,12 @@ def submit_warehouse(name: str) -> dict | None:
             item.get("company"),
             "custom_slade_id",
         ),
+        "branch": get_link_value(
+            "Branch",
+            "name",
+            item.get("custom_branch"),
+            "slade_id",
+        ),
         "active": False if item.get("disabled") == 1 else True,
     }
     if slade_id:
@@ -1002,8 +946,14 @@ def submit_location(name: str) -> dict | None:
         "warehouse": get_link_value(
             "Warehouse", "name", item.get("parent_warehouse"), "custom_slade_id"
         ),
-        "branch": get_link_value("Branch", "name", item.get("branch"), "slade_id"),
+        "branch": get_link_value(
+            "Branch",
+            "name",
+            item.get("custom_branch"),
+            "slade_id",
+        ),
         "active": False if item.get("disabled") == 1 else True,
+        "location_type": "virtual",
     }
 
     if slade_id:
