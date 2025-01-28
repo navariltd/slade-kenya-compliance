@@ -212,7 +212,7 @@ def submit_inventory_on_success(response: dict, document_name: str, **kwargs) ->
     bin = frappe.get_doc("Bin", document_name)
     from .process_request import process_request
 
-    requset_data = {
+    request_data = {
         "document_name": bin.item_code,
         "product": frappe.get_value("Item", bin.item_code, "custom_slade_id"),
         "quantity": bin.actual_qty,
@@ -224,7 +224,7 @@ def submit_inventory_on_success(response: dict, document_name: str, **kwargs) ->
         queue="default",
         is_async=True,
         doctype="Item",
-        request_data=requset_data,
+        request_data=request_data,
         route_key="StockMasterLineReq",
         handler_function=submit_inventory_item_on_success,
         request_method="POST",
@@ -237,7 +237,7 @@ def submit_inventory_item_on_success(
     from .process_request import process_request
 
     doc = frappe.get_doc("Item", document_name)
-    requset_data = {
+    request_data = {
         "document_name": document_name,
         "id": response.get("inventory_adjustment"),
     }
@@ -245,7 +245,7 @@ def submit_inventory_item_on_success(
         process_request,
         queue="default",
         doctype="Item",
-        request_data=requset_data,
+        request_data=request_data,
         route_key="StockAdjustmentTransitionReq",
         handler_function=process_inventory_transition,
         request_method="PATCH",
@@ -446,8 +446,50 @@ def sales_item_submission_on_success(
 def item_composition_submission_on_success(
     response: dict, document_name: str, **kwargs
 ) -> None:
+    from .process_request import process_request
+
     frappe.db.set_value(
-        "BOM", document_name, {"custom_item_composition_submitted_successfully": 1}
+        "BOM",
+        document_name,
+        {
+            "custom_item_composition_submitted_successfully": 1,
+            "custom_slade_id": response.get("id"),
+        },
+    )
+
+    doc = frappe.get_doc("BOM", document_name)
+
+    for item in doc.items:
+        request_data = {
+            "document_name": item.name,
+            "active": True,
+            "quantity": item.qty,
+            "bom": response.get("id"),
+            "raw_product": get_link_value(
+                "Item", "name", item.item_code, "custom_slade_id"
+            ),
+        }
+        frappe.enqueue(
+            process_request,
+            queue="default",
+            doctype="BOM Item",
+            request_data=request_data,
+            route_key="BOMItemReq",
+            handler_function=bom_item_submission_on_success,
+            request_method="POST",
+        )
+
+
+def bom_item_submission_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    frappe.db.set_value(
+        "BOM Item",
+        document_name,
+        {
+            "custom_slade_id": response.get("id"),
+            "custom_submitted_successfully": 1,
+        },
     )
 
 

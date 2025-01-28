@@ -29,15 +29,7 @@ frappe.ui.form.on(doctype, {
               method:
                 "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_item_composition",
               args: {
-                request_data: {
-                  name: frm.doc.name,
-                  company_name: companyName,
-                  item_name: frm.doc.item,
-                  quantity: frm.doc.quantity,
-                  registration_id: frm.doc.owner,
-                  item_code: itemCode,
-                  items: frm.doc.items,
-                },
+                name: frm.doc.name,
               },
               callback: (response) => {},
               error: (r) => {
