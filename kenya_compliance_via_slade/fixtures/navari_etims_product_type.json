@@ -11,17 +11,6 @@
   "sort_order": "3"
  },
  {
-  "code": "consu",
-  "code_description": "Consumable",
-  "code_name": "Consumable",
-  "docstatus": 0,
-  "doctype": "Navari eTims Product Type",
-  "modified": "2025-01-07 06:59:49.537136",
-  "name": "consu",
-  "remark": null,
-  "sort_order": "1"
- },
- {
   "code": "sku",
   "code_description": "Store Keeping Unit (SKU)",
   "code_name": "Store Keeping Unit (SKU)",
@@ -31,5 +20,16 @@
   "name": "sku",
   "remark": null,
   "sort_order": "2"
+ },
+ {
+  "code": "consu",
+  "code_description": "Consumable",
+  "code_name": "Consumable",
+  "docstatus": 0,
+  "doctype": "Navari eTims Product Type",
+  "modified": "2025-01-07 06:59:49.537136",
+  "name": "consu",
+  "remark": null,
+  "sort_order": "1"
  }
 ]

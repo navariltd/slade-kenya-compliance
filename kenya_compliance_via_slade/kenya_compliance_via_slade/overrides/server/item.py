@@ -13,7 +13,8 @@ def after_insert(doc: Document, method: str) -> None:
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
         return
 
-    perform_item_registration(doc.name)
+    if not doc.custom_sent_to_slade:
+        perform_item_registration(doc.name)
 
 
 def validate(doc: Document, method: str) -> None:
