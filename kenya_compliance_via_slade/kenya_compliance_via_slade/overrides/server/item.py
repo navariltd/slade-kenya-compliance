@@ -81,6 +81,8 @@ def validate(doc: Document, method: str) -> None:
 
     # Combine the new prefix with the existing or new suffix
     doc.custom_item_code_etims = f"{new_prefix}{existing_suffix}"
+    if not doc.custom_sent_to_slade:
+        perform_item_registration(doc.name)
 
 
 @frappe.whitelist()
