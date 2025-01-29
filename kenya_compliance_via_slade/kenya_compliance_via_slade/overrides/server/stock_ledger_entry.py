@@ -40,7 +40,8 @@ def save_ledger_details(name: str) -> None:
             )
 
         else:
-            stock_mvt_submit_items_on_success(response={}, document_name=name)
+            # stock_mvt_submit_items_on_success(response={}, document_name=name)
+            pass
 
     except Exception as e:
         frappe.log_error(
@@ -68,14 +69,18 @@ def prepare_payload(doc: dict, record: dict) -> dict:
 
     payload["document_type"] = map_document_type(doc)
 
-    if doc.voucher_type == "Stock Reconciliation":
-        update_payload_for_stock_reconciliation(doc, payload)
+    update_payload_for_stock_reconciliation(doc, payload)
 
-    if doc.voucher_type in ("Purchase Receipt", "Purchase Invoice"):
-        update_payload_for_purchase(doc, record, payload)
+    # Drop All Inventory Operations and only use Inventory Adjustment
 
-    if doc.voucher_type in ("Delivery Note", "Sales Invoice"):
-        update_payload_for_sales(doc, record, payload)
+    # if doc.voucher_type == "Stock Reconciliation":
+    #     update_payload_for_stock_reconciliation(doc, payload)
+
+    # if doc.voucher_type in ("Purchase Receipt", "Purchase Invoice"):
+    #     update_payload_for_purchase(doc, record, payload)
+
+    # if doc.voucher_type in ("Delivery Note", "Sales Invoice"):
+    #     update_payload_for_sales(doc, record, payload)
 
     return payload
 
@@ -86,7 +91,7 @@ def map_document_type(doc: dict) -> str:
         "Purchase Receipt": "grn",
         "Purchase Invoice": "purchases_invoice",
         "Delivery Note": "gdn",
-        "Sales Invoice": "sales_invoice",
+        "Sales Invoice": "gdn",
     }
 
     if doc.voucher_type in document_type_mapping:
@@ -105,7 +110,7 @@ def update_payload_for_stock_reconciliation(doc: dict, payload: dict) -> None:
     payload.update(
         {
             "inventory_reference": doc.name,
-            "reason": "Stock Reconciliation",
+            "reason": "Stock Adjustment",
             "location": frappe.get_value("Warehouse", doc.warehouse, "custom_slade_id"),
         }
     )
@@ -132,21 +137,25 @@ def update_payload_for_sales(doc: dict, record: dict, payload: dict) -> None:
 
 
 def handle_operation_type(doc: dict, payload: dict) -> None:
-    if doc.voucher_type == "Stock Reconciliation":
-        submit_stock_mvt(payload, "StockMasterSaveReq")
+    # Drop All Inventory Operations and only use Inventory Adjustment
 
-    else:
-        operation_type_fields = get_operation_type_fields(doc, payload["document_type"])
+    submit_stock_mvt(payload, "StockMasterSaveReq")
 
-        matching_operation = frappe.db.get_value(
-            OPERATION_TYPE_DOCTYPE_NAME, operation_type_fields, ["name", "slade_id"]
-        )
+    # if doc.voucher_type == "Stock Reconciliation":
+    #     submit_stock_mvt(payload, "StockMasterSaveReq")
 
-        if matching_operation:
-            payload["operation_type"] = matching_operation[1]
-            submit_stock_mvt(payload, "StockIOSaveReq")
-        else:
-            create_and_enqueue_operation(doc, operation_type_fields, payload)
+    # else:
+    #     operation_type_fields = get_operation_type_fields(doc, payload["document_type"])
+
+    #     matching_operation = frappe.db.get_value(
+    #         OPERATION_TYPE_DOCTYPE_NAME, operation_type_fields, ["name", "slade_id"]
+    #     )
+
+    #     if matching_operation:
+    #         payload["operation_type"] = matching_operation[1]
+    #         submit_stock_mvt(payload, "StockIOSaveReq")
+    #     else:
+    #         create_and_enqueue_operation(doc, operation_type_fields, payload)
 
 
 def get_operation_type_fields(doc: dict, document_type: str) -> dict:
@@ -245,7 +254,10 @@ def stock_mvt_submission_on_success(
     doc = frappe.get_doc("Stock Ledger Entry", document_name)
     record = frappe.get_doc(doc.voucher_type, doc.voucher_no)
     item = frappe.get_doc("Item", doc.item_code)
-    route_key = "StockIOLineReq"
+
+    # Drop All Inventory Operations and only use Inventory Adjustment
+
+    # route_key = "StockIOLineReq"
     requset_data = {
         "document_name": document_name,
         "branch": frappe.get_value("Branch", record.branch, "slade_id"),
@@ -258,14 +270,14 @@ def stock_mvt_submission_on_success(
         "quantity_confirmed": abs(doc.actual_qty),
         "new_price": (round(int(doc.valuation_rate), 2) if doc.valuation_rate else 0),
     }
-    if doc.voucher_type == "Stock Reconciliation":
-        route_key = "StockMasterLineReq"
-        requset_data["quantity"] = doc.qty_after_transaction
+    # if doc.voucher_type == "Stock Reconciliation":
+    route_key = "StockMasterLineReq"
+    requset_data["quantity"] = doc.qty_after_transaction
 
-    if route_key == "StockIOLineReq":
-        requset_data["inventory_operation"] = id
-    else:
-        requset_data["inventory_adjustment"] = id
+    # if route_key == "StockIOLineReq":
+    #     requset_data["inventory_operation"] = id
+    # else:
+    requset_data["inventory_adjustment"] = id
     frappe.enqueue(
         process_request,
         queue="default",
@@ -291,10 +303,13 @@ def stock_mvt_submit_items_on_success(
         {"custom_inventory_submitted_successfully": 1},
     )
     doc = frappe.get_doc("Stock Ledger Entry", document_name)
-    if doc.voucher_type == "Stock Reconciliation":
-        route_key = "StockAdjustmentTransitionReq"
-    else:
-        route_key = "StockOperationTransitionReq"
+
+    # Drop All Inventory Operations and only use Inventory Adjustment
+
+    # if doc.voucher_type == "Stock Reconciliation":
+    route_key = "StockAdjustmentTransitionReq"
+    # else:
+    #     route_key = "StockOperationTransitionReq"
     requset_data = {
         "document_name": document_name,
         "id": doc.custom_slade_id,
