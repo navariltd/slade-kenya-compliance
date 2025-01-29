@@ -310,6 +310,7 @@ def process_invoice_items(
             "amount": item.get("amount"),
             "sales_invoice": invoice_slade_id,
             "document_name": item.get("name"),
+            "allow_discount": False,
         }
         process_request(
             payload,
