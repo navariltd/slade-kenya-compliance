@@ -419,7 +419,7 @@ def build_invoice_payload(
             "organisation": frappe.get_value(
                 "Company", invoice.company, "custom_slade_id"
             ),
-            "sales_type": "cash",
+            "sales_type": "credit",
         }
 
         return payload
@@ -842,3 +842,30 @@ def process_dynamic_url(route_path: str, request_data: dict | str) -> str:
             )
 
     return route_path
+
+
+def generate_custom_item_code_etims(doc: Document) -> str:
+    """Generate custom item code ETIMS based on the document fields"""
+    new_prefix = f"{doc.custom_etims_country_of_origin_code}{doc.custom_product_type}{doc.custom_packaging_unit_code}{doc.custom_unit_of_quantity_code}"
+
+    if doc.custom_item_code_etims:
+        existing_suffix = doc.custom_item_code_etims[-7:]
+    else:
+        last_code = frappe.db.sql(
+            """
+            SELECT custom_item_code_etims
+            FROM `tabItem`
+            WHERE custom_item_classification = %s
+            ORDER BY CAST(SUBSTRING(custom_item_code_etims, -7) AS UNSIGNED) DESC
+            LIMIT 1
+            """,
+            (doc.custom_item_classification,),
+        )
+        last_code = last_code[0][0] if last_code else None
+        if last_code:
+            last_suffix = int(last_code[-7:])
+            existing_suffix = str(last_suffix + 1).zfill(7)
+        else:
+            existing_suffix = "0000001"
+
+    return f"{new_prefix}{existing_suffix}"

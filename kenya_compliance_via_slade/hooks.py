@@ -125,6 +125,7 @@ doctype_list_js = {
     "UOM": "kenya_compliance_via_slade/overrides/client/uom_list.js",
     "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse_list.js",
     "Mode of Payment": "kenya_compliance_via_slade/overrides/client/mode_of_payment_list.js",
+    "Supplier": "kenya_compliance_via_slade/overrides/client/supplier_list.js",
     # "Price List": "kenya_compliance_via_slade/overrides/client/price_list_list.js",
     # "Item Price": "kenya_compliance_via_slade/overrides/client/item_price_list.js",
 }
@@ -260,11 +261,8 @@ doc_events = {
         "validate": [
             "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.validate"
         ],
-        "after_insert": [
-            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.after_insert"
-        ],
         "on_update": [
-            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.after_insert"
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.on_update"
         ],
         "on_trash": "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.item.prevent_item_deletion",
     },
@@ -272,6 +270,16 @@ doc_events = {
         "on_submit": [
             "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.bom.on_submit"
         ]
+    },
+    "Supplier": {
+        "on_update": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.supplier.on_update"
+        ],
+    },
+    "Customer": {
+        "on_update": [
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.overrides.server.customer.on_update"
+        ],
     },
 }
 

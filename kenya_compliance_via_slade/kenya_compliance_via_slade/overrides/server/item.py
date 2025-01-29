@@ -5,9 +5,10 @@ from frappe.model.document import Document
 
 from ...apis.apis import perform_item_registration
 from ...doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
+from ...utils import generate_custom_item_code_etims
 
 
-def after_insert(doc: Document, method: str) -> None:
+def on_update(doc: Document, method: str) -> None:
     """Item doctype before insertion hook"""
 
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
@@ -45,34 +46,8 @@ def validate(doc: Document, method: str) -> None:
     if any(not field for field in required_fields):
         return
 
-    new_prefix = f"{doc.custom_etims_country_of_origin_code}{doc.custom_product_type}{doc.custom_packaging_unit_code}{doc.custom_unit_of_quantity_code}"
-
-    # Check if custom_item_code_etims exists and extract its suffix if so
-    if doc.custom_item_code_etims:
-        # Extract the last 7 digits as the suffix
-        existing_suffix = doc.custom_item_code_etims[-7:]
-    else:
-        # If there is no existing code, generate a new suffix
-        last_code = frappe.db.sql(
-            """
-            SELECT custom_item_code_etims
-            FROM `tabItem`
-            WHERE custom_item_classification = %s
-            ORDER BY CAST(SUBSTRING(custom_item_code_etims, -7) AS UNSIGNED) DESC
-            LIMIT 1
-            """,
-            (doc.custom_item_classification,),
-        )
-        last_code = last_code[0][0] if last_code else None
-        if last_code:
-            last_suffix = int(last_code[-7:])
-            existing_suffix = str(last_suffix + 1).zfill(7)
-        else:
-            # Start from '0000001' if no matching classification item exists
-            existing_suffix = "0000001"
-
-    # Combine the new prefix with the existing or new suffix
-    doc.custom_item_code_etims = f"{new_prefix}{existing_suffix}"
+    if not doc.custom_item_code_etims:
+        doc.custom_item_code_etims = generate_custom_item_code_etims(doc)
 
 
 @frappe.whitelist()

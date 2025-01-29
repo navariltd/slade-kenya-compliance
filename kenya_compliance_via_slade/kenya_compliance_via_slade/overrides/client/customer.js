@@ -60,16 +60,7 @@ frappe.ui.form.on(doctype, {
                 method:
                   "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_branch_customer_details",
                 args: {
-                  request_data: {
-                    document_name: frm.doc.name,
-                    customer_tax_pin: frm.doc.tax_id,
-                    partner_name: frm.doc.customer_name,
-                    phone_number: frm.doc.mobile_no,
-                    currency: currency,
-                    is_customer: true,
-                    country: "KEN",
-                    customer_type: "INDIVIDUAL",
-                  },
+                  name: frm.doc.name,
                 },
                 callback: (response) => {},
                 error: (r) => {
