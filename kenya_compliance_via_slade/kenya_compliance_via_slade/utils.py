@@ -385,11 +385,8 @@ def build_invoice_payload(
     if settings:
         payment_type = None
         if invoice.payments:
-            payment_type = invoice.payments[0].payment_type
+            payment_type = invoice.payments[0].mode_of_payment
 
-        custom_transaction_progres = invoice.custom_transaction_progres or settings.get(
-            "sales_transaction_progress"
-        )
         custom_payment_type = (
             invoice.custom_payment_type
             or payment_type

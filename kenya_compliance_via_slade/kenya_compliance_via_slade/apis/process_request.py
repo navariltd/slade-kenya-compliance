@@ -104,16 +104,16 @@ def extract_metadata(data: dict) -> tuple:
         document_name = first_entry.get("document_name", None)
     else:
         company_name = (
-            data.get("company_name", None)
+            data.pop("company_name", None)
             or frappe.defaults.get_user_default("Company")
             or frappe.get_value("Company", {}, "name")
         )
         branch_id = (
-            data.get("branch_id", None)
+            data.pop("branch_id", None)
             or frappe.defaults.get_user_default("Branch")
             or frappe.get_value("Branch", "name")
         )
-        document_name = data.get("document_name", None)
+        document_name = data.pop("document_name", None)
     return company_name, branch_id, document_name
 
 
@@ -136,6 +136,10 @@ def execute_request(
     document_name: str,
 ) -> str:
     url = f"{server_url}{route_path}"
+
+    # Clean data for GET request
+    if request_method == "GET":
+        clean_data_for_get_request(data)
 
     while url:
         endpoints_builder.headers = headers
