@@ -7,7 +7,7 @@ from ...apis.apis import perform_item_registration
 from ...doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
 
 
-def after_insert(doc: Document, method: str) -> None:
+def on_update(doc: Document, method: str) -> None:
     """Item doctype before insertion hook"""
 
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):

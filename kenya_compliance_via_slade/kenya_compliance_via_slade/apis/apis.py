@@ -204,26 +204,76 @@ def fetch_item_details(request_data: str) -> None:
 
 
 @frappe.whitelist()
-def send_branch_customer_details(request_data: str) -> None:
-    data = json.loads(request_data)
+def submit_all_suppliers() -> None:
+    suppliers: list[Document] = frappe.get_all(
+        "Supplier",
+        {
+            "custom_details_submitted_successfully": 0,
+        },
+        ["name"],
+    )
+    for supplier in suppliers:
+        send_branch_customer_details(supplier.name, False)
+
+
+@frappe.whitelist()
+def submit_all_customers() -> None:
+    customers: list[Document] = frappe.get_all(
+        "Customer",
+        {
+            "custom_details_submitted_successfully": 0,
+        },
+        ["name"],
+    )
+    for customer in customers:
+        send_branch_customer_details(customer.name)
+
+
+@frappe.whitelist()
+def send_branch_customer_details(name: str, is_customer: bool = True) -> None:
+    doctype = "Customer" if is_customer else "Supplier"
+    data = frappe.get_doc(doctype, name)
+
+    payload = {
+        "document_name": name,
+        "currency": data.get("default_currency") or "KES",
+        "country": "KEN",
+    }
+
+    if is_customer:
+        payload.update(
+            {
+                "is_customer": True,
+                "customer_tax_pin": data.get("customer_tax_pin"),
+                "partner_name": data.get("customer_name"),
+                "phone_number": data.get("mobile_no"),
+                "customer_type": "INDIVIDUAL",
+            }
+        )
+    else:
+        payload.update(
+            {
+                "customer_tax_pin": data.get("tax_id"),
+                "partner_name": data.get("supplier_name"),
+                "is_supplier": True,
+                "supplier_type": "INDIVIDUAL",
+            }
+        )
+
     phone_number = (data.get("phone_number") or "").replace(" ", "").strip()
-    data["phone_number"] = (
+    payload["phone_number"] = (
         "+254" + phone_number[-9:] if len(phone_number) >= 9 else None
     )
 
-    currency_name = data.get("currency")
-    if "doctype" in data:
-        doctype = data.pop("doctype")
-    else:
-        doctype = "Customer"
+    currency_name = payload.get("currency")
 
     if currency_name:
-        data["currency"] = frappe.get_value(
+        payload["currency"] = frappe.get_value(
             "Currency", currency_name, "custom_slade_id"
         )
 
-    return process_request(
-        json.dumps(data),
+    process_request(
+        json.dumps(payload),
         "BhfCustSaveReq",
         customer_branch_details_submission_on_success,
         request_method="POST",
