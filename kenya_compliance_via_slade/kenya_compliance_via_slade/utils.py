@@ -381,47 +381,52 @@ def build_invoice_payload(
     invoice_name = invoice.name
     if invoice.amended_from:
         invoice_name = clean_invc_no(invoice_name)
-
     settings = get_settings(company_name, invoice.branch)
     if settings:
         payment_type = None
         if invoice.payments:
             payment_type = invoice.payments[0].payment_type
 
-        if not invoice.custom_transaction_progres:
-            invoice.custom_transaction_progres = settings.get(
-                "sales_transaction_progress"
-            )
-        if not invoice.custom_payment_type:
-            invoice.custom_payment_type = payment_type or settings.get(
-                "purchases_payment_type"
-            )
+        custom_transaction_progres = invoice.custom_transaction_progres or settings.get(
+            "sales_transaction_progress"
+        )
+        custom_payment_type = (
+            invoice.custom_payment_type
+            or payment_type
+            or settings.get("purchases_payment_type")
+        )
+        department = invoice.department or settings.get("department")
+        branch = invoice.branch or settings.get("bhfid")
 
-        invoice.flags.ignore_permissions = True
+        payload = {
+            "document_name": invoice.name,
+            "document_number": invoice.name,
+            "branch_id": invoice.branch,
+            "company_name": company_name,
+            "description": invoice.remarks or "New",
+            "payment_method": frappe.get_value(
+                "Mode of Payment", custom_payment_type, "custom_slade_id"
+            ),
+            "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
+            "invoice_date": str(invoice.posting_date),
+            "currency": frappe.get_value(
+                "Currency", invoice.currency, "custom_slade_id"
+            ),
+            "source_organisation_unit": frappe.get_value(
+                "Department", department, "custom_slade_id"
+            ),
+            "branch": frappe.get_value("Branch", branch, "slade_id"),
+            "organisation": frappe.get_value(
+                "Company", invoice.company, "custom_slade_id"
+            ),
+            "sales_type": "cash",
+        }
 
-        invoice.save()
-
-    payload = {
-        "document_name": invoice.name,
-        "document_number": invoice.name,
-        "branch_id": invoice.branch,
-        "company_name": company_name,
-        "description": invoice.remarks or "New",
-        "payment_method": frappe.get_value(
-            "Mode of Payment", invoice.custom_payment_type, "custom_slade_id"
-        ),
-        "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
-        "invoice_date": str(invoice.posting_date),
-        "currency": frappe.get_value("Currency", invoice.currency, "custom_slade_id"),
-        "source_organisation_unit": frappe.get_value(
-            "Department", invoice.department, "custom_slade_id"
-        ),
-        "branch": frappe.get_value("Branch", invoice.branch, "slade_id"),
-        "organisation": frappe.get_value("Company", invoice.company, "custom_slade_id"),
-        "sales_type": "cash",
-    }
-
-    return payload
+        return payload
+    else:
+        frappe.throw(
+            f"Failed to fetch settings for company {company_name} and branch {invoice.branch}"
+        )
 
 
 def get_invoice_items_list(invoice: Document) -> list[dict[str, str | int | None]]:
