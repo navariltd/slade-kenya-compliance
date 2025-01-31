@@ -11,7 +11,7 @@ from ...apis.remote_response_status_handlers import (
     purchase_invoice_submission_on_success,
 )
 from ...doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
-from ...utils import get_settings, get_taxation_types
+from ...utils import get_taxation_types
 
 endpoints_builder = EndpointsBuilder()
 
@@ -59,22 +59,6 @@ def submit_purchase_invoice(doc: Document) -> None:
             or frappe.defaults.get_user_default("Company")
             or frappe.get_value("Company", {}, "name")
         )
-        settings = get_settings(company_name, doc.branch)
-
-        if settings:
-            if not doc.custom_purchase_type:
-                doc.custom_purchase_type = settings.get("purchases_purchase_type")
-            if not doc.custom_receipt_type:
-                doc.custom_receipt_type = settings.get("purchases_receipt_type")
-            if not doc.custom_purchase_status:
-                doc.custom_purchase_status = settings.get("purchases_purchase_status")
-            if not doc.custom_payment_type:
-                doc.custom_payment_type = settings.get("purchases_payment_type")
-
-            doc.flags.ignore_permissions = True
-
-            doc.save()
-
         payload = build_purchase_invoice_payload(doc, company_name)
         process_request(
             payload,

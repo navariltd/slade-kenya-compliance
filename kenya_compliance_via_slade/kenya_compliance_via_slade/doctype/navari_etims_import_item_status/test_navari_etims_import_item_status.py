@@ -16,7 +16,7 @@ class TestNavarieTimsImportItemStatus(FrappeTestCase):
         doc.code_name = "Test Status"
         doc.code_description = "Testing Import Status"
 
-        doc.save()
+        doc.save(ignore_permissions=True)
 
         fetched_doc = frappe.get_doc(
             IMPORTED_ITEMS_STATUS_DOCTYPE_NAME, doc.name, for_update=False

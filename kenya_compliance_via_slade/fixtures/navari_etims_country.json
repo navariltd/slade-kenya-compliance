@@ -110,17 +110,6 @@
   "sort_order": "0"
  },
  {
-  "code": "AR",
-  "code_description": "",
-  "code_name": "Argentina",
-  "currency_code": "ARS",
-  "docstatus": 0,
-  "doctype": "Navari eTims Country",
-  "modified": "2025-01-23 13:24:49.494908",
-  "name": "ARGENTINA",
-  "sort_order": "0"
- },
- {
   "code": "AS",
   "code_description": "",
   "code_name": "American Samoa",
@@ -2805,17 +2794,6 @@
   "sort_order": "0"
  },
  {
-  "code": "WS",
-  "code_description": "",
-  "code_name": "Samoa",
-  "currency_code": "WST",
-  "docstatus": 0,
-  "doctype": "Navari eTims Country",
-  "modified": "2025-01-23 13:24:50.685556",
-  "name": "Samoa",
-  "sort_order": "0"
- },
- {
   "code": "AX",
   "code_description": "",
   "code_name": "Aland Islands",
@@ -2824,17 +2802,6 @@
   "doctype": "Navari eTims Country",
   "modified": "2025-01-23 13:24:49.522229",
   "name": "ALAND ISLANDS",
-  "sort_order": "0"
- },
- {
-  "code": "LB",
-  "code_description": "",
-  "code_name": "Lebanon",
-  "currency_code": "LBP",
-  "docstatus": 0,
-  "doctype": "Navari eTims Country",
-  "modified": "2025-01-23 13:24:50.107555",
-  "name": "LEBANON",
   "sort_order": "0"
  },
  {
@@ -2860,6 +2827,17 @@
   "sort_order": "0"
  },
  {
+  "code": "AR",
+  "code_description": "",
+  "code_name": "Argentina",
+  "currency_code": "ARS",
+  "docstatus": 0,
+  "doctype": "Navari eTims Country",
+  "modified": "2025-01-23 13:24:49.494908",
+  "name": "ARGENTINA",
+  "sort_order": "0"
+ },
+ {
   "code": "YT",
   "code_description": "",
   "code_name": "Mayotte",
@@ -2868,6 +2846,28 @@
   "doctype": "Navari eTims Country",
   "modified": "2025-01-23 13:24:50.695392",
   "name": "Mayotte",
+  "sort_order": "0"
+ },
+ {
+  "code": "WS",
+  "code_description": "",
+  "code_name": "Samoa",
+  "currency_code": "WST",
+  "docstatus": 0,
+  "doctype": "Navari eTims Country",
+  "modified": "2025-01-23 13:24:50.685556",
+  "name": "Samoa",
+  "sort_order": "0"
+ },
+ {
+  "code": "LB",
+  "code_description": "",
+  "code_name": "Lebanon",
+  "currency_code": "LBP",
+  "docstatus": 0,
+  "doctype": "Navari eTims Country",
+  "modified": "2025-01-23 13:24:50.107555",
+  "name": "LEBANON",
   "sort_order": "0"
  }
 ]

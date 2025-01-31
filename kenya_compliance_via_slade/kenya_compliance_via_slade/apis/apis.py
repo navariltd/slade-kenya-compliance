@@ -171,8 +171,8 @@ def perform_item_registration(item_name: str) -> dict | None:
             "slade_id",
         ),
         "sale_taxes": [tax],
-        "selling_price": round(item.get("valuation_rate", 0), 2),
-        "purchasing_price": round(item.get("last_purchase_rate", 0), 2),
+        "selling_price": round(item.get("valuation_rate", 1), 2),
+        "purchasing_price": round(item.get("last_purchase_rate", 1), 2),
         "categories": [],
         "purchase_taxes": [],
     }
@@ -346,7 +346,7 @@ def create_branch_user() -> None:
                 ["name"],
             )  # Created users are assigned to Branch 00
 
-            doc.save()
+            doc.save(ignore_permissions=True)
 
     frappe.msgprint("Inspect the Branches to make sure they are mapped correctly")
 
@@ -754,7 +754,7 @@ def create_stock_entry_from_stock_movement(request_data: str) -> None:
             },
         )
 
-    stock_entry.save()
+    stock_entry.save(ignore_permissions=True)
 
     frappe.msgprint(f"Stock Entry {stock_entry.name} created successfully")
 

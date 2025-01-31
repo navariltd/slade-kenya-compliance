@@ -394,6 +394,15 @@ def build_invoice_payload(
         )
         department = invoice.department or settings.get("department")
         branch = invoice.branch or settings.get("bhfid")
+        customer = frappe.get_value("Customer", invoice.customer, "slade_id")
+        currency = frappe.get_value("Currency", invoice.currency, "custom_slade_id")
+
+        if not currency:
+            frappe.throw("Currency not found.")
+        if not customer:
+            frappe.throw("Customer not found.")
+        if not department:
+            frappe.throw("Department not found.")
 
         payload = {
             "document_name": invoice.name,
@@ -404,11 +413,9 @@ def build_invoice_payload(
             "payment_method": frappe.get_value(
                 "Mode of Payment", custom_payment_type, "custom_slade_id"
             ),
-            "customer": frappe.get_value("Customer", invoice.customer, "slade_id"),
+            "customer": customer,
             "invoice_date": str(invoice.posting_date),
-            "currency": frappe.get_value(
-                "Currency", invoice.currency, "custom_slade_id"
-            ),
+            "currency": currency,
             "source_organisation_unit": frappe.get_value(
                 "Department", department, "custom_slade_id"
             ),
@@ -473,7 +480,7 @@ def update_last_request_date(
         response_datetime, "%Y%m%d%H%M%S"
     )
 
-    doc.save()
+    doc.save(ignore_permissions=True)
     frappe.db.commit()
 
 
@@ -716,7 +723,7 @@ def update_navari_settings_with_token(docname: str) -> str:
     settings_doc.token_expiry = datetime.now() + timedelta(
         seconds=token_details["expires_in"]
     )
-    settings_doc.save()
+    settings_doc.save(ignore_permissions=True)
 
     from .apis.process_request import process_request
 
@@ -773,7 +780,7 @@ def user_details_fetch_on_success(response: dict, document_name: str, **kwargs) 
     if department_link:
         settings_doc.department = department_link
 
-    settings_doc.save()
+    settings_doc.save(ignore_permissions=True)
 
 
 def get_link_value(

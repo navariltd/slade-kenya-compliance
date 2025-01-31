@@ -424,7 +424,7 @@ def update_invoice_info(response: dict, **kwargs) -> None:
                 "attached_to_name": custom_slade_id,
             }
         )
-        file_doc.save()
+        file_doc.save(ignore_permissions=True)
         updates["custom_qr_code"] = file_doc.file_url
 
     document_name = frappe.db.get_value(
@@ -677,11 +677,11 @@ def create_and_link_purchase_item(response: dict, document_name: str, **kwargs) 
         registered_item.taxable_amount = item["taxable_amount"]
         registered_item.tax_amount = item["tax_amount"]
         registered_item.total_amount = item["total_amount"]
-        registered_item.save()
+        registered_item.save(ignore_permissions=True)
 
         parent_record.append("items", registered_item)
 
-    parent_record.save()
+    parent_record.save(ignore_permissions=True)
 
 
 def notices_search_on_success(response: dict | list, **kwargs) -> None:
@@ -718,7 +718,7 @@ def create_notice_if_new(notice: dict) -> None:
             "contents": notice.get("content"),
         }
     )
-    doc.save()
+    doc.save(ignore_permissions=True)
 
     try:
         doc.submit()
@@ -832,7 +832,7 @@ def imported_items_search_on_success(response: dict, **kwargs) -> None:
                     item_doc.imported_item_status_code
                 )
                 product.flags.ignore_mandatory = True
-                product.save()
+                product.save(ignore_permissions=True)
 
             counter += 1
             if counter % batch_size == 0:
@@ -906,7 +906,7 @@ def search_branch_request_on_success(response: dict, **kwargs) -> None:
             doc.custom_is_head_office = "Y" if branch["is_headquater"] else "N"
             doc.custom_is_etims_branch = 1 if branch["is_etims_verified"] else 0
 
-            doc.save()
+            doc.save(ignore_permissions=True)
 
 
 def item_search_on_success(response: dict, **kwargs) -> None:
