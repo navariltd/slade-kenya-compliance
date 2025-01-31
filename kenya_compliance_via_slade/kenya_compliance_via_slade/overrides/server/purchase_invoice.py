@@ -73,7 +73,7 @@ def submit_purchase_invoice(doc: Document) -> None:
 
             doc.flags.ignore_permissions = True
 
-            doc.save()
+            doc.save(ignore_permissions=True)
 
         payload = build_purchase_invoice_payload(doc, company_name)
         process_request(

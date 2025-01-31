@@ -18,7 +18,7 @@ class TestNavarieTimsCountry(FrappeTestCase):
         doc.code_name = country_name
         doc.code_description = country_name
 
-        doc.save()
+        doc.save(ignore_permissions=True)
 
         fetched_doc = frappe.get_doc(COUNTRIES_DOCTYPE_NAME, doc.name, for_update=False)
 
@@ -37,7 +37,7 @@ class TestNavarieTimsCountry(FrappeTestCase):
             doc.code_name = country_name
             doc.code_description = country_name
 
-            doc.save()
+            doc.save(ignore_permissions=True)
 
             doc = frappe.new_doc(COUNTRIES_DOCTYPE_NAME)
 
@@ -46,4 +46,4 @@ class TestNavarieTimsCountry(FrappeTestCase):
             doc.code_name = country_name
             doc.code_description = country_name
 
-            doc.save()
+            doc.save(ignore_permissions=True)

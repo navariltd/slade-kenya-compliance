@@ -16,8 +16,8 @@ class TestNavariKRAeTimsTaxationType(FrappeTestCase):
         with self.assertRaises(frappe.DuplicateEntryError):
             doc = frappe.new_doc(TAXATION_TYPE_DOCTYPE_NAME)
             doc.cd = "Z"
-            doc.save()
+            doc.save(ignore_permissions=True)
 
             doc = frappe.new_doc(TAXATION_TYPE_DOCTYPE_NAME)
             doc.cd = "Z"
-            doc.save()
+            doc.save(ignore_permissions=True)

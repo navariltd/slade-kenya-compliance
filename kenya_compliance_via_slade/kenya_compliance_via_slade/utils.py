@@ -473,7 +473,7 @@ def update_last_request_date(
         response_datetime, "%Y%m%d%H%M%S"
     )
 
-    doc.save()
+    doc.save(ignore_permissions=True)
     frappe.db.commit()
 
 
@@ -716,7 +716,7 @@ def update_navari_settings_with_token(docname: str) -> str:
     settings_doc.token_expiry = datetime.now() + timedelta(
         seconds=token_details["expires_in"]
     )
-    settings_doc.save()
+    settings_doc.save(ignore_permissions=True)
 
     from .apis.process_request import process_request
 
@@ -773,7 +773,7 @@ def user_details_fetch_on_success(response: dict, document_name: str, **kwargs) 
     if department_link:
         settings_doc.department = department_link
 
-    settings_doc.save()
+    settings_doc.save(ignore_permissions=True)
 
 
 def get_link_value(

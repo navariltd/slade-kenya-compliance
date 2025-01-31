@@ -88,7 +88,7 @@ def update_documents(
                 setattr(doc, field, record.get(value, ""))
 
         try:
-            doc.save()
+            doc.save(ignore_permissions=True)
         except Exception:
             continue
 
@@ -191,7 +191,7 @@ def update_taxation_type(response: dict, **kwargs) -> None:
             doc.useyn = 1 if taxation_type["active"] else 0
             doc.srtord = taxation_type["percentage"]
 
-            doc.save()
+            doc.save(ignore_permissions=True)
 
     frappe.db.commit()
 
@@ -215,7 +215,7 @@ def update_countries(response: list, **kwargs) -> None:
         doc.sort_order = details.get("sort_order", 0)
         doc.code_description = details.get("description", "")
 
-        doc.save()
+        doc.save(ignore_permissions=True)
 
     frappe.db.commit()
 
@@ -258,7 +258,7 @@ def update_organisations(response: dict, **kwargs) -> None:
         doc.tax_id = record.get("tax_payer_pin", "")
     doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
 
-    doc.save()
+    doc.save(ignore_permissions=True)
 
     frappe.db.commit()
 
@@ -294,7 +294,7 @@ def update_branches(response: dict, **kwargs) -> None:
         doc.custom_pin = doc_list[0].get("organisation_tax_pin")
         doc.is_etims_branch = 1
         doc.flags.ignore_permissions = True
-        doc.save()
+        doc.save(ignore_permissions=True)
     else:
         field_mapping = {
             "slade_id": "id",
@@ -367,7 +367,7 @@ def update_departments(response: dict, **kwargs) -> None:
     doc.is_etims_verified = 1 if record.get("is_etims_verified") else 0
     doc.custom_is_etims_department = 1
 
-    doc.save()
+    doc.save(ignore_permissions=True)
 
     frappe.db.commit()
 
@@ -482,7 +482,7 @@ def handle_warehouse_search_on_success(
             doc.is_group = 1
 
         try:
-            doc.save()
+            doc.save(ignore_permissions=True)
         except frappe.DuplicateEntryError:
             continue
 
@@ -537,7 +537,7 @@ def pricelist_search_on_success(response: dict, **kwargs) -> None:
         doc.buying = 1 if record.get("pricelist_type") == "sales" else 0
         doc.selling = 1 if record.get("pricelist_type") == "purchases" else 0
 
-        doc.save()
+        doc.save(ignore_permissions=True)
 
     frappe.db.commit()
 

@@ -346,7 +346,7 @@ def create_branch_user() -> None:
                 ["name"],
             )  # Created users are assigned to Branch 00
 
-            doc.save()
+            doc.save(ignore_permissions=True)
 
     frappe.msgprint("Inspect the Branches to make sure they are mapped correctly")
 
@@ -754,7 +754,7 @@ def create_stock_entry_from_stock_movement(request_data: str) -> None:
             },
         )
 
-    stock_entry.save()
+    stock_entry.save(ignore_permissions=True)
 
     frappe.msgprint(f"Stock Entry {stock_entry.name} created successfully")
 

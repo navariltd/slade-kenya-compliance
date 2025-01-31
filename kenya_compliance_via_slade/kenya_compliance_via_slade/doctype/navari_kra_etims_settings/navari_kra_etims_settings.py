@@ -51,7 +51,7 @@ class NavariKRAeTimsSettings(Document):
             if frequency == "Cron" and cron_format:
                 task.cron_format = cron_format
 
-            task.save()
+            task.save(ignore_permissions=True)
 
         if self.sales_information_submission:
             get_or_create_scheduled_job(
