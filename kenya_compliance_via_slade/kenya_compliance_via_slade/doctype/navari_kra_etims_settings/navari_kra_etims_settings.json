@@ -21,23 +21,25 @@
   "bhfid",
   "department",
   "workstation",
-  "dvcsrlno",
   "request_frequency_tab",
   "frequency_of_communication_with_etims_servers_section",
   "sales_information_submission",
   "sales_info_cron_format",
-  "sales_information_submission_timeframe",
   "column_break_ukgx",
   "stock_information_submission",
   "stock_info_cron_format",
-  "stock_information_submission_timeframe",
   "column_break_ifui",
   "purchase_information_submission",
   "purchase_info_cron_format",
-  "purchase_information_submission_timeframe",
   "column_break_fsjl",
   "notices_refresh_frequency",
   "notices_refresh_freq_cron_format",
+  "submission_timeframe_section",
+  "sales_information_submission_timeframe",
+  "column_break_xtvd",
+  "purchase_information_submission_timeframe",
+  "column_break_wyiz",
+  "stock_information_submission_timeframe",
   "field_defaults_tab",
   "sales_details_defaults_section",
   "sales_payment_type",
@@ -55,8 +57,6 @@
   "column_break_ekvx",
   "auth_username",
   "auth_password",
-  "column_break_cgts",
-  "etims_user",
   "section_break_eqay",
   "access_token",
   "column_break_clyl",
@@ -93,15 +93,7 @@
    "fieldname": "tin",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Tax Payer's PIN",
-   "reqd": 1
-  },
-  {
-   "fieldname": "dvcsrlno",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Device Serial Number",
-   "no_copy": 1
+   "label": "Tax Payer's PIN"
   },
   {
    "description": "00 is Head-Office/Headquarters, 01 to 99 is Branch Office",
@@ -336,10 +328,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "column_break_cgts",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "access_token",
    "fieldtype": "Data",
    "label": "Access Token",
@@ -373,12 +361,6 @@
   {
    "fieldname": "column_break_uosd",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "etims_user",
-   "fieldtype": "Link",
-   "label": "eTims User",
-   "options": "Navari eTims User"
   },
   {
    "fetch_from": "etims_user.workstation",
@@ -420,6 +402,20 @@
    "fieldname": "purchase_information_submission_timeframe",
    "fieldtype": "Duration",
    "label": "Purchase Information Submission Timeframe"
+  },
+  {
+   "description": "Defines the allowed period for entries to be sent to eTIMS, such as invoices and purchases, from the current time. For example, if set to 4 days, entries can only be sent within the last 4 days.",
+   "fieldname": "submission_timeframe_section",
+   "fieldtype": "Section Break",
+   "label": "Submission Timeframe"
+  },
+  {
+   "fieldname": "column_break_xtvd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_wyiz",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -430,7 +426,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-01-28 15:38:23.811843",
+ "modified": "2025-01-31 14:18:12.504438",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",
