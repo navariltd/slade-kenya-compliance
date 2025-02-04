@@ -771,8 +771,11 @@ def initialize_device(request_data: str) -> None:
 
 
 @frappe.whitelist()
-def get_invoice_details(request_data: dict, invoice_type: str) -> None:
-    invoice = frappe.get_doc(invoice_type, request_data.get("document_name"))
+def get_invoice_details(request_data: str, invoice_type: str) -> None:
+    from ..utils import parse_request_data
+
+    data = parse_request_data(request_data)
+    invoice = frappe.get_doc(invoice_type, data.get("document_name"))
     route_key = "TrnsSalesSearchReq"
     if invoice.is_return:
         route_key = "SalesCreditNoteSaveReq"

@@ -1,5 +1,6 @@
 """Utility functions"""
 
+import json
 import re
 from base64 import b64encode
 from datetime import datetime, timedelta
@@ -110,27 +111,6 @@ def is_valid_url(url: str) -> bool:
     return bool(re.match(pattern, url))
 
 
-# def get_route_path(
-#     search_field: str,
-#     vendor: str,
-#     routes_table_doctype: str = ROUTES_TABLE_CHILD_DOCTYPE_NAME,
-# ) -> tuple[str, str] | None:
-
-#     query = f"""
-#     SELECT
-#         url_path,
-#         last_request_date
-#     FROM `tab{routes_table_doctype}`
-#     WHERE url_path_function LIKE '{search_field}'
-#     AND parent LIKE '{ROUTES_TABLE_DOCTYPE_NAME}'
-#     LIMIT 1
-#     """
-
-#     results = frappe.db.sql(query, as_dict=True)
-
-
-#     if results:
-#         return (results[0].url_path, results[0].last_request_date)
 def get_route_path(
     search_field: str,
     vendor: str = "OSCU KRA",
@@ -894,3 +874,11 @@ def generate_custom_item_code_etims(doc: Document) -> str:
             existing_suffix = "0000001"
 
     return f"{new_prefix}{existing_suffix}"
+
+
+def parse_request_data(request_data: str | dict) -> dict:
+    if isinstance(request_data, str):
+        return json.loads(request_data)
+    elif isinstance(request_data, (dict, list)):
+        return request_data
+    return {}

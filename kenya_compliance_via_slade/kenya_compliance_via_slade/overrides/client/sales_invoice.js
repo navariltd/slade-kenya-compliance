@@ -19,7 +19,7 @@ frappe.ui.form.on(parentDoctype, {
         frm.toggle_reqd("set_warehouse", true);
       }
 
-      if (!frm.doc.custom_successfully_submitted) {
+      if (!frm.doc.custom_slade_id) {
         frm.add_custom_button(
           __("Send Invoice"),
           function () {
@@ -47,6 +47,7 @@ frappe.ui.form.on(parentDoctype, {
               args: {
                 request_data: {
                   id: frm.doc.custom_slade_id,
+                  document_name: frm.doc.name,
                 },
                 invoice_type: "Sales Invoice",
               },
