@@ -956,12 +956,6 @@ def submit_warehouse(name: str) -> dict | None:
             item.get("company"),
             "custom_slade_id",
         ),
-        "branch": get_link_value(
-            "Branch",
-            "name",
-            item.get("custom_branch"),
-            "slade_id",
-        ),
         "active": False if item.get("disabled") == 1 else True,
     }
     if slade_id:
