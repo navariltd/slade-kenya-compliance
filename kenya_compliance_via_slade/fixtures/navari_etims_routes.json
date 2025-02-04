@@ -2,7 +2,7 @@
  {
   "docstatus": 0,
   "doctype": "Navari eTims Routes",
-  "modified": "2025-02-04 10:34:45.915896",
+  "modified": "2025-02-04 11:59:27.919641",
   "name": "VSCU Slade 360",
   "routes_table": [
    {
@@ -542,7 +542,7 @@
     "parent": "VSCU Slade 360",
     "parentfield": "routes_table",
     "parenttype": "Navari eTims Routes",
-    "url_path": "/api/sales/salescreditnotes/{invoice_id}/transition/DRAFT_SUBMIT/",
+    "url_path": "/api/sales/salescreditnotes/{invoice_id}/transition/DRAFT_SUBMIT_APPROVE/",
     "url_path_function": "SalesCreditNoteTransitionReq"
    },
    {
