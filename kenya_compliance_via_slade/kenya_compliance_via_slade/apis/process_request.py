@@ -1,4 +1,3 @@
-import json
 from typing import Callable
 
 import frappe
@@ -11,6 +10,7 @@ from ..utils import (
     get_route_path,
     get_server_url,
     get_settings,
+    parse_request_data,
     process_dynamic_url,
 )
 from .api_builder import EndpointsBuilder
@@ -78,14 +78,6 @@ def add_organisation_branch_department(settings: dict) -> dict:
         )
 
     return result
-
-
-def parse_request_data(request_data: str | dict) -> dict:
-    if isinstance(request_data, str):
-        return json.loads(request_data)
-    elif isinstance(request_data, (dict, list)):
-        return request_data
-    return {}
 
 
 def extract_metadata(data: dict) -> tuple:

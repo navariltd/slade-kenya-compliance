@@ -42,14 +42,24 @@ def generic_invoices_on_submit_override(
         or frappe.get_value("Company", {}, "name")
     )
 
-    invoice_identifier = "C" if doc.is_return else "S"
-    payload = build_invoice_payload(doc, invoice_identifier, company_name)
+    route_key = "TrnsSalesSaveWrReq"
+
+    if doc.is_return:
+        return_invoice = frappe.get_doc("Sales Invoice", doc.return_against)
+        route_key = "SalesCreditNoteSaveReq"
+        if not return_invoice.custom_successfully_submitted:
+            frappe.msgprint(
+                f"Return against invoice {doc.return_against} was not successfully submitted. Cannot process return."
+            )
+            return
+
+    payload = build_invoice_payload(doc, company_name, doc.is_return)
     additional_context = {
         "invoice_type": invoice_type,
     }
     process_request(
         payload,
-        "TrnsSalesSaveWrReq",
+        route_key,
         lambda response, **kwargs: sales_information_submission_on_success(
             response=response,
             **additional_context,

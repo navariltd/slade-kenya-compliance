@@ -1,11 +1,11 @@
 """Utility functions"""
 
+import json
 import re
 from base64 import b64encode
 from datetime import datetime, timedelta
 from decimal import ROUND_DOWN, Decimal
 from io import BytesIO
-from typing import Literal
 from urllib.parse import urlencode
 
 import aiohttp
@@ -111,27 +111,6 @@ def is_valid_url(url: str) -> bool:
     return bool(re.match(pattern, url))
 
 
-# def get_route_path(
-#     search_field: str,
-#     vendor: str,
-#     routes_table_doctype: str = ROUTES_TABLE_CHILD_DOCTYPE_NAME,
-# ) -> tuple[str, str] | None:
-
-#     query = f"""
-#     SELECT
-#         url_path,
-#         last_request_date
-#     FROM `tab{routes_table_doctype}`
-#     WHERE url_path_function LIKE '{search_field}'
-#     AND parent LIKE '{ROUTES_TABLE_DOCTYPE_NAME}'
-#     LIMIT 1
-#     """
-
-#     results = frappe.db.sql(query, as_dict=True)
-
-
-#     if results:
-#         return (results[0].url_path, results[0].last_request_date)
 def get_route_path(
     search_field: str,
     vendor: str = "OSCU KRA",
@@ -362,7 +341,7 @@ def extract_document_series_number(document: Document) -> int | None:
 
 
 def build_invoice_payload(
-    invoice: Document, invoice_type_identifier: Literal["S", "C"], company_name: str
+    invoice: Document, company_name: str, is_return: bool = False
 ) -> dict[str, str | int | float]:
     # Retrieve taxation data for the invoice
     get_taxation_types(invoice)
@@ -397,34 +376,53 @@ def build_invoice_payload(
         customer = frappe.get_value("Customer", invoice.customer, "slade_id")
         currency = frappe.get_value("Currency", invoice.currency, "custom_slade_id")
 
-        if not currency:
-            frappe.throw("Currency not found.")
-        if not customer:
-            frappe.throw("Customer not found.")
-        if not department:
-            frappe.throw("Department not found.")
+        if is_return:
+            payload = {
+                "document_name": invoice.name,
+                "company_name": company_name,
+                "reason": "Return",
+                "amount": abs(invoice.base_grand_total),
+                "invoice": frappe.get_value(
+                    "Sales Invoice", invoice.return_against, "custom_slade_id"
+                ),
+                "organisation": frappe.get_value(
+                    "Company", invoice.company, "custom_slade_id"
+                ),
+                "source_organisation_unit": frappe.get_value(
+                    "Department", department, "custom_slade_id"
+                ),
+                "customer": customer,
+            }
+        else:
 
-        payload = {
-            "document_name": invoice.name,
-            "document_number": invoice.name,
-            "branch_id": invoice.branch,
-            "company_name": company_name,
-            "description": invoice.remarks or "New",
-            "payment_method": frappe.get_value(
-                "Mode of Payment", custom_payment_type, "custom_slade_id"
-            ),
-            "customer": customer,
-            "invoice_date": str(invoice.posting_date),
-            "currency": currency,
-            "source_organisation_unit": frappe.get_value(
-                "Department", department, "custom_slade_id"
-            ),
-            "branch": frappe.get_value("Branch", branch, "slade_id"),
-            "organisation": frappe.get_value(
-                "Company", invoice.company, "custom_slade_id"
-            ),
-            "sales_type": "credit",
-        }
+            if not currency:
+                frappe.throw("Currency not found.")
+            if not customer:
+                frappe.throw("Customer not found.")
+            if not department:
+                frappe.throw("Department not found.")
+
+            payload = {
+                "document_name": invoice.name,
+                "document_number": invoice.name,
+                "branch_id": invoice.branch,
+                "company_name": company_name,
+                "description": invoice.remarks or "New",
+                "payment_method": frappe.get_value(
+                    "Mode of Payment", custom_payment_type, "custom_slade_id"
+                ),
+                "customer": customer,
+                "invoice_date": str(invoice.posting_date),
+                "currency": currency,
+                "source_organisation_unit": frappe.get_value(
+                    "Department", department, "custom_slade_id"
+                ),
+                "branch": frappe.get_value("Branch", branch, "slade_id"),
+                "organisation": frappe.get_value(
+                    "Company", invoice.company, "custom_slade_id"
+                ),
+                "sales_type": "credit",
+            }
 
         return payload
     else:
@@ -633,7 +631,10 @@ def get_taxation_types(doc: dict) -> dict:
 
     # Loop through each item in the Sales Invoice
     for item in doc.items:
-        taxation_type = item.custom_taxation_type
+        # Fetch the taxation type using item_code
+        taxation_type = frappe.db.get_value(
+            "Item", item.item_code, "custom_taxation_type"
+        )
         taxable_amount = item.net_amount
         tax_amount = item.custom_tax_amount
 
@@ -873,3 +874,11 @@ def generate_custom_item_code_etims(doc: Document) -> str:
             existing_suffix = "0000001"
 
     return f"{new_prefix}{existing_suffix}"
+
+
+def parse_request_data(request_data: str | dict) -> dict:
+    if isinstance(request_data, str):
+        return json.loads(request_data)
+    elif isinstance(request_data, (dict, list)):
+        return request_data
+    return {}

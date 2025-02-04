@@ -2,7 +2,7 @@
  {
   "docstatus": 0,
   "doctype": "Navari eTims Routes",
-  "modified": "2025-01-28 14:50:39.394029",
+  "modified": "2025-02-04 10:34:45.915896",
   "name": "VSCU Slade 360",
   "routes_table": [
    {
@@ -517,6 +517,42 @@
     "parenttype": "Navari eTims Routes",
     "url_path": "/api/products/bom_components/",
     "url_path_function": "BOMItemReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salescreditnotes/",
+    "url_path_function": "SalesCreditNoteSaveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salescreditnotelines/",
+    "url_path_function": "SalesCreditNoteLineReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salescreditnotes/{invoice_id}/transition/DRAFT_SUBMIT/",
+    "url_path_function": "SalesCreditNoteTransitionReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salescreditnotes/{invoice_id}/send_credit_note/",
+    "url_path_function": "SalesCreditNoteSignReq"
    }
   ],
   "vendor": "VSCU Slade 360"
