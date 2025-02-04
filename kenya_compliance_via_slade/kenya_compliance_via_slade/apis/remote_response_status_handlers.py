@@ -268,7 +268,6 @@ def sales_information_submission_on_success(
         document_name,
         {
             "custom_slade_id": response.get("id"),
-            "custom_successfully_submitted": 1,
         },
     )
     frappe.enqueue(
@@ -300,21 +299,25 @@ def process_invoice_items(
     if not items:
         frappe.throw(f"No items found for {doctype} {document_name}.")
 
+    route_key = "SalesLineSaveReq"
+    if invoice.is_return:
+        route_key = "SalesCreditNoteLineReq"
+
     for item in items:
         payload = {
             "product": get_link_value(
                 "Item", "name", item.get("item_code"), "custom_slade_id"
             ),
-            "quantity": item.get("qty"),
+            "quantity": abs(item.get("qty")),
             "new_price": item.get("rate"),
-            "amount": item.get("amount"),
-            "sales_invoice": invoice_slade_id,
+            "amount": abs(item.get("amount")),
+            "credit_note" if invoice.is_return else "sales_invoice": invoice_slade_id,
             "document_name": item.get("name"),
             "allow_discount": False,
         }
         process_request(
             payload,
-            "SalesLineSaveReq",
+            route_key,
             sales_item_submission_on_success,
             doctype=items_table_doctype,
             request_method="POST",
@@ -328,8 +331,10 @@ def process_sales_transition(
 ) -> None:
     from .process_request import process_request
 
+    invoice = frappe.get_doc(doctype, document_name)
+
     def handle_transition_success(response: dict, document_name: str, **kwargs) -> None:
-        # process_sales_sign(document_name, doctype, invoice_slade_id)
+        frappe.db.set_value(doctype, document_name, {"custom_transition_successful": 1})
         frappe.enqueue(
             "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.remote_response_status_handlers.process_sales_sign",
             document_name=document_name,
@@ -339,10 +344,13 @@ def process_sales_transition(
         )
 
     payload = {"invoice_id": invoice_slade_id, "document_name": document_name}
+    route_key = "SalesTransitionReq"
+    if invoice.is_return:
+        route_key = "SalesCreditNoteTransitionReq"
 
     process_request(
         payload,
-        "SalesTransitionReq",
+        route_key,
         handle_transition_success,
         request_method="PATCH",
         doctype=doctype,
@@ -352,10 +360,14 @@ def process_sales_transition(
 def process_sales_sign(document_name: str, doctype: str, invoice_slade_id: str) -> None:
     from .process_request import process_request
 
+    invoice = frappe.get_doc(doctype, document_name)
+
     def handle_invoice_sign_success(
         response: dict, document_name: str, **kwargs
     ) -> None:
-        # process_sales_sign(document_name, doctype, invoice_slade_id)
+        frappe.db.set_value(
+            doctype, document_name, {"custom_successfully_submitted": 1}
+        )
         frappe.enqueue(
             "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_invoice_details",
             request_data={"id": invoice_slade_id, "document_name": document_name},
@@ -364,10 +376,13 @@ def process_sales_sign(document_name: str, doctype: str, invoice_slade_id: str) 
         )
 
     payload = {"invoice_id": invoice_slade_id, "document_name": document_name}
+    route_key = "SalesSignInvReq"
+    if invoice.is_return:
+        route_key = "SalesCreditNoteSignReq"
 
     process_request(
         payload,
-        "SalesSignInvReq",
+        route_key,
         handle_invoice_sign_success,
         request_method="POST",
         doctype=doctype,
