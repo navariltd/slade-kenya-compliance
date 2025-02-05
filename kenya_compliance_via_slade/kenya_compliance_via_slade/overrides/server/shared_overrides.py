@@ -30,6 +30,8 @@ def generic_invoices_on_submit_override(
 
     for item in doc.items:
         item_doc = frappe.get_doc("Item", item.item_code)
+        item_doc.run_method("validate")
+        item_doc.save()
         if not item_doc.custom_slade_id:
             frappe.msgprint(
                 f"Item {item.item_code} is not registered. Cannot send invoice to eTims."
