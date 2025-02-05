@@ -315,12 +315,16 @@ def process_invoice_items(
             "document_name": item.get("name"),
             "allow_discount": False,
         }
+        request_method = "POST"
+        if item.get("custom_slade_id"):
+            request_method = "PATCH"
+            payload["id"] = item.get("custom_slade_id")
         process_request(
             payload,
             route_key,
             sales_item_submission_on_success,
             doctype=items_table_doctype,
-            request_method="POST",
+            request_method=request_method,
         )
 
     process_sales_transition(document_name, doctype, invoice_slade_id)
@@ -370,7 +374,8 @@ def process_sales_sign(document_name: str, doctype: str, invoice_slade_id: str) 
         )
         frappe.enqueue(
             "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.get_invoice_details",
-            request_data={"id": invoice_slade_id, "document_name": document_name},
+            id=invoice_slade_id,
+            document_name=document_name,
             invoice_type=doctype,
             queue="long",
         )
@@ -391,8 +396,9 @@ def process_sales_sign(document_name: str, doctype: str, invoice_slade_id: str) 
 
 def update_invoice_info(response: dict, **kwargs) -> None:
     doctype = kwargs.get("doctype")
-    custom_slade_id = response.get("id")
-    scu_data = response.get("scu_data")
+    data = response.get("results", [])[0] if response.get("results") else response
+    custom_slade_id = data.get("id")
+    scu_data = data.get("scu_data")
     if not scu_data:
         return
 

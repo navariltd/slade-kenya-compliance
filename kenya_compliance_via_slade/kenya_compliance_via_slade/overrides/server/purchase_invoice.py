@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 import frappe
 from frappe.model.document import Document
 
@@ -20,8 +18,6 @@ def validate(doc: Document, method: str) -> None:
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
         return
     get_itemised_tax_breakup_data(doc)
-    defaultdict(list)
-    defaultdict(list)
     if not doc.taxes:
         vat_acct = frappe.get_value(
             "Account", {"account_type": "Tax", "tax_rate": "16"}, ["name"], as_dict=True

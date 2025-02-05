@@ -578,43 +578,17 @@ def itemprice_search_on_success(response: dict, **kwargs) -> None:
     )
 
 
-def operation_types_search_on_success(response: dict, **kwargs) -> None:
-    field_mapping = {
-        "slade_id": "id",
-        "operation_name": "operation_name",
-        "operation_type": "operation_type",
-        "item_code": {
-            "doctype": "Item",
-            "link_field": "product",
-            "filter_field": "custom_slade_id",
-            "extract_field": "name",
+def operation_types_search_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    frappe.db.set_value(
+        OPERATION_TYPE_DOCTYPE_NAME,
+        document_name,
+        {
+            "slade_id": response.get("id"),
+            "operation_name": response.get("operation_name"),
+            "source_location_id": response.get("source_location"),
+            "destination_location_id": response.get("destination_location"),
+            "operation_type": response.get("operation_type"),
         },
-        "company": {
-            "doctype": "Company",
-            "link_field": "organisation",
-            "filter_field": "custom_slade_id",
-            "extract_field": "name",
-        },
-        "source_location": {
-            "doctype": "Warehouse",
-            "link_field": "source_location",
-            "filter_field": "custom_slade_id",
-            "extract_field": "name",
-        },
-        "destination_location": {
-            "doctype": "Warehouse",
-            "link_field": "destination_location",
-            "filter_field": "custom_slade_id",
-            "extract_field": "name",
-        },
-        "transit_location": {
-            "doctype": "Warehouse",
-            "link_field": "transit_location",
-            "filter_field": "custom_slade_id",
-            "extract_field": "name",
-        },
-        "active": lambda x: 1 if x.get("active") else 0,
-    }
-    update_documents(
-        response, OPERATION_TYPE_DOCTYPE_NAME, field_mapping, filter_field="slade_id"
     )
