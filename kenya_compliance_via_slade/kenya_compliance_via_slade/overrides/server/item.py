@@ -49,20 +49,6 @@ def validate(doc: Document, method: str) -> None:
     if not doc.custom_item_code_etims:
         doc.custom_item_code_etims = generate_custom_item_code_etims(doc)
 
-    # Check if the tax type field has changed
-    is_tax_type_changed = doc.has_value_changed("custom_taxation_type")
-    if doc.custom_taxation_type and is_tax_type_changed:
-        relevant_tax_templates = frappe.get_all(
-            "Item Tax Template",
-            ["*"],
-            {"custom_etims_taxation_type": doc.custom_taxation_type},
-        )
-
-        if relevant_tax_templates:
-            doc.set("taxes", [])
-            for template in relevant_tax_templates:
-                doc.append("taxes", {"item_tax_template": template.name})
-
 
 @frappe.whitelist()
 def prevent_item_deletion(doc: dict) -> None:
