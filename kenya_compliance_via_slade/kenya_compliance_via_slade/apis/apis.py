@@ -112,6 +112,8 @@ def perform_customer_search(request_data: str) -> None:
 def perform_item_registration(item_name: str) -> dict | None:
     item = frappe.get_doc("Item", item_name)
     missing_fields = []
+    item.run_method("validate")
+    item.save()
 
     required_fields = [
         "custom_item_code_etims",
@@ -136,6 +138,62 @@ def perform_item_registration(item_name: str) -> dict | None:
     )
     sent_to_slade = item.get("custom_sent_to_slade", False)
     custom_slade_id = item.get("custom_slade_id", None)
+
+    request_data = {
+        "name": item.get("item_name"),
+        "document_name": item.get("name"),
+        "description": item.get("description"),
+        "can_be_sold": True if item.get("is_sales_item") == 1 else False,
+        "can_be_purchased": True if item.get("is_purchase_item") == 1 else False,
+        "company_name": frappe.defaults.get_user_default("Company"),
+        "code": item.get("item_code"),
+        "scu_item_code": item.get("custom_item_code_etims"),
+        "scu_item_classification": get_link_value(
+            ITEM_CLASSIFICATIONS_DOCTYPE_NAME,
+            "itemclscd",
+            item.get("custom_item_classification"),
+            "slade_id",
+        ),
+        "product_type": item.get("custom_product_type"),
+        "item_type": item.get("custom_item_type"),
+        "preferred_name": item.get("item_name"),
+        "country_of_origin": item.get("custom_etims_country_of_origin_code"),
+        "packaging_unit": get_link_value(
+            PACKAGING_UNIT_DOCTYPE_NAME,
+            "code",
+            item.get("custom_packaging_unit"),
+            "slade_id",
+        ),
+        "quantity_unit": get_link_value(
+            UNIT_OF_QUANTITY_DOCTYPE_NAME,
+            "code",
+            item.get("custom_unit_of_quantity"),
+            "slade_id",
+        ),
+        "sale_taxes": [tax],
+        "selling_price": round(item.get("valuation_rate", 1), 2),
+        "purchasing_price": round(item.get("last_purchase_rate", 1), 2),
+        "categories": [],
+        "purchase_taxes": [],
+    }
+
+    if sent_to_slade and custom_slade_id:
+        request_data["id"] = custom_slade_id
+        process_request(
+            request_data,
+            "ItemsSearchReq",
+            item_registration_on_success,
+            request_method="PATCH",
+            doctype="Item",
+        )
+    else:
+        process_request(
+            request_data,
+            "ItemsSearchReq",
+            item_registration_on_success,
+            request_method="POST",
+            doctype="Item",
+        )
 
     request_data = {
         "name": item.get("item_name"),
