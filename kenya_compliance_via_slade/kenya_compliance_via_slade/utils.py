@@ -706,37 +706,43 @@ def authenticate_and_get_token(
 @frappe.whitelist()
 def update_navari_settings_with_token(docname: str) -> str:
     settings_doc = frappe.get_doc(SETTINGS_DOCTYPE_NAME, docname)
-    auth_server_url = settings_doc.auth_server_url
-    username = settings_doc.auth_username
-    client_id = settings_doc.client_id
-    password = settings_doc.get_password("auth_password")
-    client_secret = settings_doc.get_password("client_secret")
+    if (
+        datetime.strptime(
+            str(settings_doc.get("token_expiry")).split(".")[0], "%Y-%m-%d %H:%M:%S"
+        )
+        < datetime.now()
+    ):
+        auth_server_url = settings_doc.auth_server_url
+        username = settings_doc.auth_username
+        client_id = settings_doc.client_id
+        password = settings_doc.get_password("auth_password")
+        client_secret = settings_doc.get_password("client_secret")
 
-    token_details = authenticate_and_get_token(
-        auth_server_url, username, password, client_id, client_secret
-    )
+        token_details = authenticate_and_get_token(
+            auth_server_url, username, password, client_id, client_secret
+        )
 
-    if not token_details:
-        return None
+        if not token_details:
+            return None
 
-    settings_doc.access_token = token_details["access_token"]
-    settings_doc.refresh_token = token_details["refresh_token"]
-    settings_doc.token_expiry = datetime.now() + timedelta(
-        seconds=token_details["expires_in"]
-    )
-    settings_doc.save(ignore_permissions=True)
+        settings_doc.access_token = token_details["access_token"]
+        settings_doc.refresh_token = token_details["refresh_token"]
+        settings_doc.token_expiry = datetime.now() + timedelta(
+            seconds=token_details["expires_in"]
+        )
+        settings_doc.save(ignore_permissions=True)
 
-    from .apis.process_request import process_request
+        from .apis.process_request import process_request
 
-    request_data = {"document_name": docname}
+        request_data = {"document_name": docname}
 
-    process_request(
-        request_data,
-        "BhfUserSearchReq",
-        user_details_fetch_on_success,
-        request_method="GET",
-        doctype=SETTINGS_DOCTYPE_NAME,
-    )
+        process_request(
+            request_data,
+            "BhfUserSearchReq",
+            user_details_fetch_on_success,
+            request_method="GET",
+            doctype=SETTINGS_DOCTYPE_NAME,
+        )
     return settings_doc
 
 
