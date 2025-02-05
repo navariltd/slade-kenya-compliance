@@ -1,6 +1,5 @@
 import asyncio
 import json
-from typing import Callable
 
 import aiohttp
 
@@ -36,7 +35,6 @@ from .remote_response_status_handlers import (
     item_search_on_success,
     location_update_on_success,
     mode_of_payment_on_success,
-    operation_type_create_on_success,
     pricelist_update_on_success,
     purchase_search_on_success,
     search_branch_request_on_success,
@@ -771,11 +769,11 @@ def initialize_device(request_data: str) -> None:
 
 
 @frappe.whitelist()
-def get_invoice_details(request_data: str, invoice_type: str) -> None:
-    from ..utils import parse_request_data
-
-    data = parse_request_data(request_data)
-    invoice = frappe.get_doc(invoice_type, data.get("document_name"))
+def get_invoice_details(
+    id: str, document_name: str, invoice_type: str = "Sales Invoice"
+) -> None:
+    request_data = {"id": id, "document_name": document_name}
+    invoice = frappe.get_doc(invoice_type, document_name)
     route_key = "TrnsSalesSearchReq"
     if invoice.is_return:
         route_key = "SalesCreditNoteSaveReq"
@@ -1166,65 +1164,41 @@ def sync_item_price(request_data: str) -> None:
 
 
 @frappe.whitelist()
-def save_operation_type(
-    name: str, on_success: Callable = operation_type_create_on_success
-) -> dict | None:
+def save_operation_type(name: str) -> dict | None:
     item = frappe.get_doc(OPERATION_TYPE_DOCTYPE_NAME, name)
     slade_id = item.get("slade_id", None)
 
     route_key = "OperationTypesReq"
+    if item.get("destination_location_id") and item.get("source_location_id"):
+        request_data = {
+            "operation_name": item.get("operation_name"),
+            "document_name": item.get("name"),
+            "operation_type": item.get("operation_type"),
+            "organisation": get_link_value(
+                "Company",
+                "name",
+                item.get("company"),
+                "custom_slade_id",
+            ),
+            "destination_location": item.get("destination_location_id"),
+            "source_location": item.get("source_location_id"),
+            "active": False if item.get("active") == 0 else True,
+        }
 
-    request_data = {
-        "operation_name": item.get("operation_name"),
-        "document_name": item.get("name"),
-        "operation_type": item.get("operation_type"),
-        "organisation": get_link_value(
-            "Company",
-            "name",
-            item.get("company"),
-            "custom_slade_id",
-        ),
-        "branch": get_link_value(
-            "Branch",
-            "name",
-            item.get("branch"),
-            "slade_id",
-        ),
-        "destination_location": get_link_value(
-            "Warehouse",
-            "name",
-            item.get("destination_location"),
-            "custom_slade_id",
-        ),
-        "source_location": get_link_value(
-            "Warehouse",
-            "name",
-            item.get("source_location"),
-            "custom_slade_id",
-        ),
-        "transit_location": get_link_value(
-            "Warehouse",
-            "name",
-            item.get("transit_location"),
-            "custom_slade_id",
-        ),
-        "active": False if item.get("active") == 0 else True,
-    }
+        if slade_id:
+            request_data["id"] = slade_id
+            method = "PATCH"
+        else:
+            method = "POST"
 
-    if slade_id:
-        request_data["id"] = slade_id
-        method = "PATCH"
-        on_success = operation_types_search_on_success
-    else:
-        method = "POST"
-
-    process_request(
-        request_data,
-        route_key=route_key,
-        handler_function=on_success,
-        request_method=method,
-        doctype=OPERATION_TYPE_DOCTYPE_NAME,
-    )
+        process_request(
+            request_data,
+            route_key=route_key,
+            handler_function=operation_types_search_on_success,
+            request_method=method,
+            doctype=OPERATION_TYPE_DOCTYPE_NAME,
+        )
+    return None
 
 
 @frappe.whitelist()

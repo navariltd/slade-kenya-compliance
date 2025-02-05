@@ -43,37 +43,152 @@ def refresh_notices() -> None:
     perform_notice_search(json.dumps({"company_name": company}))
 
 
-def send_sales_invoices_information() -> None:
-    from ..overrides.server.sales_invoice import on_submit
-
+def get_timeframe() -> timedelta:
     settings = get_settings()
-    # Get the timeframe from kwargs or default to 24 hours
     timeframe = settings.get("sales_information_submission_timeframe", 86400)
-    duration = timedelta(seconds=timeframe)
-    timeframe_ago = datetime.now() - duration
-    all_submitted_unsent: list[Document] = frappe.get_all(
-        "Sales Invoice",
+    return timedelta(seconds=timeframe)
+
+
+def get_max_submission_attempts() -> int:
+    settings = get_settings()
+    return settings.get("maximum_sales_information_submission_attempts", 3)
+
+
+def fetch_sales_invoices(filters: dict) -> list:
+    return frappe.get_all("Sales Invoice", filters, ["name"])
+
+
+def send_sales_invoices_information() -> None:
+    timeframe_ago = datetime.now() - get_timeframe()
+    all_submitted_unsent = fetch_sales_invoices(
+        {
+            "docstatus": 1,
+            "custom_slade_id": ["is", "not set"],
+            "creation": [">=", timeframe_ago],
+        }
+    )
+    if all_submitted_unsent:
+        submit_new_invoices(all_submitted_unsent)
+
+    successful_without_scu_data = fetch_sales_invoices(
+        {
+            "docstatus": 1,
+            "custom_successfully_submitted": 1,
+            "custom_qr_code": ["is", "not set"],
+            "creation": [">=", timeframe_ago],
+        }
+    )
+    if successful_without_scu_data:
+        fetch_scu_data(successful_without_scu_data)
+
+    sent_unprocessed = fetch_sales_invoices(
+        {
+            "docstatus": 1,
+            "custom_slade_id": ["is", "set"],
+            "custom_successfully_submitted": 0,
+            "custom_transition_successful": 0,
+            "creation": [">=", timeframe_ago],
+        }
+    )
+    if sent_unprocessed:
+        process_sent_invoices(sent_unprocessed)
+
+    processed_unsent_to_etims = fetch_sales_invoices(
         {
             "docstatus": 1,
             "custom_successfully_submitted": 0,
+            "custom_transition_successful": 1,
             "creation": [">=", timeframe_ago],
-        },
-        ["name"],
-    )  # Fetch all Sales Invoice records according to filter
+        }
+    )
+    if processed_unsent_to_etims:
+        sign_processed_invoices(processed_unsent_to_etims)
 
-    if all_submitted_unsent:
-        for sales_invoice in all_submitted_unsent:
-            doc = frappe.get_doc(
-                "Sales Invoice", sales_invoice.name, for_update=False
-            )  # Refetch to get the document representation of the record
 
-            try:
-                on_submit(
-                    doc, method=None
-                )  # Delegate to the on_submit method for sales invoices
+def handle_invoice_submission(invoices: list, action_func: callable) -> None:
+    max_tries = get_max_submission_attempts()
 
-            except TypeError:
+    for sales_invoice in invoices:
+        doc = frappe.get_doc("Sales Invoice", sales_invoice.name, for_update=False)
+        tries = int(doc.custom_submission_attempts or 0)
+
+        if tries >= max_tries:
+            continue
+
+        try:
+            action_func(doc)
+            frappe.db.set_value(
+                "Sales Invoice",
+                sales_invoice.name,
+                "custom_submission_attempts",
+                tries + 1,
+            )
+        except Exception as e:
+            frappe.log_error(f"Error processing invoice {sales_invoice.name}: {str(e)}")
+            frappe.db.set_value(
+                "Sales Invoice",
+                sales_invoice.name,
+                "custom_submission_attempts",
+                tries + 1,
+            )
+            continue
+
+
+def submit_new_invoices(invoices: list) -> None:
+    from ..overrides.server.sales_invoice import on_submit
+
+    def action_func(doc: Document) -> None:
+        on_submit(doc, method=None)
+
+    handle_invoice_submission(invoices, action_func)
+
+
+def sign_processed_invoices(invoices: list) -> None:
+    from ..apis.remote_response_status_handlers import process_sales_sign
+
+    def action_func(doc: Document) -> None:
+        process_sales_sign(doc.name, "Sales Invoice", doc.custom_slade_id)
+
+    handle_invoice_submission(invoices, action_func)
+
+
+def process_sent_invoices(invoices: list) -> None:
+    from ..apis.remote_response_status_handlers import process_invoice_items
+
+    def action_func(doc: Document) -> None:
+        process_invoice_items(doc.name, "Sales Invoice", doc.custom_slade_id)
+
+    handle_invoice_submission(invoices, action_func)
+
+
+def fetch_scu_data(invoices: list) -> None:
+    from ..apis.apis import get_invoice_details
+
+    for sales_invoice in invoices:
+        try:
+            doc = frappe.get_doc("Sales Invoice", sales_invoice.name, for_update=False)
+            tries = int(doc.custom_submission_attempts or 0)
+            max_tries = get_max_submission_attempts()
+            if tries >= max_tries:
                 continue
+            get_invoice_details(id=doc.custom_slade_id, document_name=doc.name)
+            frappe.db.set_value(
+                "Sales Invoice",
+                sales_invoice.name,
+                "custom_submission_attempts",
+                tries + 1,
+            )
+        except Exception as e:
+            frappe.log_error(
+                f"Error fetching SCU data for invoice {sales_invoice.name}: {str(e)}"
+            )
+            frappe.db.set_value(
+                "Sales Invoice",
+                sales_invoice.name,
+                "custom_submission_attempts",
+                tries + 1,
+            )
+            continue
 
 
 @frappe.whitelist()

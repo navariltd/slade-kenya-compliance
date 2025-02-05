@@ -4,6 +4,10 @@
 # import frappe
 from frappe.model.document import Document
 
+from ...apis.apis import save_operation_type
+
 
 class NavarieTimsStockOperationType(Document):
-    pass
+    def on_update(self) -> None:
+        if not self.slade_id:
+            save_operation_type(self.name)

@@ -36,10 +36,13 @@
   "notices_refresh_freq_cron_format",
   "submission_timeframe_section",
   "sales_information_submission_timeframe",
+  "maximum_sales_information_submission_attempts",
   "column_break_xtvd",
   "purchase_information_submission_timeframe",
+  "maximum_purchase_information_submission_attempts",
   "column_break_wyiz",
   "stock_information_submission_timeframe",
+  "maximum_stock_information_submission_attempts",
   "field_defaults_tab",
   "sales_details_defaults_section",
   "sales_payment_type",
@@ -416,6 +419,24 @@
   {
    "fieldname": "column_break_wyiz",
    "fieldtype": "Column Break"
+  },
+  {
+   "description": "Maximum attempts allowed to resubmit failed sales invoices before restrictions apply.",
+   "fieldname": "maximum_sales_information_submission_attempts",
+   "fieldtype": "Int",
+   "label": "Max Sales Submission Attempts"
+  },
+  {
+   "description": "Maximum attempts allowed to resubmit failed purchase invoices before restrictions apply.",
+   "fieldname": "maximum_purchase_information_submission_attempts",
+   "fieldtype": "Int",
+   "label": "Max Purchase Submission Attempts"
+  },
+  {
+   "description": "Maximum attempts allowed to resubmit failed stock operations before restrictions apply.",
+   "fieldname": "maximum_stock_information_submission_attempts",
+   "fieldtype": "Int",
+   "label": "Max Stock Submission Attempts"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -426,7 +447,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-01-31 14:18:12.504438",
+ "modified": "2025-02-05 12:24:09.705144",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",
