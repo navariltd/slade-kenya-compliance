@@ -706,7 +706,7 @@ def authenticate_and_get_token(
 @frappe.whitelist()
 def update_navari_settings_with_token(docname: str) -> str:
     settings_doc = frappe.get_doc(SETTINGS_DOCTYPE_NAME, docname)
-    if (
+    if not settings_doc.get("access_token") or (
         datetime.strptime(
             str(settings_doc.get("token_expiry")).split(".")[0], "%Y-%m-%d %H:%M:%S"
         )

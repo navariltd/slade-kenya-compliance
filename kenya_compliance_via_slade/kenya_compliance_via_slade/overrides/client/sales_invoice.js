@@ -14,11 +14,6 @@ frappe.ui.form.on(parentDoctype, {
     );
 
     if (activeSetting?.name) {
-      frm.set_value("update_stock", 1);
-      if (frm.doc.update_stock === 1) {
-        frm.toggle_reqd("set_warehouse", true);
-      }
-
       if (!frm.doc.custom_slade_id) {
         frm.add_custom_button(
           __("Send Invoice"),
