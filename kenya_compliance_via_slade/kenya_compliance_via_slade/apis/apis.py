@@ -19,7 +19,12 @@ from ..doctype.doctype_names_mapping import (
     UOM_CATEGORY_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
 )
-from ..utils import generate_custom_item_code_etims, get_link_value, make_get_request
+from ..utils import (
+    generate_custom_item_code_etims,
+    get_link_value,
+    get_settings,
+    make_get_request,
+)
 from .api_builder import EndpointsBuilder
 from .process_request import process_request
 from .remote_response_status_handlers import (
@@ -37,6 +42,7 @@ from .remote_response_status_handlers import (
     pricelist_update_on_success,
     purchase_search_on_success,
     search_branch_request_on_success,
+    submit_inventory_on_success,
     update_invoice_info,
     user_details_fetch_on_success,
     user_details_submission_on_success,
@@ -421,48 +427,45 @@ def send_entire_stock_balance() -> None:
 @frappe.whitelist()
 def submit_inventory(name: str) -> None:
     # TODO: Redesign this function to work with the new structure for Stock Submission
-    pass
-    # if not name:
-    #     frappe.throw("Item name is required.")
+    # pass
+    if not name:
+        frappe.throw("Item name is required.")
 
-    # stock_levels = frappe.db.get_all(
-    #     "Bin",
-    #     filters={"item_code": name},
-    #     fields=["warehouse", "actual_qty", "reserved_qty", "projected_qty", "name"],
-    # )
+    settings = get_settings()
+    stock_levels = frappe.db.get_all(
+        "Bin",
+        filters={"item_code": name},
+        fields=["warehouse", "actual_qty", "reserved_qty", "projected_qty", "name"],
+    )
 
-    # if not stock_levels:
-    #     frappe.msgprint(f"No stock levels found for item {name}.")
-    # else:
-    #     department = frappe.defaults.get_user_default("Department") or frappe.get_value(
-    #         "Department", {}, "name"
-    #     )
-    #     for stock in stock_levels:
-    #         request_data = {
-    #             "document_name": stock.get("name"),
-    #             "inventory_reference": f"{name} - {stock['warehouse']}",
-    #             "description": f"{name} Stock Adjustment for {stock['warehouse']}",
-    #             "reason": "Opening Stock",
-    #             "source_organisation_unit": get_link_value(
-    #                 "Department",
-    #                 "name",
-    #                 department,
-    #                 "custom_slade_id",
-    #             ),
-    #             "location": get_link_value(
-    #                 "Warehouse",
-    #                 "name",
-    #                 stock.get("warehouse"),
-    #                 "custom_slade_id",
-    #             ),
-    #         }
-    #         process_request(
-    #             request_data,
-    #             route_key="StockMasterSaveReq",
-    #             handler_function=submit_inventory_on_success,
-    #             request_method="POST",
-    #             doctype="Bin",
-    #         )
+    if not stock_levels:
+        frappe.msgprint(f"No stock levels found for item {name}.")
+    else:
+        request_data = {
+            "document_name": name,
+            "inventory_reference": name,
+            "description": f"{name} Stock Adjustment for {name}",
+            "reason": "Opening Stock",
+            "source_organisation_unit": get_link_value(
+                "Department",
+                "name",
+                settings.department,
+                "custom_slade_id",
+            ),
+            "location": get_link_value(
+                "Warehouse",
+                "name",
+                settings.get("warehouse"),
+                "custom_slade_id",
+            ),
+        }
+        process_request(
+            request_data,
+            route_key="StockMasterSaveReq",
+            handler_function=submit_inventory_on_success,
+            request_method="POST",
+            doctype="Item",
+        )
 
 
 @frappe.whitelist()
