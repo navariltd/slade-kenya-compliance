@@ -66,7 +66,7 @@ def bulk_submit_sales_invoices(docs_list: str) -> None:
         for invoice in all_sales_invoices:
             if record == invoice.name:
                 doc = frappe.get_doc("Sales Invoice", record, for_update=False)
-                on_submit(doc, method=None)
+                frappe.enqueue(on_submit, doc=doc, method=None)
 
 
 @frappe.whitelist()
@@ -77,7 +77,7 @@ def bulk_register_item(docs_list: str) -> None:
         is_registered = frappe.db.get_value("Item", record, "custom_sent_to_slade")
         if is_registered == 0:
             item_name = frappe.db.get_value("Item", record, "name")
-            perform_item_registration(item_name=str(item_name))
+            frappe.enqueue(perform_item_registration, item_name=str(item_name))
 
 
 @frappe.whitelist()
@@ -88,7 +88,7 @@ def register_all_items() -> None:
 
     for record in data:
         item_name = frappe.db.get_value("Item", record, "name")
-        perform_item_registration(item_name=str(item_name))
+        frappe.enqueue(perform_item_registration, item_name=str(item_name))
 
 
 @frappe.whitelist()
@@ -215,7 +215,9 @@ def submit_all_suppliers() -> None:
         ["name"],
     )
     for supplier in suppliers:
-        send_branch_customer_details(supplier.name, False)
+        frappe.enqueue(
+            send_branch_customer_details, name=supplier.name, is_customer=False
+        )
 
 
 @frappe.whitelist()
@@ -228,7 +230,7 @@ def submit_all_customers() -> None:
         ["name"],
     )
     for customer in customers:
-        send_branch_customer_details(customer.name)
+        frappe.enqueue(send_branch_customer_details, name=customer.name)
 
 
 @frappe.whitelist()
@@ -936,7 +938,7 @@ def sync_warehouse_details(request_data: str, type: str = "warehouse") -> None:
 def submit_warehouse_list() -> None:
     warehouses = frappe.get_all("Warehouse", filters={"is_group": 1}, fields=["name"])
     for warehouse in warehouses:
-        submit_warehouse(warehouse.name)
+        frappe.enqueue(submit_warehouse, name=warehouse.name)
 
 
 @frappe.whitelist()
@@ -1225,7 +1227,7 @@ def send_all_mode_of_payments() -> None:
         fields=["name"],
     )
     for mop in mode_of_payments:
-        send_mode_of_payment_details(mop.name)
+        frappe.enqueue(send_mode_of_payment_details, name=mop.name)
 
 
 @frappe.whitelist()

@@ -332,9 +332,7 @@ def send_stock_information() -> None:
         )  # Refetch to get the document representation of the record
 
         try:
-            on_update(
-                doc, method=None
-            )  # Delegate to the on_update method for Stock Ledger Entry override
+            frappe.enqueue(on_update, doc=doc, method=None)
 
         except TypeError:
             continue
@@ -363,7 +361,7 @@ def send_purchase_information() -> None:
         )  # Refetch to get the document representation of the record
 
         try:
-            on_submit(doc, method=None)
+            frappe.enqueue(on_submit, doc=doc, method=None)
 
         except TypeError:
             continue
