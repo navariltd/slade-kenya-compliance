@@ -69,7 +69,7 @@ def bulk_submit_sales_invoices(docs_list: str) -> None:
         for invoice in all_sales_invoices:
             if record == invoice.name:
                 doc = frappe.get_doc("Sales Invoice", record, for_update=False)
-                frappe.enqueue(on_submit, doc=doc, method=None)
+                frappe.enqueue(on_submit, doc=doc)
 
 
 @frappe.whitelist()
@@ -1071,7 +1071,7 @@ def save_operation_type(name: str) -> dict | None:
     slade_id = item.get("slade_id", None)
 
     route_key = "OperationTypesReq"
-    if item.get("destination_location_id") and item.get("source_location_id"):
+    if item.get("destination_location") and item.get("source_location"):
         request_data = {
             "operation_name": item.get("operation_name"),
             "document_name": item.get("name"),
@@ -1082,8 +1082,8 @@ def save_operation_type(name: str) -> dict | None:
                 item.get("company"),
                 "custom_slade_id",
             ),
-            "destination_location": item.get("destination_location_id"),
-            "source_location": item.get("source_location_id"),
+            "destination_location": item.get("destination_location"),
+            "source_location": item.get("source_location"),
             "active": False if item.get("active") == 0 else True,
         }
 

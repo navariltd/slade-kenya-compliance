@@ -13,9 +13,9 @@
   "branch",
   "column_break_wflh",
   "slade_id",
-  "source_location_id",
-  "destination_location_id",
-  "transit_location_id",
+  "source_location",
+  "destination_location",
+  "transit_location",
   "active"
  ],
  "fields": [
@@ -78,33 +78,6 @@
    "options": "Branch"
   },
   {
-   "fieldname": "source_location_id",
-   "fieldtype": "Data",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Source Location ID"
-  },
-  {
-   "fieldname": "destination_location_id",
-   "fieldtype": "Data",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Destination Location ID"
-  },
-  {
-   "fieldname": "transit_location_id",
-   "fieldtype": "Data",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Transit Location ID"
-  },
-  {
    "fieldname": "warehouse",
    "fieldtype": "Link",
    "in_filter": 1,
@@ -113,11 +86,38 @@
    "in_standard_filter": 1,
    "label": "Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "source_location",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Source Location ID"
+  },
+  {
+   "fieldname": "destination_location",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Destination Location ID"
+  },
+  {
+   "fieldname": "transit_location",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Transit Location ID"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-04 15:48:52.991198",
+ "modified": "2025-02-13 02:03:36.701127",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari eTims Stock Operation Type",
