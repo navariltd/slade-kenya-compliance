@@ -58,15 +58,15 @@ def save_ledger_details(name: str) -> None:
 
 def prepare_payload(doc: dict, record: dict) -> dict:
     company_name = doc.company
+    settings = get_settings(company_name=company_name)
     series_no = extract_document_series_number(record)
-    department_name = get_default("Department")
 
     payload = {
         "name": doc.name,
         "document_name": doc.name,
         "organisation": frappe.get_value("Company", company_name, "custom_slade_id"),
         "source_organisation_unit": frappe.get_value(
-            "Department", department_name, "custom_slade_id"
+            "Department", settings.department, "custom_slade_id"
         ),
         "document_number": doc.name,
         "document_count": series_no,

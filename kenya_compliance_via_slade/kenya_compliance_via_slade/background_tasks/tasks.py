@@ -42,7 +42,7 @@ def refresh_notices() -> None:
 
 def get_timeframe() -> timedelta:
     settings = get_settings()
-    timeframe = settings.get("sales_information_submission_timeframe", 86400)
+    timeframe = settings.get("sales_information_submission_timeframe", 86400) or 86400
     return timedelta(seconds=timeframe)
 
 
@@ -138,7 +138,7 @@ def submit_new_invoices(invoices: list) -> None:
     from ..overrides.server.sales_invoice import on_submit
 
     def action_func(doc: Document) -> None:
-        on_submit(doc, method=None)
+        on_submit(doc)
 
     handle_invoice_submission(invoices, action_func)
 
@@ -307,7 +307,7 @@ def send_stock_information() -> None:
     settings = get_settings()
     if not settings.get("stock_auto_submission_enabled"):
         return
-    timeframe = settings.get("stock_information_submission_timeframe", 86400)
+    timeframe = settings.get("stock_information_submission_timeframe", 86400) or 86400
     duration = timedelta(seconds=timeframe)
 
     timeframe_ago = datetime.now() - duration
@@ -326,9 +326,10 @@ def send_stock_information() -> None:
         )  # Refetch to get the document representation of the record
 
         try:
-            frappe.enqueue(on_update, doc=doc, method=None)
+            frappe.enqueue(on_update, doc=doc)
 
-        except TypeError:
+        except Exception as e:
+            frappe.log_error(f"Error Enqueuing stock ledger entry {doc.name}, {str(e)}")
             continue
 
 
@@ -338,7 +339,9 @@ def send_purchase_information() -> None:
     settings = get_settings()
     if not settings.get("purchase_auto_submission_enabled"):
         return
-    timeframe = settings.get("purchase_information_submission_timeframe", 86400)
+    timeframe = (
+        settings.get("purchase_information_submission_timeframe", 86400) or 86400
+    )
     duration = timedelta(seconds=timeframe)
     timeframe_ago = datetime.now() - duration
     all_submitted_purchase_invoices: list[Document] = frappe.get_all(
@@ -357,7 +360,7 @@ def send_purchase_information() -> None:
         )  # Refetch to get the document representation of the record
 
         try:
-            frappe.enqueue(on_submit, doc=doc, method=None)
+            frappe.enqueue(on_submit, doc=doc)
 
         except TypeError:
             continue
