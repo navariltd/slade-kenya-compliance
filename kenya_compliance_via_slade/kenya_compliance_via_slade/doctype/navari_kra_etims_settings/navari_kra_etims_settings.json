@@ -23,17 +23,24 @@
   "workstation",
   "request_frequency_tab",
   "frequency_of_communication_with_etims_servers_section",
-  "sales_information_submission",
-  "sales_info_cron_format",
-  "column_break_ukgx",
-  "stock_information_submission",
-  "stock_info_cron_format",
-  "column_break_ifui",
-  "purchase_information_submission",
-  "purchase_info_cron_format",
   "column_break_fsjl",
   "notices_refresh_frequency",
   "notices_refresh_freq_cron_format",
+  "column_break_fudf",
+  "codes_refresh_frequency",
+  "codes_refresh_freq_cron_format",
+  "section_break_kkbe",
+  "sales_auto_submission_enabled",
+  "sales_information_submission",
+  "sales_info_cron_format",
+  "column_break_ifui",
+  "purchase_auto_submission_enabled",
+  "purchase_information_submission",
+  "purchase_info_cron_format",
+  "column_break_ukgx",
+  "stock_auto_submission_enabled",
+  "stock_information_submission",
+  "stock_info_cron_format",
   "submission_timeframe_section",
   "sales_information_submission_timeframe",
   "maximum_sales_information_submission_attempts",
@@ -84,7 +91,7 @@
   },
   {
    "default": "https://api.erp.release.slade360edi.com",
-   "description": "KRA E-Tims Server URL. Don't fill if you're not sure what to input.",
+   "description": "Slade360 Server URL. Don't fill if you're not sure what to input.",
    "fieldname": "server_url",
    "fieldtype": "Data",
    "label": "Server URL",
@@ -158,6 +165,7 @@
   },
   {
    "default": "All",
+   "depends_on": "eval: doc.sales_auto_submission_enabled == 1",
    "fieldname": "sales_information_submission",
    "fieldtype": "Select",
    "label": "Sales Information Submission Frequency",
@@ -169,6 +177,7 @@
   },
   {
    "default": "All",
+   "depends_on": "eval: doc.stock_auto_submission_enabled == 1",
    "fieldname": "stock_information_submission",
    "fieldtype": "Select",
    "label": "Stock Information Submission Frequency",
@@ -180,6 +189,7 @@
   },
   {
    "default": "All",
+   "depends_on": "eval: doc.purchase_auto_submission_enabled == 1",
    "fieldname": "purchase_information_submission",
    "fieldtype": "Select",
    "label": "Purchase Information Submission Frequency",
@@ -187,21 +197,21 @@
    "options": "\nAll\nHourly\nDaily\nWeekly\nMonthly\nYearly\nAnnual\nCron"
   },
   {
-   "depends_on": "eval:doc.sales_information_submission === \"Cron\";",
+   "depends_on": "eval:doc.sales_information_submission === \"Cron\" && doc.sales_auto_submission_enabled == 1;",
    "fieldname": "sales_info_cron_format",
    "fieldtype": "Data",
    "label": "Sales Info. Cron Format",
    "mandatory_depends_on": "eval:doc.sales_information_submission === \"Cron\";"
   },
   {
-   "depends_on": "eval:doc.stock_information_submission === \"Cron\";",
+   "depends_on": "eval:doc.stock_information_submission === \"Cron\" && stock_auto_submission_enabled == 1;",
    "fieldname": "stock_info_cron_format",
    "fieldtype": "Data",
    "label": "Stock Info. Cron Format",
    "mandatory_depends_on": "eval:doc.stock_information_submission === \"Cron\";"
   },
   {
-   "depends_on": "eval:doc.purchase_information_submission === \"Cron\";",
+   "depends_on": "eval:doc.purchase_information_submission === \"Cron\" && purchase_auto_submission_enabled == 1;",
    "fieldname": "purchase_info_cron_format",
    "fieldtype": "Data",
    "label": "Purchase Info. Cron Format",
@@ -374,7 +384,7 @@
   },
   {
    "default": "https://accounts.multitenant.slade360.co.ke",
-   "description": "KRA E-Tims Auth Server URL. Don't fill if you're not sure what to input.",
+   "description": "Slade360 Auth Server URL. Don't fill if you're not sure what to input.",
    "fieldname": "auth_server_url",
    "fieldtype": "Data",
    "label": "Auth Server URL",
@@ -392,16 +402,19 @@
    "options": "Department"
   },
   {
+   "depends_on": "eval: doc.sales_auto_submission_enabled == 1",
    "fieldname": "sales_information_submission_timeframe",
    "fieldtype": "Duration",
    "label": "Sales Information Submission Timeframe"
   },
   {
+   "depends_on": "eval: doc.stock_auto_submission_enabled == 1",
    "fieldname": "stock_information_submission_timeframe",
    "fieldtype": "Duration",
    "label": "Stock Information Submission Timeframe"
   },
   {
+   "depends_on": "eval: doc.purchase_auto_submission_enabled == 1",
    "fieldname": "purchase_information_submission_timeframe",
    "fieldtype": "Duration",
    "label": "Purchase Information Submission Timeframe"
@@ -421,22 +434,65 @@
    "fieldtype": "Column Break"
   },
   {
+   "depends_on": "eval: doc.sales_auto_submission_enabled == 1",
    "description": "Maximum attempts allowed to resubmit failed sales invoices before restrictions apply.",
    "fieldname": "maximum_sales_information_submission_attempts",
    "fieldtype": "Int",
    "label": "Max Sales Submission Attempts"
   },
   {
+   "depends_on": "eval: doc.purchase_auto_submission_enabled == 1",
    "description": "Maximum attempts allowed to resubmit failed purchase invoices before restrictions apply.",
    "fieldname": "maximum_purchase_information_submission_attempts",
    "fieldtype": "Int",
    "label": "Max Purchase Submission Attempts"
   },
   {
+   "depends_on": "eval: doc.stock_auto_submission_enabled == 1",
    "description": "Maximum attempts allowed to resubmit failed stock operations before restrictions apply.",
    "fieldname": "maximum_stock_information_submission_attempts",
    "fieldtype": "Int",
    "label": "Max Stock Submission Attempts"
+  },
+  {
+   "default": "0",
+   "fieldname": "sales_auto_submission_enabled",
+   "fieldtype": "Check",
+   "label": "Sales Auto Submission Enabled"
+  },
+  {
+   "default": "0",
+   "fieldname": "purchase_auto_submission_enabled",
+   "fieldtype": "Check",
+   "label": "Purchase Auto Submission Enabled"
+  },
+  {
+   "default": "0",
+   "fieldname": "stock_auto_submission_enabled",
+   "fieldtype": "Check",
+   "label": "Stock Auto Submission Enabled"
+  },
+  {
+   "fieldname": "section_break_kkbe",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_fudf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Hourly",
+   "fieldname": "codes_refresh_frequency",
+   "fieldtype": "Select",
+   "label": "Codes Refresh Frequency",
+   "options": "\nAll\nHourly\nDaily\nWeekly\nMonthly\nYearly\nAnnual\nCron"
+  },
+  {
+   "depends_on": "eval:doc.codes_refresh_frequency === \"Cron\";",
+   "fieldname": "codes_refresh_freq_cron_format",
+   "fieldtype": "Data",
+   "label": "Codes Refresh Freq. Cron Format",
+   "mandatory_depends_on": "eval:doc.notices_refresh_frequency === \"Cron\";"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -447,7 +503,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-02-05 12:24:09.705144",
+ "modified": "2025-02-12 17:05:44.229177",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",

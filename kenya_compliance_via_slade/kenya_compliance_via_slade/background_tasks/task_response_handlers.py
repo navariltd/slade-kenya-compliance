@@ -274,27 +274,40 @@ def update_branches(response: dict, **kwargs) -> None:
         response if isinstance(response, list) else response.get("results", response)
     )
     if len(doc_list) == 1:
-        branch_name = "eTims Branch"
-        existing_branch = frappe.db.get_value("Branch", {"branch": branch_name}, "name")
-
-        if existing_branch:
-            doc = frappe.get_doc("Branch", existing_branch)
+        branches = frappe.get_all("Branch")
+        if branches:
+            for branch in branches:
+                frappe.set_value(
+                    "Branch",
+                    branch.get("name"),
+                    {"slade_id": doc_list[0].get("id"), "is_etims_branch": 1},
+                )
         else:
-            doc = frappe.new_doc("Branch")
-            doc.branch = branch_name
+            branch_name = "eTims Branch"
+            existing_branch = frappe.db.get_value(
+                "Branch", {"branch": branch_name}, "name"
+            )
 
-        doc.custom_slade_id = doc_list[0].get("id")
-        doc.is_etims_verified = 1 if doc_list[0].get("is_etims_verified") else 0
-        doc.is_head_office = 1 if doc_list[0].get("is_headquater") else 0
-        doc.custom_company = get_link_value(
-            "Company", "custom_slade_id", doc_list[0].get("organisation")
-        )
-        doc.custom_etims_device_serial_no = doc_list[0].get("etims_device_serial_no")
-        doc.custom_branch_code = doc_list[0].get("etims_branch_id")
-        doc.custom_pin = doc_list[0].get("organisation_tax_pin")
-        doc.is_etims_branch = 1
-        doc.flags.ignore_permissions = True
-        doc.save(ignore_permissions=True)
+            if existing_branch:
+                doc = frappe.get_doc("Branch", existing_branch)
+            else:
+                doc = frappe.new_doc("Branch")
+                doc.branch = branch_name
+
+            doc.slade_id = doc_list[0].get("id")
+            doc.is_etims_verified = 1 if doc_list[0].get("is_etims_verified") else 0
+            doc.is_head_office = 1 if doc_list[0].get("is_headquater") else 0
+            doc.custom_company = get_link_value(
+                "Company", "custom_slade_id", doc_list[0].get("organisation")
+            )
+            doc.custom_etims_device_serial_no = doc_list[0].get(
+                "etims_device_serial_no"
+            )
+            doc.custom_branch_code = doc_list[0].get("etims_branch_id")
+            doc.custom_pin = doc_list[0].get("organisation_tax_pin")
+            doc.is_etims_branch = 1
+            doc.flags.ignore_permissions = True
+            doc.save(ignore_permissions=True)
     else:
         field_mapping = {
             "slade_id": "id",

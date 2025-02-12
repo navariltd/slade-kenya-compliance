@@ -732,18 +732,24 @@ def update_navari_settings_with_token(docname: str) -> str:
         )
         settings_doc.save(ignore_permissions=True)
 
-        from .apis.process_request import process_request
+        user_details_fetch(docname)
 
-        request_data = {"document_name": docname}
-
-        process_request(
-            request_data,
-            "BhfUserSearchReq",
-            user_details_fetch_on_success,
-            request_method="GET",
-            doctype=SETTINGS_DOCTYPE_NAME,
-        )
     return settings_doc
+
+
+@frappe.whitelist()
+def user_details_fetch(document_name: str, **kwargs) -> None:
+    from .apis.process_request import process_request
+
+    request_data = {"document_name": document_name}
+
+    process_request(
+        request_data,
+        "BhfUserSearchReq",
+        user_details_fetch_on_success,
+        request_method="GET",
+        doctype=SETTINGS_DOCTYPE_NAME,
+    )
 
 
 @frappe.whitelist()
@@ -769,10 +775,14 @@ def user_details_fetch_on_success(response: dict, document_name: str, **kwargs) 
         else None
     )
 
-    company = get_link_value(
-        "Company", "custom_slade_id", result.get("organisation_id")
+    company = frappe.defaults.get_user_default("Company") or frappe.get_value(
+        "Company", {}, "name"
     )
+
     if company:
+        frappe.db.set_value(
+            "Company", company, "custom_slade_id", result.get("organisation_id")
+        )
         settings_doc.company = company
 
     workstation_link = get_link_value(WORKSTATION_DOCTYPE_NAME, "slade_id", workstation)

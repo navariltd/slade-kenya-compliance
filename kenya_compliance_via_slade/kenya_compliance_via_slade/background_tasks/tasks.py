@@ -14,7 +14,7 @@ from ..doctype.doctype_names_mapping import (
 )
 from ..overrides.server.stock_ledger_entry import on_update
 from ..utils import get_settings
-from .task_response_handlers import (
+from .task_response_handlers import (  # update_organisations,
     itemprice_search_on_success,
     location_search_on_success,
     operation_types_search_on_success,
@@ -26,7 +26,6 @@ from .task_response_handlers import (
     update_currencies,
     update_departments,
     update_item_classification_codes,
-    update_organisations,
     update_packaging_units,
     update_taxation_type,
     update_unit_of_quantity,
@@ -221,7 +220,7 @@ def refresh_code_lists(request_data: str) -> str:
 def search_organisations_request(request_data: str) -> str:
     """Refresh code lists based on request data."""
     tasks = [
-        ("OrgSearchReq", update_organisations),
+        # ("OrgSearchReq", update_organisations), # Shift to the auth API
         ("BhfSearchReq", update_branches),
         ("DeptSearchReq", update_departments),
         ("WorkstationSearchReq", update_workstations),

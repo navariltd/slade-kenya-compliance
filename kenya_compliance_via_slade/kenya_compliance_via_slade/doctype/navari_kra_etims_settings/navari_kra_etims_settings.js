@@ -171,6 +171,20 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
     }
 
     frm.add_custom_button(
+      __("Sync User Details"),
+      function () {
+        frappe.call({
+          method:
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.utils.user_details_fetch",
+          args: {
+            document_name: frm.doc.name,
+          },
+        });
+      },
+      __("eTims Actions")
+    );
+
+    frm.add_custom_button(
       __("Get Auth Token"),
       function () {
         frappe.call({
