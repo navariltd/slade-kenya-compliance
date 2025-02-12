@@ -56,6 +56,9 @@ def fetch_sales_invoices(filters: dict) -> list:
 
 
 def send_sales_invoices_information() -> None:
+    settings = get_settings()
+    if not settings.get("sales_auto_submission_enabled"):
+        return
     timeframe_ago = datetime.now() - get_timeframe()
     all_submitted_unsent = fetch_sales_invoices(
         {
@@ -302,6 +305,8 @@ def fetch_etims_operation_types(request_data: str) -> None:
 
 def send_stock_information() -> None:
     settings = get_settings()
+    if not settings.get("stock_auto_submission_enabled"):
+        return
     timeframe = settings.get("stock_information_submission_timeframe", 86400)
     duration = timedelta(seconds=timeframe)
 
@@ -331,6 +336,8 @@ def send_purchase_information() -> None:
     from ..overrides.server.purchase_invoice import on_submit
 
     settings = get_settings()
+    if not settings.get("purchase_auto_submission_enabled"):
+        return
     timeframe = settings.get("purchase_information_submission_timeframe", 86400)
     duration = timedelta(seconds=timeframe)
     timeframe_ago = datetime.now() - duration
