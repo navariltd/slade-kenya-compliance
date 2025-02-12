@@ -104,22 +104,22 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
         __("eTims Actions")
       );
 
-      frm.add_custom_button(
-        __("Submit Warehouses"),
-        function () {
-          frappe.call({
-            method:
-              "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_warehouse_list",
-            args: {},
+      // frm.add_custom_button(
+      //   __("Submit Warehouses"),
+      //   function () {
+      //     frappe.call({
+      //       method:
+      //         "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.submit_warehouse_list",
+      //       args: {},
 
-            callback: (response) => {},
-            error: (error) => {
-              // Error Handling is Defered to the Server
-            },
-          });
-        },
-        __("eTims Actions")
-      );
+      //       callback: (response) => {},
+      //       error: (error) => {
+      //         // Error Handling is Defered to the Server
+      //       },
+      //     });
+      //   },
+      //   __("eTims Actions")
+      // );
 
       // frm.add_custom_button(
       //   __("Initialize device"),
@@ -169,6 +169,20 @@ frappe.ui.form.on("Navari KRA eTims Settings", {
       //   __("eTims Actions")
       // );
     }
+
+    frm.add_custom_button(
+      __("Sync User Details"),
+      function () {
+        frappe.call({
+          method:
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.utils.user_details_fetch",
+          args: {
+            document_name: frm.doc.name,
+          },
+        });
+      },
+      __("eTims Actions")
+    );
 
     frm.add_custom_button(
       __("Get Auth Token"),

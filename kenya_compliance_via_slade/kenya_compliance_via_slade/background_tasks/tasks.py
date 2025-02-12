@@ -16,7 +16,6 @@ from ..overrides.server.stock_ledger_entry import on_update
 from ..utils import get_settings
 from .task_response_handlers import (
     itemprice_search_on_success,
-    location_search_on_success,
     operation_types_search_on_success,
     pricelist_search_on_success,
     uom_category_search_on_success,
@@ -24,9 +23,7 @@ from .task_response_handlers import (
     update_branches,
     update_countries,
     update_currencies,
-    update_departments,
     update_item_classification_codes,
-    update_organisations,
     update_packaging_units,
     update_taxation_type,
     update_unit_of_quantity,
@@ -59,6 +56,9 @@ def fetch_sales_invoices(filters: dict) -> list:
 
 
 def send_sales_invoices_information() -> None:
+    settings = get_settings()
+    if not settings.get("sales_auto_submission_enabled"):
+        return
     timeframe_ago = datetime.now() - get_timeframe()
     all_submitted_unsent = fetch_sales_invoices(
         {
@@ -218,16 +218,23 @@ def refresh_code_lists(request_data: str) -> str:
 
 
 @frappe.whitelist()
-def search_organisations_request(request_data: str) -> str:
+def search_organisations_request(request_data: str | dict) -> str:
     """Refresh code lists based on request data."""
     tasks = [
-        ("OrgSearchReq", update_organisations),
+        # ("OrgSearchReq", update_organisations), # Shift to the auth API
         ("BhfSearchReq", update_branches),
-        ("DeptSearchReq", update_departments),
+        # ("DeptSearchReq", update_departments), # Shift to the auth API
         ("WorkstationSearchReq", update_workstations),
     ]
 
     messages = [process_request(request_data, task[0], task[1]) for task in tasks]
+
+    process_request(
+        {"location_type": "internal"},
+        "LocationsSearchReq",
+        warehouse_search_on_success,
+        doctype="Warehouse",
+    )
 
     return " ".join(messages)
 
@@ -261,23 +268,6 @@ def fetch_etims_uom_list(request_data: str) -> None:
         doctype="UOM",
     )
     return message
-
-
-@frappe.whitelist()
-def fetch_etims_warehouse_list(request_data: str) -> None:
-    warehouses = process_request(
-        request_data,
-        "WarehousesSearchReq",
-        warehouse_search_on_success,
-        doctype="Warehouse",
-    )
-    locations = process_request(
-        request_data,
-        "LocationsSearchReq",
-        location_search_on_success,
-        doctype="Warehouse",
-    )
-    return warehouses, locations
 
 
 @frappe.whitelist()
@@ -315,6 +305,8 @@ def fetch_etims_operation_types(request_data: str) -> None:
 
 def send_stock_information() -> None:
     settings = get_settings()
+    if not settings.get("stock_auto_submission_enabled"):
+        return
     timeframe = settings.get("stock_information_submission_timeframe", 86400)
     duration = timedelta(seconds=timeframe)
 
@@ -334,9 +326,7 @@ def send_stock_information() -> None:
         )  # Refetch to get the document representation of the record
 
         try:
-            on_update(
-                doc, method=None
-            )  # Delegate to the on_update method for Stock Ledger Entry override
+            frappe.enqueue(on_update, doc=doc, method=None)
 
         except TypeError:
             continue
@@ -346,6 +336,8 @@ def send_purchase_information() -> None:
     from ..overrides.server.purchase_invoice import on_submit
 
     settings = get_settings()
+    if not settings.get("purchase_auto_submission_enabled"):
+        return
     timeframe = settings.get("purchase_information_submission_timeframe", 86400)
     duration = timedelta(seconds=timeframe)
     timeframe_ago = datetime.now() - duration
@@ -365,7 +357,7 @@ def send_purchase_information() -> None:
         )  # Refetch to get the document representation of the record
 
         try:
-            on_submit(doc, method=None)
+            frappe.enqueue(on_submit, doc=doc, method=None)
 
         except TypeError:
             continue

@@ -237,12 +237,13 @@ def build_headers(company_name: str, branch_id: str) -> dict[str, str] | None:
         access_token = settings.get("access_token")
         token_expiry = settings.get("token_expiry")
 
-        if not access_token or not token_expiry:
-            return None
-
         if (
-            datetime.strptime(str(token_expiry).split(".")[0], "%Y-%m-%d %H:%M:%S")
-            < datetime.now()
+            not access_token
+            or not token_expiry
+            or (
+                datetime.strptime(str(token_expiry).split(".")[0], "%Y-%m-%d %H:%M:%S")
+                < datetime.now()
+            )
         ):
             new_settings = update_navari_settings_with_token(settings.get("name"))
 
@@ -732,18 +733,24 @@ def update_navari_settings_with_token(docname: str) -> str:
         )
         settings_doc.save(ignore_permissions=True)
 
-        from .apis.process_request import process_request
+        user_details_fetch(docname)
 
-        request_data = {"document_name": docname}
-
-        process_request(
-            request_data,
-            "BhfUserSearchReq",
-            user_details_fetch_on_success,
-            request_method="GET",
-            doctype=SETTINGS_DOCTYPE_NAME,
-        )
     return settings_doc
+
+
+@frappe.whitelist()
+def user_details_fetch(document_name: str, **kwargs) -> None:
+    from .apis.process_request import process_request
+
+    request_data = {"document_name": document_name}
+
+    process_request(
+        request_data,
+        "BhfUserSearchReq",
+        user_details_fetch_on_success,
+        request_method="GET",
+        doctype=SETTINGS_DOCTYPE_NAME,
+    )
 
 
 @frappe.whitelist()
@@ -763,16 +770,20 @@ def user_details_fetch_on_success(response: dict, document_name: str, **kwargs) 
         else None
     )
 
-    department = (
+    department_id = (
         result.get("user_workstations")[0]["workstation__org_unit"]
         if result.get("user_workstations") and len(result.get("user_workstations")) > 0
         else None
     )
 
-    company = get_link_value(
-        "Company", "custom_slade_id", result.get("organisation_id")
+    company = frappe.defaults.get_user_default("Company") or frappe.get_value(
+        "Company", {}, "name"
     )
+
     if company:
+        frappe.db.set_value(
+            "Company", company, "custom_slade_id", result.get("organisation_id")
+        )
         settings_doc.company = company
 
     workstation_link = get_link_value(WORKSTATION_DOCTYPE_NAME, "slade_id", workstation)
@@ -783,11 +794,30 @@ def user_details_fetch_on_success(response: dict, document_name: str, **kwargs) 
     if branch_link:
         settings_doc.bhfid = branch_link
 
-    department_link = get_link_value("Department", "slade_id", department)
+    department_link = get_department(department_id)
+
     if department_link:
         settings_doc.department = department_link
 
     settings_doc.save(ignore_permissions=True)
+
+
+def get_department(id: str) -> str:
+    department_name = "eTims Department"
+    existing_department = frappe.db.get_value(
+        "Department", {"department_name": department_name}, "name"
+    )
+    if existing_department:
+        doc = frappe.get_doc("Department", existing_department)
+    else:
+        doc = frappe.new_doc("Department")
+        doc.department_name = department_name
+
+    doc.custom_slade_id = id
+    doc.custom_is_etims_department = 1
+
+    doc.save(ignore_permissions=True)
+    return doc.name
 
 
 def get_link_value(

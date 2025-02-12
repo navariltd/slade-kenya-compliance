@@ -209,13 +209,19 @@ def imported_item_submission_on_success(
 
 
 def submit_inventory_on_success(response: dict, document_name: str, **kwargs) -> None:
-    bin = frappe.get_doc("Bin", document_name)
     from .process_request import process_request
 
+    # item = frappe.get_doc("Item", document_name)
+    stock_levels = frappe.db.get_all(
+        "Bin",
+        filters={"item_code": document_name},
+        fields=["actual_qty"],
+    )
+
     request_data = {
-        "document_name": bin.item_code,
-        "product": frappe.get_value("Item", bin.item_code, "custom_slade_id"),
-        "quantity": bin.actual_qty,
+        "document_name": document_name,
+        "product": frappe.get_value("Item", document_name, "custom_slade_id"),
+        "quantity": sum([float(stock.get("actual_qty", 0)) for stock in stock_levels]),
         "inventory_adjustment": response.get("id"),
     }
 

@@ -19,10 +19,15 @@ from ..doctype.doctype_names_mapping import (
     UOM_CATEGORY_DOCTYPE_NAME,
     USER_DOCTYPE_NAME,
 )
-from ..utils import generate_custom_item_code_etims, get_link_value, make_get_request
+from ..utils import (
+    generate_custom_item_code_etims,
+    get_link_value,
+    get_settings,
+    make_get_request,
+)
 from .api_builder import EndpointsBuilder
 from .process_request import process_request
-from .remote_response_status_handlers import (  # submit_inventory_on_success,
+from .remote_response_status_handlers import (
     customer_branch_details_submission_on_success,
     customer_search_on_success,
     customers_search_on_success,
@@ -33,11 +38,11 @@ from .remote_response_status_handlers import (  # submit_inventory_on_success,
     item_price_update_on_success,
     item_registration_on_success,
     item_search_on_success,
-    location_update_on_success,
     mode_of_payment_on_success,
     pricelist_update_on_success,
     purchase_search_on_success,
     search_branch_request_on_success,
+    submit_inventory_on_success,
     update_invoice_info,
     user_details_fetch_on_success,
     user_details_submission_on_success,
@@ -45,11 +50,9 @@ from .remote_response_status_handlers import (  # submit_inventory_on_success,
 
 endpoints_builder = EndpointsBuilder()
 from ..background_tasks.task_response_handlers import (
-    location_search_on_success,
     operation_types_search_on_success,
     uom_category_search_on_success,
     uom_search_on_success,
-    warehouse_search_on_success,
 )
 
 
@@ -66,7 +69,7 @@ def bulk_submit_sales_invoices(docs_list: str) -> None:
         for invoice in all_sales_invoices:
             if record == invoice.name:
                 doc = frappe.get_doc("Sales Invoice", record, for_update=False)
-                on_submit(doc, method=None)
+                frappe.enqueue(on_submit, doc=doc, method=None)
 
 
 @frappe.whitelist()
@@ -77,7 +80,7 @@ def bulk_register_item(docs_list: str) -> None:
         is_registered = frappe.db.get_value("Item", record, "custom_sent_to_slade")
         if is_registered == 0:
             item_name = frappe.db.get_value("Item", record, "name")
-            perform_item_registration(item_name=str(item_name))
+            frappe.enqueue(perform_item_registration, item_name=str(item_name))
 
 
 @frappe.whitelist()
@@ -88,7 +91,7 @@ def register_all_items() -> None:
 
     for record in data:
         item_name = frappe.db.get_value("Item", record, "name")
-        perform_item_registration(item_name=str(item_name))
+        frappe.enqueue(perform_item_registration, item_name=str(item_name))
 
 
 @frappe.whitelist()
@@ -215,7 +218,9 @@ def submit_all_suppliers() -> None:
         ["name"],
     )
     for supplier in suppliers:
-        send_branch_customer_details(supplier.name, False)
+        frappe.enqueue(
+            send_branch_customer_details, name=supplier.name, is_customer=False
+        )
 
 
 @frappe.whitelist()
@@ -228,7 +233,7 @@ def submit_all_customers() -> None:
         ["name"],
     )
     for customer in customers:
-        send_branch_customer_details(customer.name)
+        frappe.enqueue(send_branch_customer_details, name=customer.name)
 
 
 @frappe.whitelist()
@@ -408,50 +413,59 @@ def perform_purchase_search(request_data: str) -> None:
 
 
 @frappe.whitelist()
+def send_entire_stock_balance() -> None:
+    all_items = frappe.get_all(
+        "Item",
+        filters={"is_stock_item": 1, "custom_sent_to_slade": 1},
+        fields=["name", "item_code", "item_name"],
+    )
+
+    for item in all_items:
+        frappe.enqueue(submit_inventory, name=item.name)
+
+
+@frappe.whitelist()
 def submit_inventory(name: str) -> None:
     # TODO: Redesign this function to work with the new structure for Stock Submission
-    pass
-    # if not name:
-    #     frappe.throw("Item name is required.")
+    # pass
+    if not name:
+        frappe.throw("Item name is required.")
 
-    # stock_levels = frappe.db.get_all(
-    #     "Bin",
-    #     filters={"item_code": name},
-    #     fields=["warehouse", "actual_qty", "reserved_qty", "projected_qty", "name"],
-    # )
+    settings = get_settings()
+    stock_levels = frappe.db.get_all(
+        "Bin",
+        filters={"item_code": name},
+        fields=["warehouse", "actual_qty", "reserved_qty", "projected_qty", "name"],
+    )
 
-    # if not stock_levels:
-    #     frappe.msgprint(f"No stock levels found for item {name}.")
-    # else:
-    #     department = frappe.defaults.get_user_default("Department") or frappe.get_value(
-    #         "Department", {}, "name"
-    #     )
-    #     for stock in stock_levels:
-    #         request_data = {
-    #             "document_name": stock.get("name"),
-    #             "inventory_reference": f"{name} - {stock['warehouse']}",
-    #             "description": f"{name} Stock Adjustment for {stock['warehouse']}",
-    #             "reason": "Opening Stock",
-    #             "source_organisation_unit": get_link_value(
-    #                 "Department",
-    #                 "name",
-    #                 department,
-    #                 "custom_slade_id",
-    #             ),
-    #             "location": get_link_value(
-    #                 "Warehouse",
-    #                 "name",
-    #                 stock.get("warehouse"),
-    #                 "custom_slade_id",
-    #             ),
-    #         }
-    #         process_request(
-    #             request_data,
-    #             route_key="StockMasterSaveReq",
-    #             handler_function=submit_inventory_on_success,
-    #             request_method="POST",
-    #             doctype="Bin",
-    #         )
+    if not stock_levels:
+        frappe.msgprint(f"No stock levels found for item {name}.")
+    else:
+        request_data = {
+            "document_name": name,
+            "inventory_reference": name,
+            "description": f"{name} Stock Adjustment for {name}",
+            "reason": "Opening Stock",
+            "source_organisation_unit": get_link_value(
+                "Department",
+                "name",
+                settings.department,
+                "custom_slade_id",
+            ),
+            "location": get_link_value(
+                "Warehouse",
+                "name",
+                settings.get("warehouse"),
+                "custom_slade_id",
+            ),
+        }
+        process_request(
+            request_data,
+            route_key="StockMasterSaveReq",
+            handler_function=submit_inventory_on_success,
+            request_method="POST",
+            doctype="Item",
+        )
 
 
 @frappe.whitelist()
@@ -915,124 +929,6 @@ def submit_uom_list() -> dict | None:
 
 
 @frappe.whitelist()
-def sync_warehouse_details(request_data: str, type: str = "warehouse") -> None:
-    if type == "warehouse":
-        process_request(
-            request_data,
-            "WarehouseSearchReq",
-            warehouse_search_on_success,
-            doctype="Warehouse",
-        )
-    else:
-        process_request(
-            request_data,
-            "LocationSearchReq",
-            location_search_on_success,
-            doctype="Warehouse",
-        )
-
-
-@frappe.whitelist()
-def submit_warehouse_list() -> None:
-    warehouses = frappe.get_all("Warehouse", filters={"is_group": 1}, fields=["name"])
-    for warehouse in warehouses:
-        submit_warehouse(warehouse.name)
-
-
-@frappe.whitelist()
-def save_warehouse_details(name: str) -> dict | None:
-    is_group = frappe.db.get_value("Warehouse", name, "is_group")
-    submit_warehouse(name) if is_group == 1 else submit_location(name)
-
-
-@frappe.whitelist()
-def submit_warehouse(name: str) -> dict | None:
-    item = frappe.get_doc("Warehouse", name)
-    slade_id = item.get("custom_slade_id", None)
-    route_key = "WarehousesSearchReq"
-    on_success = warehouse_update_on_success
-    request_data = {
-        "name": item.get("warehouse_name"),
-        "document_name": item.get("name"),
-        "organisation": get_link_value(
-            "Company",
-            "name",
-            item.get("company"),
-            "custom_slade_id",
-        ),
-        "active": False if item.get("disabled") == 1 else True,
-    }
-    if slade_id:
-        request_data["id"] = slade_id
-        method = "PATCH"
-    else:
-        method = "POST"
-
-    process_request(
-        request_data,
-        route_key=route_key,
-        handler_function=on_success,
-        request_method=method,
-        doctype="Warehouse",
-    )
-
-
-def warehouse_update_on_success(response: dict, document_name: str, **kwargs) -> None:
-    frappe.db.set_value(
-        "Warehouse", document_name, {"custom_slade_id": response.get("id")}
-    )
-    warehouses = frappe.get_all(
-        "Warehouse", filters={"parent_warehouse": document_name}, fields=["name"]
-    )
-    for warehouse in warehouses:
-        submit_location(warehouse.name)
-
-
-@frappe.whitelist()
-def submit_location(name: str) -> dict | None:
-    item = frappe.get_doc("Warehouse", name)
-    slade_id = item.get("custom_slade_id", None)
-    route_key = "LocationsSearchReq"
-    on_success = location_update_on_success
-
-    request_data = {
-        "name": item.get("warehouse_name"),
-        "document_name": item.get("name"),
-        "organisation": get_link_value(
-            "Company",
-            "name",
-            item.get("company"),
-            "custom_slade_id",
-        ),
-        "warehouse": get_link_value(
-            "Warehouse", "name", item.get("parent_warehouse"), "custom_slade_id"
-        ),
-        "branch": get_link_value(
-            "Branch",
-            "name",
-            item.get("custom_branch"),
-            "slade_id",
-        ),
-        "active": False if item.get("disabled") == 1 else True,
-        "location_type": "virtual",
-    }
-
-    if slade_id:
-        request_data["id"] = slade_id
-        method = "PATCH"
-    else:
-        method = "POST"
-
-    process_request(
-        request_data,
-        route_key=route_key,
-        handler_function=on_success,
-        request_method=method,
-        doctype="Warehouse",
-    )
-
-
-@frappe.whitelist()
 def submit_pricelist(name: str) -> dict | None:
     item = frappe.get_doc("Price List", name)
     slade_id = item.get("custom_slade_id", None)
@@ -1225,7 +1121,7 @@ def send_all_mode_of_payments() -> None:
         fields=["name"],
     )
     for mop in mode_of_payments:
-        send_mode_of_payment_details(mop.name)
+        frappe.enqueue(send_mode_of_payment_details, name=mop.name)
 
 
 @frappe.whitelist()

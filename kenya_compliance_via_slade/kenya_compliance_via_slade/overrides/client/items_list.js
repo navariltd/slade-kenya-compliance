@@ -52,6 +52,22 @@ frappe.listview_settings[doctypeName].onload = async function (listview) {
     );
 
     listview.page.add_inner_button(
+      __("Submit Inventory"),
+      function (listview) {
+        frappe.call({
+          method:
+            "kenya_compliance_via_slade.kenya_compliance_via_slade.apis.apis.send_entire_stock_balance",
+          args: {},
+          callback: (response) => {},
+          error: (r) => {
+            // Error Handling is Defered to the Server
+          },
+        });
+      },
+      __("eTims Actions")
+    );
+
+    listview.page.add_inner_button(
       __("Register all Items"),
       function (listview) {
         frappe.call({
