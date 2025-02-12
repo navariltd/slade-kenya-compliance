@@ -2750,17 +2750,6 @@
   "sort_order": "0"
  },
  {
-  "code": "ZA",
-  "code_description": "",
-  "code_name": "South Africa",
-  "currency_code": "ZAR",
-  "docstatus": 0,
-  "doctype": "Navari eTims Country",
-  "modified": "2025-01-23 13:24:50.700290",
-  "name": "South Africa",
-  "sort_order": "0"
- },
- {
   "code": "ZM",
   "code_description": "",
   "code_name": "Zambia",
@@ -2868,6 +2857,17 @@
   "doctype": "Navari eTims Country",
   "modified": "2025-01-23 13:24:50.107555",
   "name": "LEBANON",
+  "sort_order": "0"
+ },
+ {
+  "code": "ZA",
+  "code_description": "",
+  "code_name": "South Africa",
+  "currency_code": "ZAR",
+  "docstatus": 0,
+  "doctype": "Navari eTims Country",
+  "modified": "2025-01-23 13:24:50.700290",
+  "name": "South Africa",
   "sort_order": "0"
  }
 ]
