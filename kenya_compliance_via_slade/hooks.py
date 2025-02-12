@@ -123,9 +123,9 @@ doctype_list_js = {
     "Branch": "kenya_compliance_via_slade/overrides/client/branch_list.js",
     "Customer": "kenya_compliance_via_slade/overrides/client/customer_list.js",
     "UOM": "kenya_compliance_via_slade/overrides/client/uom_list.js",
-    "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse_list.js",
+    # "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse_list.js",
     "Mode of Payment": "kenya_compliance_via_slade/overrides/client/mode_of_payment_list.js",
-    # "Supplier": "kenya_compliance_via_slade/overrides/client/supplier_list.js",
+    "Supplier": "kenya_compliance_via_slade/overrides/client/supplier_list.js",
     # "Price List": "kenya_compliance_via_slade/overrides/client/price_list_list.js",
     # "Item Price": "kenya_compliance_via_slade/overrides/client/item_price_list.js",
 }
@@ -291,8 +291,8 @@ scheduler_events = {
         "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.refresh_notices",
     ],
     "hourly": [
-        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_sales_invoices_information",
-        "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_purchase_information",
+        # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_sales_invoices_information",
+        # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_purchase_information",
         # "kenya_compliance_via_slade.kenya_compliance_via_slade.background_tasks.tasks.send_stock_information",
     ],
     "monthly": [

@@ -1,7 +1,5 @@
 from hashlib import sha256
 
-import requests
-
 import frappe
 from frappe.model.document import Document
 
@@ -13,7 +11,7 @@ from ...doctype.doctype_names_mapping import (
     OPERATION_TYPE_DOCTYPE_NAME,
     SETTINGS_DOCTYPE_NAME,
 )
-from ...utils import extract_document_series_number
+from ...utils import extract_document_series_number, get_settings
 
 endpoints_builder = EndpointsBuilder()
 
@@ -34,8 +32,14 @@ def save_ledger_details(name: str) -> None:
 
         elif not doc.custom_slade_id:
             record = frappe.get_doc(doc.voucher_type, doc.voucher_no)
-            payload = prepare_payload(doc, record)
-            handle_operation_type(doc, payload)
+            if (
+                doc.voucher_type == "Stock Entry"
+                and getattr(record, "stock_entry_type", "") == "Material Transfer"
+            ):
+                return
+            else:
+                payload = prepare_payload(doc, record)
+                handle_operation_type(doc, payload)
 
         elif not doc.custom_inventory_submitted_successfully:
             stock_mvt_submission_on_success(
@@ -55,7 +59,6 @@ def save_ledger_details(name: str) -> None:
 def prepare_payload(doc: dict, record: dict) -> dict:
     company_name = doc.company
     series_no = extract_document_series_number(record)
-    branch_name = get_default("Branch")
     department_name = get_default("Department")
 
     payload = {
@@ -105,11 +108,14 @@ def map_document_type(doc: dict) -> str:
 
 
 def update_payload_for_stock_reconciliation(doc: dict, payload: dict) -> None:
+    settings = get_settings(company_name=doc.company)
     payload.update(
         {
             "inventory_reference": doc.name,
             "reason": "Stock Reconciliation",
-            "location": frappe.get_value("Warehouse", doc.warehouse, "custom_slade_id"),
+            "location": frappe.get_value(
+                "Warehouse", settings.warehouse, "custom_slade_id"
+            ),
         }
     )
 
@@ -135,6 +141,8 @@ def update_payload_for_sales(doc: dict, record: dict, payload: dict) -> None:
 
 
 def handle_operation_type(doc: dict, payload: dict) -> None:
+    settings = get_settings(company_name=doc.company)
+    warehouse = frappe.get_doc("Warehouse", settings.warehouse)
     if doc.voucher_type == "Stock Reconciliation":
         submit_stock_mvt(payload, "StockMasterSaveReq")
 
@@ -143,7 +151,7 @@ def handle_operation_type(doc: dict, payload: dict) -> None:
 
         matching_operation = frappe.db.get_value(
             OPERATION_TYPE_DOCTYPE_NAME,
-            {"operation_type": operation_type, "warehouse": doc.warehouse},
+            {"operation_type": operation_type, "warehouse": settings.warehouse},
             ["name", "slade_id"],
         )
 
@@ -151,7 +159,7 @@ def handle_operation_type(doc: dict, payload: dict) -> None:
             payload["operation_type"] = matching_operation[1]
             submit_stock_mvt(payload, "StockIOSaveReq")
         else:
-            create_and_enqueue_operation(doc, operation_type, payload)
+            create_and_enqueue_operation(doc, operation_type, warehouse)
 
 
 def get_operation_type(doc: dict, document_type: str) -> dict:
@@ -186,61 +194,30 @@ def get_operation_type(doc: dict, document_type: str) -> dict:
 
 
 def create_and_enqueue_operation(
-    doc: dict, operation_type: dict, payload: dict
+    doc: dict, operation_type: dict, warehouse: Document
 ) -> None:
-    name_parts = [doc.company, doc.warehouse, operation_type]
+    name_parts = [doc.company, warehouse.name, operation_type]
     new_operation_type = frappe.get_doc(
         {
             "doctype": OPERATION_TYPE_DOCTYPE_NAME,
             "operation_type": operation_type,
             "company": doc.company,
-            "warehouse": doc.warehouse,
+            "warehouse": warehouse.name,
+            "source_location": (
+                warehouse.custom_slade_supplier_warehouse
+                if operation_type == "outgoing"
+                else warehouse.custom_slade_id
+            ),
+            "destination_location": (
+                warehouse.custom_slade_customer_warehouse
+                if operation_type == "incoming"
+                else warehouse.custom_slade_id
+            ),
             "operation_name": " ".join(name_parts),
             "active": 1,
         }
     )
     new_operation_type.insert()
-
-    process_request(
-        {"document_name": new_operation_type.name, "company": doc.company},
-        route_key="LocationsSearchReq",
-        handler_function=location_defaults_search_on_success,
-        request_method="GET",
-        doctype=OPERATION_TYPE_DOCTYPE_NAME,
-    )
-
-
-def location_defaults_search_on_success(
-    response: dict, document_name: str, **kwargs
-) -> None:
-    try:
-        operation = frappe.get_doc(OPERATION_TYPE_DOCTYPE_NAME, document_name)
-        locations = response.get("results", [response])
-        if operation.operation_type == "outgoing":
-            operation.source_location_id = frappe.get_value(
-                "Warehouse", operation.warehouse, "custom_slade_id"
-            )
-            operation.destination_location_id = next(
-                (loc["id"] for loc in locations if loc["location_type"] == "customer"),
-                None,
-            )
-        elif operation.operation_type == "incoming":
-            operation.destination_location_id = frappe.get_value(
-                "Warehouse", operation.warehouse, "custom_slade_id"
-            )
-            operation.source_location_id = next(
-                (loc["id"] for loc in locations if loc["location_type"] == "supplier"),
-                None,
-            )
-
-        operation.save(ignore_permissions=True)
-
-    except requests.RequestException as e:
-        frappe.log_error(
-            title="Error Fetching Locations",
-            message=f"Error while fetching locations: {str(e)}",
-        )
-        return
 
 
 def get_default(field: str) -> str:
@@ -281,7 +258,6 @@ def stock_mvt_submission_on_success(
     route_key = "StockIOLineReq"
     requset_data = {
         "document_name": document_name,
-        "branch": frappe.get_value("Branch", record.branch, "slade_id"),
         "organisation": frappe.get_value("Company", record.company, "custom_slade_id"),
         "source_organisation_unit": frappe.get_value(
             "Department", record.department, "custom_slade_id"
@@ -289,11 +265,10 @@ def stock_mvt_submission_on_success(
         "product": item.custom_slade_id,
         "quantity": abs(doc.actual_qty),
         "quantity_confirmed": abs(doc.actual_qty),
-        "new_price": (round(int(doc.valuation_rate), 2) if doc.valuation_rate else 0),
     }
     if doc.voucher_type == "Stock Reconciliation":
         route_key = "StockMasterLineReq"
-        requset_data["quantity"] = doc.qty_after_transaction
+        requset_data["quantity"] = get_total_stock_balance(doc.item_code)
 
     if route_key == "StockIOLineReq":
         requset_data["inventory_operation"] = id
@@ -313,6 +288,16 @@ def stock_mvt_submission_on_success(
         handler_function=stock_mvt_submit_items_on_success,
         request_method="POST",
     )
+
+
+def get_total_stock_balance(item_code: str) -> float:
+    bins = frappe.get_all(
+        "Bin", filters={"item_code": item_code}, fields=["warehouse", "actual_qty"]
+    )
+
+    total_qty = sum(float(bin["actual_qty"]) for bin in bins)
+
+    return total_qty
 
 
 def stock_mvt_submit_items_on_success(
