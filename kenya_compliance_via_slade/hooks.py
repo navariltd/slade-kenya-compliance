@@ -111,7 +111,7 @@ doctype_js = {
     "BOM": "kenya_compliance_via_slade/overrides/client/bom.js",
     "Branch": "kenya_compliance_via_slade/overrides/client/branch.js",
     "UOM": "kenya_compliance_via_slade/overrides/client/uom.js",
-    "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse.js",
+    # "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse.js",
     "Mode of Payment": "kenya_compliance_via_slade/overrides/client/mode_of_payment.js",
     # "Price List": "kenya_compliance_via_slade/overrides/client/price_list.js",
     # "Item Price": "kenya_compliance_via_slade/overrides/client/item_price.js",
@@ -125,7 +125,7 @@ doctype_list_js = {
     "UOM": "kenya_compliance_via_slade/overrides/client/uom_list.js",
     "Warehouse": "kenya_compliance_via_slade/overrides/client/warehouse_list.js",
     "Mode of Payment": "kenya_compliance_via_slade/overrides/client/mode_of_payment_list.js",
-    "Supplier": "kenya_compliance_via_slade/overrides/client/supplier_list.js",
+    # "Supplier": "kenya_compliance_via_slade/overrides/client/supplier_list.js",
     # "Price List": "kenya_compliance_via_slade/overrides/client/price_list_list.js",
     # "Item Price": "kenya_compliance_via_slade/overrides/client/item_price_list.js",
 }

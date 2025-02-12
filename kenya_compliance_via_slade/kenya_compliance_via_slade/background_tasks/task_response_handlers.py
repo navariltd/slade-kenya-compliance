@@ -10,6 +10,7 @@ from ..doctype.doctype_names_mapping import (
     OPERATION_TYPE_DOCTYPE_NAME,
     PACKAGING_UNIT_DOCTYPE_NAME,
     PAYMENT_TYPE_DOCTYPE_NAME,
+    SETTINGS_DOCTYPE_NAME,
     TAXATION_TYPE_DOCTYPE_NAME,
     UNIT_OF_QUANTITY_DOCTYPE_NAME,
     UOM_CATEGORY_DOCTYPE_NAME,
@@ -441,16 +442,8 @@ def uom_search_on_success(response: dict, **kwargs) -> None:
 
 
 def warehouse_search_on_success(response: dict, **kwargs) -> None:
-    handle_warehouse_search_on_success(response)
+    from ..utils import get_settings
 
-
-def location_search_on_success(response: dict, **kwargs) -> None:
-    handle_warehouse_search_on_success(response, True)
-
-
-def handle_warehouse_search_on_success(
-    response: dict, is_location: bool = False
-) -> None:
     if isinstance(response, str):
         try:
             response = json.loads(response)
@@ -461,45 +454,90 @@ def handle_warehouse_search_on_success(
         response if isinstance(response, list) else response.get("results", [response])
     )
 
-    for record in doc_list:
-        if isinstance(record, str):
-            continue
+    settings = get_settings()
 
+    bhfid_slade_id = frappe.db.get_value("Branch", settings.bhfid, "slade_id")
+    selected_record = (
+        next((r for r in doc_list if r.get("branch") == bhfid_slade_id), None)
+        or next((r for r in doc_list if "Stock" in r.get("name", "")), None)
+        or (doc_list[0] if doc_list else None)
+    )
+    if selected_record:
         existing_warehouse = frappe.db.get_value(
-            "Warehouse", {"warehouse_name": record.get("name")}, "name"
+            "Warehouse", {"company": settings.company, "is_group": 1}, "name"
         )
         if existing_warehouse:
-            doc = frappe.get_doc("Warehouse", existing_warehouse)
-        else:
-            warehouse_name = record.get("name")
-
-            doc = frappe.new_doc("Warehouse")
-            doc.warehouse_name = warehouse_name
-
-        if record.get("organisation"):
-            doc.company = (
-                get_link_value("Company", "custom_slade_id", record.get("organisation"))
-                or frappe.defaults.get_user_default("Company")
-                or frappe.get_value("Company", {}, "name")
+            frappe.db.set_value(
+                "Warehouse",
+                existing_warehouse,
+                {
+                    "custom_slade_id": selected_record.get("id", ""),
+                },
             )
-        if is_location and record.get("branch"):
-            doc.branch = get_link_value("Branch", "slade_id", record.get("branch"))
-        if is_location and record.get("warehouse"):
-            doc.parent_warehouse = get_link_value(
-                "Warehouse", "custom_slade_id", record.get("warehouse")
+            frappe.db.set_value(
+                SETTINGS_DOCTYPE_NAME,
+                settings.name,
+                {
+                    "warehouse": existing_warehouse,
+                },
             )
-        if record.get("id"):
-            doc.custom_slade_id = record.get("id", "")
-        doc.disabled = 0 if record.get("active") else 1
-        if not is_location:
-            doc.is_group = 1
+            frappe.enqueue(
+                search_customer_supplier_locations, document_name=settings.name
+            )
 
+
+def search_customer_supplier_locations(document_name: str) -> None:
+    from ..apis.process_request import process_request
+
+    process_request(
+        {"location_type": "customer", "document_name": document_name},
+        "LocationsSearchReq",
+        search_customer_supplier_locations_on_success,
+        doctype=SETTINGS_DOCTYPE_NAME,
+    )
+
+    process_request(
+        {"location_type": "supplier", "document_name": document_name},
+        "LocationsSearchReq",
+        search_customer_supplier_locations_on_success,
+        doctype=SETTINGS_DOCTYPE_NAME,
+    )
+
+
+def search_customer_supplier_locations_on_success(
+    response: dict, document_name: str, **kwargs
+) -> None:
+    if isinstance(response, str):
         try:
-            doc.save(ignore_permissions=True)
-        except frappe.DuplicateEntryError:
-            continue
+            response = json.loads(response)
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON string: {response}")
 
-    frappe.db.commit()
+    doc_list = (
+        response if isinstance(response, list) else response.get("results", [response])
+    )
+    settings = frappe.get_doc(SETTINGS_DOCTYPE_NAME, document_name)
+    bhfid_slade_id = frappe.db.get_value("Branch", settings.bhfid, "slade_id")
+    selected_record = next(
+        (r for r in doc_list if r.get("branch") == bhfid_slade_id), None
+    ) or (doc_list[0] if doc_list else None)
+
+    if selected_record:
+        location_type = selected_record.get("location_type", "").lower()
+        if location_type == "supplier":
+            frappe.db.set_value(
+                "Warehouse",
+                settings.warehouse,
+                "custom_slade_supplier_warehouse",
+                selected_record.get("id"),
+            )
+        elif location_type == "customer":
+            frappe.db.set_value(
+                "Warehouse",
+                settings.warehouse,
+                "custom_slade_customer_warehouse",
+                selected_record.get("id"),
+            )
 
 
 def pricelist_search_on_success(response: dict, **kwargs) -> None:

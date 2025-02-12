@@ -16,7 +16,6 @@ from ..overrides.server.stock_ledger_entry import on_update
 from ..utils import get_settings
 from .task_response_handlers import (
     itemprice_search_on_success,
-    location_search_on_success,
     operation_types_search_on_success,
     pricelist_search_on_success,
     uom_category_search_on_success,
@@ -227,6 +226,13 @@ def search_organisations_request(request_data: str | dict) -> str:
 
     messages = [process_request(request_data, task[0], task[1]) for task in tasks]
 
+    process_request(
+        {"location_type": "internal"},
+        "LocationsSearchReq",
+        warehouse_search_on_success,
+        doctype="Warehouse",
+    )
+
     return " ".join(messages)
 
 
@@ -259,23 +265,6 @@ def fetch_etims_uom_list(request_data: str) -> None:
         doctype="UOM",
     )
     return message
-
-
-@frappe.whitelist()
-def fetch_etims_warehouse_list(request_data: str) -> None:
-    warehouses = process_request(
-        request_data,
-        "WarehousesSearchReq",
-        warehouse_search_on_success,
-        doctype="Warehouse",
-    )
-    locations = process_request(
-        request_data,
-        "LocationsSearchReq",
-        location_search_on_success,
-        doctype="Warehouse",
-    )
-    return warehouses, locations
 
 
 @frappe.whitelist()

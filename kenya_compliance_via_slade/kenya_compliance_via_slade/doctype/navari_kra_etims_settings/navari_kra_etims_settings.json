@@ -21,6 +21,7 @@
   "bhfid",
   "department",
   "workstation",
+  "warehouse",
   "request_frequency_tab",
   "frequency_of_communication_with_etims_servers_section",
   "column_break_fsjl",
@@ -396,7 +397,6 @@
    "reqd": 1
   },
   {
-   "description": "00 is Head-Office/Headquarters, 01 to 99 is Branch Office",
    "fieldname": "department",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -497,6 +497,13 @@
    "fieldtype": "Data",
    "label": "Codes Refresh Freq. Cron Format",
    "mandatory_depends_on": "eval:doc.notices_refresh_frequency === \"Cron\";"
+  },
+  {
+   "fetch_from": "etims_user.workstation",
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Default Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -507,7 +514,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-02-12 18:51:21.380650",
+ "modified": "2025-02-12 22:09:44.963647",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",
