@@ -344,24 +344,28 @@
    "fieldname": "access_token",
    "fieldtype": "Data",
    "label": "Access Token",
+   "no_copy": 1,
    "read_only": 1
   },
   {
    "fieldname": "refresh_token",
    "fieldtype": "Data",
    "label": "Refresh Token",
+   "no_copy": 1,
    "read_only": 1
   },
   {
    "fieldname": "expires_in",
    "fieldtype": "Data",
    "label": "Expires In",
+   "no_copy": 1,
    "read_only": 1
   },
   {
    "fieldname": "token_expiry",
    "fieldtype": "Datetime",
-   "label": "Token Expiry"
+   "label": "Token Expiry",
+   "no_copy": 1
   },
   {
    "fieldname": "section_break_eqay",
@@ -503,7 +507,7 @@
    "link_fieldname": "reference_docname"
   }
  ],
- "modified": "2025-02-12 17:05:44.229177",
+ "modified": "2025-02-12 18:51:21.380650",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "Navari KRA eTims Settings",

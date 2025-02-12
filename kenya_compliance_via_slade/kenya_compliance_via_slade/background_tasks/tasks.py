@@ -14,7 +14,7 @@ from ..doctype.doctype_names_mapping import (
 )
 from ..overrides.server.stock_ledger_entry import on_update
 from ..utils import get_settings
-from .task_response_handlers import (  # update_organisations,
+from .task_response_handlers import (
     itemprice_search_on_success,
     location_search_on_success,
     operation_types_search_on_success,
@@ -24,7 +24,6 @@ from .task_response_handlers import (  # update_organisations,
     update_branches,
     update_countries,
     update_currencies,
-    update_departments,
     update_item_classification_codes,
     update_packaging_units,
     update_taxation_type,
@@ -217,12 +216,12 @@ def refresh_code_lists(request_data: str) -> str:
 
 
 @frappe.whitelist()
-def search_organisations_request(request_data: str) -> str:
+def search_organisations_request(request_data: str | dict) -> str:
     """Refresh code lists based on request data."""
     tasks = [
         # ("OrgSearchReq", update_organisations), # Shift to the auth API
         ("BhfSearchReq", update_branches),
-        ("DeptSearchReq", update_departments),
+        # ("DeptSearchReq", update_departments), # Shift to the auth API
         ("WorkstationSearchReq", update_workstations),
     ]
 

@@ -6,14 +6,26 @@ from frappe.model.document import Document
 
 from ...background_tasks.tasks import (
     refresh_notices,
+    search_organisations_request,
     send_purchase_information,
     send_sales_invoices_information,
     send_stock_information,
 )
+from ...utils import user_details_fetch
 
 
 class NavariKRAeTimsSettings(Document):
     """ETims Integration Settings doctype"""
+
+    def after_insert(self) -> None:
+        if self.is_active == 1:
+            request_data = {
+                "branch_id": self.bhfid,
+                "company_name": self.company,
+                "document_name": self.name,
+            }
+            search_organisations_request(request_data)
+            user_details_fetch(self.name)
 
     def validate(self) -> None:
         if self.is_active == 1:
