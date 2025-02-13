@@ -84,6 +84,17 @@ def bulk_register_item(docs_list: str) -> None:
 
 
 @frappe.whitelist()
+def update_all_items() -> None:
+    data = frappe.db.get_all(
+        "Item", filters={"custom_sent_to_slade": 1}, fields=["name"]
+    )
+
+    for record in data:
+        item_name = frappe.db.get_value("Item", record, "name")
+        frappe.enqueue(perform_item_registration, item_name=str(item_name))
+
+
+@frappe.whitelist()
 def register_all_items() -> None:
     data = frappe.db.get_all(
         "Item", filters={"custom_sent_to_slade": 0}, fields=["name"]
