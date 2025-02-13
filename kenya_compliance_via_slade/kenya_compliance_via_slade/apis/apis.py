@@ -84,6 +84,17 @@ def bulk_register_item(docs_list: str) -> None:
 
 
 @frappe.whitelist()
+def update_all_items() -> None:
+    data = frappe.db.get_all(
+        "Item", filters={"custom_sent_to_slade": 1}, fields=["name"]
+    )
+
+    for record in data:
+        item_name = frappe.db.get_value("Item", record, "name")
+        frappe.enqueue(perform_item_registration, item_name=str(item_name))
+
+
+@frappe.whitelist()
 def register_all_items() -> None:
     data = frappe.db.get_all(
         "Item", filters={"custom_sent_to_slade": 0}, fields=["name"]
@@ -143,6 +154,7 @@ def perform_item_registration(item_name: str) -> dict | None:
     )
     sent_to_slade = item.get("custom_sent_to_slade", False)
     custom_slade_id = item.get("custom_slade_id", None)
+    selling_price = round(item.get("valuation_rate", 1), 2) or 1
 
     request_data = {
         "name": item.get("item_name"),
@@ -176,7 +188,7 @@ def perform_item_registration(item_name: str) -> dict | None:
             "slade_id",
         ),
         "sale_taxes": [tax],
-        "selling_price": round(item.get("valuation_rate", 1), 2),
+        "selling_price": selling_price,
         "purchasing_price": round(item.get("last_purchase_rate", 1), 2),
         "categories": [],
         "purchase_taxes": [],
