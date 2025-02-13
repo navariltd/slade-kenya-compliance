@@ -14,7 +14,7 @@ from ...utils import get_taxation_types
 endpoints_builder = EndpointsBuilder()
 
 
-def validate(doc: Document, method: str) -> None:
+def validate(doc: Document, method: str = None) -> None:
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
         return
     get_itemised_tax_breakup_data(doc)
@@ -37,7 +37,7 @@ def validate(doc: Document, method: str) -> None:
         )
 
 
-def on_submit(doc: Document, method: str) -> None:
+def on_submit(doc: Document, method: str = None) -> None:
     submit_purchase_invoice(doc)
 
 

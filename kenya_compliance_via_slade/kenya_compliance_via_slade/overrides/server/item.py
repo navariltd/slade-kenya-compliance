@@ -8,7 +8,7 @@ from ...doctype.doctype_names_mapping import SETTINGS_DOCTYPE_NAME
 from ...utils import generate_custom_item_code_etims
 
 
-def on_update(doc: Document, method: str) -> None:
+def on_update(doc: Document, method: str = None) -> None:
     """Item doctype before insertion hook"""
 
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
@@ -18,7 +18,7 @@ def on_update(doc: Document, method: str) -> None:
         perform_item_registration(doc.name)
 
 
-def validate(doc: Document, method: str) -> None:
+def validate(doc: Document, method: str = None) -> None:
     # Check if the tax type field has changed
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
         return
