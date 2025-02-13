@@ -143,6 +143,7 @@ def perform_item_registration(item_name: str) -> dict | None:
     )
     sent_to_slade = item.get("custom_sent_to_slade", False)
     custom_slade_id = item.get("custom_slade_id", None)
+    selling_price = round(item.get("valuation_rate", 1), 2) or 1
 
     request_data = {
         "name": item.get("item_name"),
@@ -176,7 +177,7 @@ def perform_item_registration(item_name: str) -> dict | None:
             "slade_id",
         ),
         "sale_taxes": [tax],
-        "selling_price": round(item.get("valuation_rate", 1), 2),
+        "selling_price": selling_price,
         "purchasing_price": round(item.get("last_purchase_rate", 1), 2),
         "categories": [],
         "purchase_taxes": [],
