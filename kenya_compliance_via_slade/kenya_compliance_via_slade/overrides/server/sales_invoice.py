@@ -4,7 +4,7 @@ from frappe.model.document import Document
 from .shared_overrides import generic_invoices_on_submit_override
 
 
-def on_submit(doc: Document, method: str) -> None:
+def on_submit(doc: Document, method: str = None) -> None:
 
     if (
         doc.custom_successfully_submitted == 0
@@ -14,7 +14,7 @@ def on_submit(doc: Document, method: str) -> None:
         generic_invoices_on_submit_override(doc, "Sales Invoice")
 
 
-def before_cancel(doc: Document, method: str) -> None:
+def before_cancel(doc: Document, method: str = None) -> None:
     """Disallow cancelling of submitted invoice to eTIMS."""
 
     if doc.doctype == "Sales Invoice" and doc.custom_successfully_submitted:
