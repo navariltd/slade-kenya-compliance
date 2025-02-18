@@ -1,3 +1,4 @@
+import uuid
 from hashlib import sha256
 
 import frappe
@@ -39,7 +40,7 @@ def save_ledger_details(name: str) -> None:
                 return
             else:
                 payload = prepare_payload(doc, record)
-                handle_operation_type(doc, payload)
+                handle_operation_type(doc, record, payload)
 
         elif not doc.custom_inventory_submitted_successfully:
             stock_mvt_submission_on_success(
@@ -72,9 +73,11 @@ def prepare_payload(doc: dict, record: dict) -> dict:
         "document_count": series_no,
     }
 
-    payload["document_type"] = map_document_type(doc)
+    payload["document_type"] = map_document_type(doc, record)
 
-    if doc.voucher_type == "Stock Reconciliation":
+    if doc.voucher_type == "Stock Reconciliation" or (
+        doc.voucher_type == "Stock Entry" and record.is_opening == "Yes"
+    ):
         update_payload_for_stock_reconciliation(doc, payload)
 
     if doc.voucher_type in ("Purchase Receipt", "Purchase Invoice"):
@@ -86,7 +89,7 @@ def prepare_payload(doc: dict, record: dict) -> dict:
     return payload
 
 
-def map_document_type(doc: dict) -> str:
+def map_document_type(doc: dict, record: dict) -> str:
     document_type_mapping = {
         "Stock Reconciliation": "stock_take",
         "Purchase Receipt": "grn",
@@ -99,6 +102,8 @@ def map_document_type(doc: dict) -> str:
         return document_type_mapping[doc.voucher_type]
 
     if doc.voucher_type == "Stock Entry":
+        if record.is_opening == "Yes":
+            return "stock_take"
         if doc.actual_qty > 0:
             return "warehouse_in"
         elif doc.actual_qty < 0:
@@ -140,10 +145,12 @@ def update_payload_for_sales(doc: dict, record: dict, payload: dict) -> None:
         )
 
 
-def handle_operation_type(doc: dict, payload: dict) -> None:
+def handle_operation_type(doc: dict, record: dict, payload: dict) -> None:
     settings = get_settings(company_name=doc.company)
     warehouse = frappe.get_doc("Warehouse", settings.warehouse)
-    if doc.voucher_type == "Stock Reconciliation":
+    if doc.voucher_type == "Stock Reconciliation" or (
+        doc.voucher_type == "Stock Entry" and record.is_opening == "Yes"
+    ):
         submit_stock_mvt(payload, "StockMasterSaveReq")
 
     else:
@@ -178,19 +185,6 @@ def get_operation_type(doc: dict, document_type: str) -> dict:
     operation_type = document_to_operation_mapping.get(document_type)
 
     return operation_type
-
-    # return {
-    #     "operation_type": operation_type,
-    #     "company": doc.company,
-    #     "source_location": doc.custom_source_warehouse or doc.warehouse,
-    #     "destination_location": doc.custom_target_warehouse or doc.warehouse,
-    #     "transit_location": frappe.get_value(
-    #         "Warehouse",
-    #         {"warehouse_type": "Transit", "company": doc.company},
-    #         "name",
-    #     )
-    #     or doc.warehouse,
-    # }
 
 
 def create_and_enqueue_operation(
@@ -247,12 +241,28 @@ def submit_stock_mvt(payload: dict, route_key: str, **kwargs) -> None:
     )
 
 
+def is_valid_uuid(uuid_to_test: str, version: int = 4) -> bool:
+    try:
+        uuid_obj = uuid.UUID(uuid_to_test, version=version)
+    except ValueError:
+        return False
+    return str(uuid_obj) == uuid_to_test
+
+
 def stock_mvt_submission_on_success(
     response: dict, document_name: str, **kwargs
 ) -> None:
     id = response.get("id")
+    if not id or id == "0" or not is_valid_uuid(id):
+        frappe.log_error(
+            title=f"Invalid ID for Stock Ledger Entry {document_name}",
+            message="Received invalid ID from response",
+        )
+        return
+
     frappe.db.set_value("Stock Ledger Entry", document_name, {"custom_slade_id": id})
     doc = frappe.get_doc("Stock Ledger Entry", document_name)
+
     record = frappe.get_doc(doc.voucher_type, doc.voucher_no)
     item = frappe.get_doc("Item", doc.item_code)
     route_key = "StockIOLineReq"
@@ -266,7 +276,9 @@ def stock_mvt_submission_on_success(
         "quantity": abs(doc.actual_qty),
         "quantity_confirmed": abs(doc.actual_qty),
     }
-    if doc.voucher_type == "Stock Reconciliation":
+    if doc.voucher_type == "Stock Reconciliation" or (
+        doc.voucher_type == "Stock Entry" and record.is_opening == "Yes"
+    ):
         route_key = "StockMasterLineReq"
         requset_data["quantity"] = get_total_stock_balance(doc.item_code)
 
@@ -331,4 +343,50 @@ def stock_mvt_submit_items_on_success(
 def process_stock_mvt_transition(response: dict, document_name: str, **kwargs) -> None:
     frappe.db.set_value(
         "Stock Ledger Entry", document_name, {"custom_submitted_successfully": 1}
+    )
+    doc = frappe.get_doc("Stock Ledger Entry", document_name)
+    settings = get_settings(company_name=doc.company)
+    requset_data = {
+        "document_name": document_name,
+        "id": doc.custom_slade_id,
+        "location": frappe.get_value(
+            "Warehouse", settings.warehouse, "custom_slade_id"
+        ),
+        "product": frappe.get_value("Item", doc.item_code, "custom_slade_id"),
+    }
+    frappe.enqueue(
+        process_request,
+        queue="default",
+        doctype="Stock Ledger Entry",
+        request_data=requset_data,
+        route_key="GetStockBalanceReq",
+        handler_function=stock_balance_on_success,
+        request_method="GET",
+    )
+
+
+def stock_balance_on_success(response: dict, document_name: str, **kwargs) -> None:
+    doc = frappe.get_doc("Stock Ledger Entry", document_name)
+
+    results = (
+        response.get("results", [])
+        if isinstance(response, dict)
+        else response if isinstance(response, list) else []
+    )
+
+    slade_balance = float(results[0].get("quantity", 0)) if results else 0
+    actual_balance = float(get_total_stock_balance(doc.item_code))
+
+    if actual_balance != slade_balance and slade_balance <= 0:
+        from ...apis.apis import submit_inventory
+
+        frappe.enqueue(
+            submit_inventory,
+            queue="default",
+            name=doc.item_code,
+        )
+        return
+
+    frappe.db.set_value(
+        "Stock Ledger Entry", document_name, {"custom_new_total_qty": slade_balance}
     )
