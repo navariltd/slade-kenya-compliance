@@ -1,0 +1,41 @@
+{
+ "chart_name": "Document Submission Status",
+ "chart_type": "Report",
+ "creation": "2025-02-19 17:59:20.363564",
+ "custom_options": "{\"x_field\": \"doctype\", \"chart_type\": \"Bar\", \"y_axis_fields\": [{\"idx\": 1, \"__islocal\": true, \"y_field\": \"not_sent\", \"color\": \"#ECAD4B\", \"name\": \"row 3\"}, {\"idx\": 2, \"__islocal\": true, \"y_field\": \"failed\", \"color\": \"#f50a0a\", \"name\": \"row 1\"}, {\"idx\": 3, \"__islocal\": true, \"y_field\": \"successful\", \"color\": \"#29CD42\", \"name\": \"row 2\"}], \"y_fields\": [\"not_sent\", \"failed\", \"successful\"], \"colors\": [\"#ECAD4B\", \"#f50a0a\", \"#29CD42\"]}",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "filters_json": "{}",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2025-02-19 17:59:57.659733",
+ "modified_by": "Administrator",
+ "module": "Kenya Compliance Via Slade",
+ "name": "Document Submission Status",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "Document Submission Status Report",
+ "roles": [],
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 0,
+ "x_field": "doctype",
+ "y_axis": [
+  {
+   "color": "#ECAD4B",
+   "y_field": "not_sent"
+  },
+  {
+   "color": "#f50a0a",
+   "y_field": "failed"
+  },
+  {
+   "color": "#29CD42",
+   "y_field": "successful"
+  }
+ ]
+}

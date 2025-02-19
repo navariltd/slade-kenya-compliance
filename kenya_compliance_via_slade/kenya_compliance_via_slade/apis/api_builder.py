@@ -194,7 +194,7 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                 data=self._payload,
                 request_description=self._request_description,
                 is_remote_request=True,
-                service_name="eTims via Slade360",
+                service_name=self._request_description,
                 request_headers=self._headers,
                 url=self._url,
                 reference_docname=document_name,
