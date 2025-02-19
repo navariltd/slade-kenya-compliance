@@ -1,0 +1,50 @@
+{
+ "cards": [
+  {
+   "card": "Total Successful Requests"
+  },
+  {
+   "card": "Total Failed Requests"
+  },
+  {
+   "card": "Registered Items"
+  },
+  {
+   "card": "Pending Item Submissions"
+  },
+  {
+   "card": "Signed Invoices"
+  },
+  {
+   "card": "Pending Invoice Submissions"
+  },
+  {
+   "card": "Failed Invoices"
+  },
+  {
+   "card": "Failed Credit Notes"
+  }
+ ],
+ "charts": [
+  {
+   "chart": "Document Submission Status",
+   "width": "Full"
+  },
+  {
+   "chart": "Integration Request Endpoints",
+   "width": "Full"
+  }
+ ],
+ "creation": "2025-02-19 11:18:21.084677",
+ "dashboard_name": "eTims",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2025-02-19 19:16:12.994978",
+ "modified_by": "Administrator",
+ "module": "Kenya Compliance Via Slade",
+ "name": "eTims",
+ "owner": "Administrator"
+}
