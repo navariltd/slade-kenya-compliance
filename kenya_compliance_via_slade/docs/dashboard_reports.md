@@ -77,4 +77,4 @@ The **eTims Dashboard** provides a real-time overview of all eTims-related activ
 
 ---
 
-[<< Previous: Customisations](./customisations.md)
+[⬅️ Previous: Customisations](./customisations.md)

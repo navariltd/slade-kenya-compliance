@@ -1,13 +1,16 @@
-**Operation: Classification**
+## 🚀 Operation Types
+
+### 📂 Classification
 
 Defines different operation types and their associated workflows within the system.
 
-**Operation: Transaction Management**
+### 💼 Transaction Management
 
 Defines and manages new transaction types within the system.
+
 ![Current Environment Identifier](../images/operation_type.png)
 
-### Fields:
+### 📝 Fields
 
 - **Operation Name**: The name assigned to the transaction operation.
 - **Operation Type**: Specifies whether the operation is incoming, outgoing, or internal.
