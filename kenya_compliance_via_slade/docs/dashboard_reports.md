@@ -47,24 +47,42 @@ The **Request Tracking Report** tracks all integrations through the Integration 
 
 ## 📈 **eTims Dashboard**
 
-![eTims Dashboard](images/dashboard.png)
-
 The **eTims Dashboard** provides a real-time overview of all eTims-related activities, helping you manage compliance and track submissions efficiently.
 
 ### Dashboard Insights:
 
 #### 📌 **Key Metrics & Cards:**
 
-- **Total Successful Requests** – Displays the total number of successfully processed requests.
+![eTims Dashboard](images/dashboard.png)
+
+- **Queued Requests** – Displays the number of requests queued for processing.
+- **Total Successful Requests** – Shows the total number of successfully processed requests.
 - **Total Failed Requests** – Tracks all failed eTims submissions.
-- **Registered Items** – Shows the number of successfully registered items in eTims.
 - **Pending Item Submissions** – Lists items that are yet to be submitted.
-- **Signed Invoices** – Indicates the total number of invoices successfully signed and submitted.
 - **Pending Invoice Submissions** – Highlights invoices waiting for submission.
+- **Signed Invoices** – Indicates the total number of invoices successfully signed and submitted.
 - **Failed Invoices** – Tracks invoices that failed during submission.
-- **Failed Credit Notes** – Displays credit notes that were not successfully processed.
+- **Registered Items** – Shows the number of successfully registered items in eTims.
+- **Pending Credit Notes** – Lists credit notes that are yet to be submitted.
+- **Successful Credit Notes** – Displays the number of successfully processed credit notes.
+- **Failed Credit Notes** – Tracks credit notes that were not successfully processed.
+- **Pending Customer Submissions** – Lists customers that are yet to be submitted.
+- **Pending Purchase Submissions** – Highlights purchase submissions waiting for processing.
+- **Successful Purchases** – Shows the number of successfully processed purchases.
+- **Failed Purchases** – Tracks purchases that failed during submission.
+- **Registered Customers** – Displays the number of successfully registered customers.
+- **Pending Stock Ledger Entry Submissions** – Lists stock ledger entries that are yet to be submitted.
+- **Successful Stock Ledger Entries** – Shows the number of successfully processed stock ledger entries.
+- **Failed Stock Ledger Entries** – Tracks stock ledger entries that failed during submission.
+- **Pending Supplier Submissions** – Lists suppliers that are yet to be submitted.
+- **Pending BOM Submissions** – Highlights BOM submissions waiting for processing.
+- **Successful BOMs** – Shows the number of successfully processed BOMs.
+- **Failed BOMs** – Tracks BOMs that failed during submission.
+- **Registered Suppliers** – Displays the number of successfully registered suppliers.
 
 #### 📊 **Charts & Visual Insights:**
+
+![eTims Dashboard](images/dashboard-2.png)
 
 - **Document Submission Status** – Provides a full-width graphical representation of submission statuses (Pending, Successful, Failed).
 - **Integration Request Endpoints** – Displays a full-width chart summarizing API requests, endpoints, and responses.

@@ -8,7 +8,7 @@ This application integrates **ERPNext** with **Kenya Revenue Authority's (KRA) e
 
 ## Why Compliance via Slade360? 🤔
 
-While awaiting full approval by KRA, this integration provides a robust compliance solution through **Slade360**, offering businesses an efficient pathway to meet Kenyan tax regulations.
+This integration provides a robust compliance solution through **Slade360**, offering businesses an efficient pathway to meet Kenyan tax regulations with a highly reliable middleware to VSCU.
 
 For more details about eTims and Slade360:
 
