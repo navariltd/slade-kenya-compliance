@@ -1,4 +1,4 @@
-# Kenya Compliance via Slade360 🚀
+# Kenya Compliance via Slade 360 Advantage 🚀
 
 This application integrates **ERPNext** with **Kenya Revenue Authority's (KRA) eTIMS** through the **Virtual Sales Control Unit (VSCU)**, facilitating seamless tax compliance and data synchronization. With this integration, businesses can:
 
@@ -6,14 +6,14 @@ This application integrates **ERPNext** with **Kenya Revenue Authority's (KRA) e
 - 📦 Update inventory records and manage customer information efficiently.
 - 🛒 Register items and synchronize product data with eTIMS servers.
 
-## Why Compliance via Slade360? 🤔
+## Why Compliance via Slade 360 Advantage? 🤔
 
-This integration provides a robust compliance solution through **Slade360**, offering businesses an efficient pathway to meet Kenyan tax regulations with a highly reliable middleware to VSCU.
+This integration leverages **Slade 360 Advantage**, a trusted third-party solution, to provide businesses with a seamless and robust compliance pathway for Kenyan tax regulations. With a highly reliable middleware to VSCU, it ensures efficiency and accuracy in tax compliance.
 
-For more details about eTims and Slade360:
+For more details about eTims and Slade 360 Advantage:
 
 - 📄 [VSCU Documentation](https://www.kra.go.ke/images/publications/VSCU_Specification_Document_v2.0.pdf)
-- 📘 [Slade360 Documentation](https://developers.slade360.com/docs/getting-started)
+- 📘 [Slade 360 Advantage Documentation](https://developers.slade360.com/docs/getting-started)
 
 ## Key Sections 📚
 
