@@ -32,6 +32,8 @@ For more details about eTims and Slade360:
 
 - #### [Customisations](kenya_compliance_via_slade/docs/customisations.md)
 
+- #### [Dashboard & Reports](kenya_compliance_via_slade/docs/dashboard_reports.md)
+
 For a more comprehensive guide and details on the integration, visit our [Complete Guide](https://github.com/navariltd/kenya-compliance-via-slade/wiki).
 
 ## How to Install
@@ -72,4 +74,4 @@ Installing on [FrappeCloud](https://frappecloud.com/docs/introduction) can be ac
 
 This integration goes through an approved third party. Please contact them for installation details at: [etims@savannahinformatics.com](mailto:etims@savannahinformatics.com).
 
-For support, contact us at: [solutions@navari.co.ke](mailto:solutions@navari.co.ke) or visit [Navari](https://navari.co.ke/).
+For support, contact us at: [support@navari.co.ke](mailto:support@navari.co.ke) or visit [Navari](https://navari.co.ke/).

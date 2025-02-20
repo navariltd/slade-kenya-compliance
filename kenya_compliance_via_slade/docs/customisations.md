@@ -38,4 +38,4 @@ Record all stock movements meticulously and update eTims accordingly to maintain
 
 [More details about Stock Ledger Entry Doctype](./features/stock_submission.md#stock_submission)
 
-[<< Previous: Key DocTypes](./doctypes.md)
+[<< Previous: Key DocTypes](./doctypes.md) | [Next: Dashboard & Reports >>](/kenya_compliance_via_slade/docs/dashboard_reports.md)
