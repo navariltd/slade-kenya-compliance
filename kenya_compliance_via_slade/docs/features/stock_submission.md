@@ -1,18 +1,18 @@
-# **Stock Submission**
+# **📦 Stock Submission**
 
-### Warehouse Customizations
+## 🚧 Warehouse Customizations
 
 <a id="warehouse_customisations"></a>
 
 ![Warehouse Doctype Customisations](../images/warehouses.png)
 
-<a id="operation_type"></a>
+## 🔄 Operation Type
 
-### Operation Type
+<a id="operation_type"></a>
 
 ![Operation Type Doctype Customisations](../images/operation_type.png)
 
-## **Process Overview**
+## **📋 Process Overview**
 
 <a id="stock_submission"></a>
 
@@ -24,9 +24,9 @@ Stock submissions are categorized into two primary processes: **Stock Adjustment
 
 ---
 
-## **Types of Requests**
+## **📑 Types of Requests**
 
-### **1. Stock Adjustment**
+### **1️⃣ Stock Adjustment**
 
 Stock Adjustments handle inventory changes due to **Opening Stock** and **Stock Reconciliation** in ERPNext.
 
@@ -41,7 +41,7 @@ Stock Adjustments handle inventory changes due to **Opening Stock** and **Stock 
 
 ---
 
-### **2. Stock Operation**
+### **2️⃣ Stock Operation**
 
 #### **Stock Operation Types & Mapping**
 
@@ -75,7 +75,7 @@ Stock Adjustments handle inventory changes due to **Opening Stock** and **Stock 
    - Source → **Default warehouse (from eTims settings)**
    - Destination → **Customer (Slade)**
 
-## **Stock Operation Submission Process**
+## **🔄 Stock Operation Submission Process**
 
 1. **Create Operation**
 

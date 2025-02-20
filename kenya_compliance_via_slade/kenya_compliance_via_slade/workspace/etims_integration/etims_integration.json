@@ -351,28 +351,26 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Integration Request Endpoints Report",
    "link_count": 0,
    "link_to": "Integration Requests",
    "link_type": "Report",
    "onboard": 0,
-   "report_ref_doctype": "Integration Request",
    "type": "Link"
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Document Submission Status Report",
    "link_count": 0,
    "link_to": "Document Submission Status Report",
    "link_type": "Report",
    "onboard": 0,
-   "report_ref_doctype": "Item",
    "type": "Link"
   }
  ],
- "modified": "2025-02-19 19:38:59.850885",
+ "modified": "2025-02-20 12:58:09.121412",
  "modified_by": "Administrator",
  "module": "Kenya Compliance Via Slade",
  "name": "eTims Integration",
