@@ -53,7 +53,7 @@ The **eTims Dashboard** provides a real-time overview of all eTims-related activ
 
 #### 📌 **Key Metrics & Cards:**
 
-![eTims Dashboard](images/dashboard.png)
+![eTims Dashboard](images/dashboard-cards.png)
 
 - **Queued Requests** – Displays the number of requests queued for processing.
 - **Total Successful Requests** – Shows the total number of successfully processed requests.
@@ -82,7 +82,7 @@ The **eTims Dashboard** provides a real-time overview of all eTims-related activ
 
 #### 📊 **Charts & Visual Insights:**
 
-![eTims Dashboard](images/dashboard-2.png)
+![eTims Dashboard](images/dashboard-charts.png)
 
 - **Document Submission Status** – Provides a full-width graphical representation of submission statuses (Pending, Successful, Failed).
 - **Integration Request Endpoints** – Displays a full-width chart summarizing API requests, endpoints, and responses.
