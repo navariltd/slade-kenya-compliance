@@ -15,7 +15,7 @@ app_publisher = "Navari Ltd"
 app_description = (
     "KRA eTIMS Online Sales Control Unit (OSCU) Integration with ERPNext by Navari Ltd"
 )
-app_email = "solutions@navari.co.ke"
+app_email = "support@navari.co.ke"
 app_license = "GNU Affero General Public License v3.0"
 required_apps = ["frappe/erpnext"]
 
