@@ -1,0 +1,331 @@
+[
+  {
+    "fieldname": "custom_kra_tax_details",
+    "fieldtype": "Tab Break",
+    "insert_after": "uoms",
+    "label": "eTims Details",
+    "name": "Item-custom_kra_tax_details"
+  },
+  {
+    "fieldname": "custom_item_registration_status",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_kra_tax_details",
+    "label": "Item Registration Status",
+    "name": "Item-custom_item_registration_status"
+  },
+  {
+    "description": "Whether the item has been successfully registered in eTim's servers through the Register Item button",
+    "fieldname": "custom_item_registered",
+    "fieldtype": "Check",
+    "insert_after": "custom_item_registration_status",
+    "label": "Item Registered?",
+    "name": "Item-custom_item_registered",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "description": "Whether the item has been successfully registered in eTim's servers through the Register Item button",
+    "fieldname": "custom_sent_to_slade",
+    "fieldtype": "Check",
+    "insert_after": "custom_item_registered",
+    "label": "Sent to Slade",
+    "name": "Item-custom_sent_to_slade",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_column_break_uazue",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_sent_to_slade",
+    "label": "",
+    "name": "Item-custom_column_break_uazue"
+  },
+  {
+    "fieldname": "custom_submission_tries",
+    "fieldtype": "Int",
+    "insert_after": "custom_sent_to_slade",
+    "label": "Submission Tries",
+    "name": "Item-custom_submission_tries"
+  },
+  {
+    "description": "Whether this imported item has been successfully submitted to etims servers through the \"send imported item\" button.",
+    "fieldname": "custom_imported_item_submitted",
+    "fieldtype": "Check",
+    "insert_after": "custom_column_break_uazue",
+    "label": "Imported Item Submitted?",
+    "name": "Item-custom_imported_item_submitted",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_imported_item_submitted",
+    "label": "Slade ID",
+    "name": "Item-custom_slade_id",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_item_classification_details",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_slade_id",
+    "label": "Item Classification Details",
+    "name": "Item-custom_item_classification_details"
+  },
+  {
+    "fieldname": "custom_item_classification",
+    "fieldtype": "Link",
+    "insert_after": "custom_item_classification_details",
+    "label": "Item Classification Code",
+    "name": "Item-custom_item_classification",
+    "options": "Navari KRA eTims Item Classification",
+    "reqd": 1
+  },
+  {
+    "fetch_from": "custom_referenced_imported_item.origin_nation_code",
+    "fieldname": "custom_etims_country_of_origin",
+    "fieldtype": "Link",
+    "insert_after": "custom_item_classification",
+    "label": "eTims Country of Origin",
+    "name": "Item-custom_etims_country_of_origin",
+    "options": "Navari eTims Country",
+    "reqd": 1
+  },
+  {
+    "fieldname": "custom_item_code_etims",
+    "fieldtype": "Data",
+    "insert_after": "custom_etims_country_of_origin",
+    "label": "Item Code (eTims)",
+    "name": "Item-custom_item_code_etims",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_column_break_f8lz3",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_item_code_etims",
+    "label": "",
+    "name": "Item-custom_column_break_f8lz3"
+  },
+  {
+    "fetch_from": "custom_item_classification.itemclsnm",
+    "fieldname": "custom_item_classification_code",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_f8lz3",
+    "label": "Item Classification Name",
+    "name": "Item-custom_item_classification_code",
+    "read_only": 1
+  },
+  {
+    "fetch_from": "custom_etims_country_of_origin.code",
+    "fieldname": "custom_etims_country_of_origin_code",
+    "fieldtype": "Data",
+    "insert_after": "custom_item_classification_code",
+    "label": "eTims Country of Origin Code",
+    "name": "Item-custom_etims_country_of_origin_code",
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_column_break_etc01",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_etims_country_of_origin_code",
+    "label": "",
+    "name": "Item-custom_column_break_etc01"
+  },
+  {
+    "fetch_from": "custom_item_classification.taxtycd",
+    "fetch_if_empty": 1,
+    "fieldname": "custom_taxation_type",
+    "fieldtype": "Link",
+    "insert_after": "custom_column_break_etc01",
+    "label": "Taxation Type",
+    "name": "Item-custom_taxation_type",
+    "options": "Navari KRA eTims Taxation Type",
+    "reqd": 1
+  },
+  {
+    "fieldname": "custom_packaging_unit_details",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_taxation_type",
+    "label": "Packaging Unit Details",
+    "name": "Item-custom_packaging_unit_details"
+  },
+  {
+    "fieldname": "custom_packaging_unit",
+    "fieldtype": "Link",
+    "insert_after": "custom_packaging_unit_details",
+    "label": "Packaging Unit",
+    "name": "Item-custom_packaging_unit",
+    "options": "Navari eTims Packaging Unit",
+    "reqd": 1
+  },
+  {
+    "fieldname": "custom_column_break_mn3af",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_packaging_unit",
+    "label": "",
+    "name": "Item-custom_column_break_mn3af"
+  },
+  {
+    "fetch_from": "custom_packaging_unit.code",
+    "fieldname": "custom_packaging_unit_code",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_mn3af",
+    "label": "Packaging Unit Code",
+    "name": "Item-custom_packaging_unit_code",
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_unit_of_quantity_details",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_packaging_unit_code",
+    "label": "Unit of Quantity Details",
+    "name": "Item-custom_unit_of_quantity_details"
+  },
+  {
+    "fieldname": "custom_unit_of_quantity",
+    "fieldtype": "Link",
+    "insert_after": "custom_unit_of_quantity_details",
+    "label": "Unit of Quantity",
+    "name": "Item-custom_unit_of_quantity",
+    "options": "Navari eTims Unit of Quantity",
+    "reqd": 1
+  },
+  {
+    "fieldname": "custom_column_break_57atq",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_unit_of_quantity",
+    "label": "",
+    "name": "Item-custom_column_break_57atq"
+  },
+  {
+    "fetch_from": "custom_unit_of_quantity.code",
+    "fieldname": "custom_unit_of_quantity_code",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_57atq",
+    "label": "Unit of Quantity Code",
+    "name": "Item-custom_unit_of_quantity_code",
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_item_details",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_unit_of_quantity_code",
+    "label": "Product Type Details",
+    "name": "Item-custom_item_details"
+  },
+  {
+    "fieldname": "custom_product_type",
+    "fieldtype": "Link",
+    "insert_after": "custom_item_details",
+    "label": "Product Type Code",
+    "name": "Item-custom_product_type",
+    "options": "Navari eTims Product Type",
+    "reqd": 1
+  },
+  {
+    "fieldname": "custom_item_type",
+    "fieldtype": "Link",
+    "insert_after": "custom_product_type",
+    "label": "Navari eTims Item Type",
+    "name": "Item-custom_navari_etims_item_type",
+    "options": "Navari eTims Item Type",
+    "reqd": 1
+  },
+  {
+    "fieldname": "custom_column_break_5wrxn",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_item_type",
+    "label": "",
+    "name": "Item-custom_column_break_5wrxn"
+  },
+  {
+    "fetch_from": "custom_item_type.code_name",
+    "fieldname": "custom_item_type_name",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_5wrxn",
+    "label": "Item Type Name",
+    "name": "Item-custom_item_type_name",
+    "read_only": 1,
+    "translatable": 1
+  },
+  {
+    "fetch_from": "custom_product_type.code_name",
+    "fieldname": "custom_product_type_name",
+    "fieldtype": "Data",
+    "insert_after": "custom_item_type_name",
+    "label": "Product Type Name",
+    "name": "Item-custom_product_type_name",
+    "read_only": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_country_of_origin_details",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_product_type_name",
+    "label": "eTims Imported Item Information",
+    "name": "Item-custom_country_of_origin_details"
+  },
+  {
+    "fieldname": "custom_referenced_imported_item",
+    "fieldtype": "Link",
+    "insert_after": "custom_country_of_origin_details",
+    "label": "Referenced Imported Item",
+    "name": "Item-custom_referenced_imported_item",
+    "no_copy": 1,
+    "options": "Navari eTims Registered Imported Item"
+  },
+  {
+    "fieldname": "custom_imported_item_status",
+    "fieldtype": "Link",
+    "insert_after": "custom_referenced_imported_item",
+    "label": "Imported Item Status",
+    "mandatory_depends_on": "eval:doc.custom_referenced_imported_item;",
+    "name": "Item-custom_imported_item_status",
+    "options": "Navari eTims Import Item Status"
+  },
+  {
+    "fieldname": "custom_column_break_vhoyw",
+    "fieldtype": "Column Break",
+    "insert_after": "total_projected_qty",
+    "label": "",
+    "name": "Item-custom_column_break_vhoyw"
+  },
+  {
+    "fetch_from": "custom_imported_item_status.code",
+    "fieldname": "custom_imported_item_status_code",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_vhoyw",
+    "label": "imported Item Status Code",
+    "name": "Item-custom_imported_item_status_code",
+    "read_only": 1
+  },
+  {
+    "fetch_from": "custom_referenced_imported_item.branch",
+    "fieldname": "custom_branch",
+    "fieldtype": "Link",
+    "insert_after": "custom_imported_item_status_code",
+    "label": "Branch",
+    "name": "Item-custom_branch",
+    "options": "Branch"
+  },
+  {
+    "fetch_from": "custom_referenced_imported_item.hs_code",
+    "fieldname": "custom_imported_item_task_code",
+    "fieldtype": "Data",
+    "insert_after": "custom_branch",
+    "label": "Imported Item Task Code",
+    "name": "Item-custom_imported_item_task_code",
+    "read_only": 1
+  },
+  {
+    "fetch_from": "custom_referenced_imported_item.hs_code",
+    "fieldname": "custom_hs_code",
+    "fieldtype": "Data",
+    "insert_after": "custom_imported_item_task_code",
+    "label": "HS Code",
+    "name": "Item-custom_hs_code",
+    "read_only": 1
+  }
+]

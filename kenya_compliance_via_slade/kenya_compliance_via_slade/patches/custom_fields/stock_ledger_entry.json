@@ -1,0 +1,88 @@
+[
+  {
+    "depends_on": "eval:(doc.actual_qty < 0 && doc.custom_stock_entry_type === \"Material Transfer\");",
+    "fieldname": "custom_target_warehouse",
+    "fieldtype": "Link",
+    "insert_after": "warehouse",
+    "label": "Target Warehouse",
+    "name": "Stock Ledger Entry-custom_target_warehouse",
+    "options": "Warehouse",
+    "read_only": 1
+  },
+  {
+    "depends_on": "eval:(doc.actual_qty > 0 && doc.custom_stock_entry_type === \"Material Transfer\");",
+    "fieldname": "custom_source_warehouse",
+    "fieldtype": "Link",
+    "insert_after": "custom_target_warehouse",
+    "label": "Source Warehouse",
+    "name": "Stock Ledger Entry-custom_source_warehouse",
+    "options": "Warehouse",
+    "read_only": 1
+  },
+  {
+    "depends_on": "eval:doc.voucher_type === \"Stock Entry\";",
+    "fieldname": "custom_stock_entry_type",
+    "fieldtype": "Data",
+    "insert_after": "voucher_no",
+    "label": "Stock Entry Type",
+    "name": "Stock Ledger Entry-custom_stock_entry_type",
+    "read_only": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_etims_details",
+    "fieldtype": "Section Break",
+    "insert_after": "dependant_sle_voucher_detail_no",
+    "label": "ETIMS Details",
+    "name": "Stock Ledger Entry-custom_etims_details"
+  },
+  {
+    "allow_on_submit": 1,
+    "default": "0",
+    "description": "Whether this ledger entry was submitted to etims successfully.",
+    "fieldname": "custom_submitted_successfully",
+    "fieldtype": "Check",
+    "in_list_view": 1,
+    "in_standard_filter": 1,
+    "insert_after": "custom_etims_details",
+    "label": "Submitted Successfully?",
+    "name": "Stock Ledger Entry-custom_submitted_successfully",
+    "no_copy": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "description": "Whether this ledger entry's Qty After Transaction was submitted to etims successfully.",
+    "fieldname": "custom_inventory_submitted_successfully",
+    "fieldtype": "Check",
+    "insert_after": "custom_submitted_successfully",
+    "label": "Inventory Submitted Successfully?",
+    "name": "Stock Ledger Entry-custom_inventory_submitted_successfully",
+    "no_copy": 1
+  },
+  {
+    "fieldname": "custom_column_break_psrbm",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_inventory_submitted_successfully",
+    "label": "",
+    "name": "Stock Ledger Entry-custom_column_break_psrbm"
+  },
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_psrbm",
+    "label": "Slade ID",
+    "name": "Stock Ledger Entry-custom_slade_id",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_new_total_qty",
+    "fieldtype": "Float",
+    "insert_after": "custom_slade_id",
+    "label": "New Total Qty",
+    "name": "Stock Ledger Entry-custom_new_total_qty",
+    "no_copy": 1,
+    "read_only": 1
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "fieldname": "custom_etims_details",
+    "fieldtype": "Tab Break",
+    "insert_after": "items",
+    "label": "eTims Details",
+    "name": "BOM-custom_etims_details"
+  },
+  {
+    "default": "0",
+    "description": "Whether the item composition was sent successfully to etims servers through the \"Submit Item Composition\" button.",
+    "fieldname": "custom_item_composition_submitted_successfully",
+    "fieldtype": "Check",
+    "insert_after": "custom_etims_details",
+    "label": "Item Composition Submitted Successfully?",
+    "name": "BOM-custom_item_composition_submitted_successfully",
+    "no_copy": 1
+  },
+  {
+    "fieldname": "custom_column_break_adi7k",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_item_composition_submitted_successfully",
+    "label": "",
+    "name": "BOM-custom_column_break_adi7k"
+  },
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_adi7k",
+    "label": "Slade ID",
+    "name": "BOM-custom_slade_id",
+    "no_copy": 1,
+    "translatable": 1
+  }
+]

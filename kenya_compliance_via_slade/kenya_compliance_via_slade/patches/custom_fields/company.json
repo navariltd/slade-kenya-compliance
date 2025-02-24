@@ -1,0 +1,17 @@
+[
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "cb0",
+    "label": "Slade ID",
+    "name": "Company-custom_slade_id"
+  },
+  {
+    "fieldname": "custom_is_etims_verified",
+    "fieldtype": "Check",
+    "insert_after": "parent_company",
+    "label": "Is eTims Verified",
+    "name": "Company-custom_is_etims_verified",
+    "read_only": 1
+  }
+]

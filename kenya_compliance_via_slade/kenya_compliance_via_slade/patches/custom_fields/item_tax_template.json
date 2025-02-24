@@ -1,0 +1,10 @@
+[
+  {
+    "fieldname": "custom_etims_taxation_type",
+    "fieldtype": "Link",
+    "insert_after": "company",
+    "label": "eTims Taxation Type",
+    "name": "Item Tax Template-custom_etims_taxation_type",
+    "options": "Navari KRA eTims Taxation Type"
+  }
+]

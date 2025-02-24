@@ -1,0 +1,34 @@
+[
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "parent_department",
+    "label": "Slade ID",
+    "name": "Department-custom_slade_id",
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_is_etims_department",
+    "fieldtype": "Check",
+    "insert_after": "custom_slade_id",
+    "label": "Is eTims Department",
+    "name": "Department-custom_is_etims_department"
+  },
+  {
+    "fieldname": "custom_is_etims_verified",
+    "fieldtype": "Check",
+    "insert_after": "custom_is_etims_department",
+    "label": "Is eTims Verified",
+    "name": "Department-custom_is_etims_verified",
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_branch",
+    "fieldtype": "Link",
+    "in_standard_filter": 1,
+    "insert_after": "company",
+    "label": "Branch",
+    "name": "Department-custom_branch",
+    "options": "Branch"
+  }
+]

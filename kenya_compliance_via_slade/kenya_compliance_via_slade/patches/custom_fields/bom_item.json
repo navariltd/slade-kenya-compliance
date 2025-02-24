@@ -1,0 +1,19 @@
+[
+  {
+    "fieldname": "custom_submitted_successfully",
+    "fieldtype": "Check",
+    "insert_after": "operation",
+    "label": "Submitted Successfully",
+    "name": "BOM Item-custom_submitted_successfully",
+    "no_copy": 1
+  },
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_submitted_successfully",
+    "label": "Slade ID",
+    "name": "BOM Item-custom_slade_id",
+    "no_copy": 1,
+    "translatable": 1
+  }
+]
