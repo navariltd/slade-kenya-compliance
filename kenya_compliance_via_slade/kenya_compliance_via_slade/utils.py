@@ -372,7 +372,11 @@ def build_invoice_payload(
             or payment_type
             or settings.get("purchases_payment_type")
         )
-        department = invoice.department or settings.get("department")
+        department = (
+            invoice.department
+            if frappe.get_value("Department", invoice.department, "custom_slade_id")
+            else settings.get("department")
+        )
         branch = invoice.branch or settings.get("bhfid")
         customer = frappe.get_value("Customer", invoice.customer, "slade_id")
         currency = frappe.get_value("Currency", invoice.currency, "custom_slade_id")

@@ -409,6 +409,41 @@ def update_invoice_info(response: dict, **kwargs) -> None:
         return
 
     qr_code_url = scu_data.get("qr_code_url")
+    sales_invoice_tax_table = data.get("sales_invoice_tax_table", {})
+
+    tax_amounts = {
+        "custom_taxbl_amount_a": float(
+            sales_invoice_tax_table.get("A", {}).get("total_taxable_amount", 0.0)
+        ),
+        "custom_tax_a": float(
+            sales_invoice_tax_table.get("A", {}).get("total_tax_amount", 0.0)
+        ),
+        "custom_taxbl_amount_b": float(
+            sales_invoice_tax_table.get("B", {}).get("total_taxable_amount", 0.0)
+        ),
+        "custom_tax_b": float(
+            sales_invoice_tax_table.get("B", {}).get("total_tax_amount", 0.0)
+        ),
+        "custom_taxbl_amount_c": float(
+            sales_invoice_tax_table.get("C", {}).get("total_taxable_amount", 0.0)
+        ),
+        "custom_tax_c": float(
+            sales_invoice_tax_table.get("C", {}).get("total_tax_amount", 0.0)
+        ),
+        "custom_taxbl_amount_d": float(
+            sales_invoice_tax_table.get("D", {}).get("total_taxable_amount", 0.0)
+        ),
+        "custom_tax_d": float(
+            sales_invoice_tax_table.get("D", {}).get("total_tax_amount", 0.0)
+        ),
+        "custom_taxbl_amount_e": float(
+            sales_invoice_tax_table.get("E", {}).get("total_taxable_amount", 0.0)
+        ),
+        "custom_tax_e": float(
+            sales_invoice_tax_table.get("E", {}).get("total_tax_amount", 0.0)
+        ),
+    }
+
     updates = {
         "custom_slade_id": custom_slade_id,
         "custom_qr_code_url": qr_code_url,
@@ -421,6 +456,7 @@ def update_invoice_info(response: dict, **kwargs) -> None:
         "custom_scu_id": scu_data.get("scu_id"),
         "custom_scu_mrc_no": scu_data.get("scu_mrc_number"),
         "custom_scu_invoice_number": scu_data.get("scu_invoice_number"),
+        **tax_amounts,
     }
 
     # Generate QR Code image if qr_code_url is available
