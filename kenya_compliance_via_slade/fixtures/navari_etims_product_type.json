@@ -1,35 +1,35 @@
 [
-  {
-    "code": "service",
-    "code_description": "Service without stock",
-    "code_name": "Service",
-
-    "doctype": "Navari eTims Product Type",
-    "modified": "2025-01-07 06:59:49.594619",
-    "name": "service",
-    "remark": null,
-    "sort_order": "3"
-  },
-  {
-    "code": "sku",
-    "code_description": "Store Keeping Unit (SKU)",
-    "code_name": "Store Keeping Unit (SKU)",
-
-    "doctype": "Navari eTims Product Type",
-    "modified": "2025-01-07 06:59:49.618533",
-    "name": "sku",
-    "remark": null,
-    "sort_order": "2"
-  },
-  {
-    "code": "consu",
-    "code_description": "Consumable",
-    "code_name": "Consumable",
-
-    "doctype": "Navari eTims Product Type",
-    "modified": "2025-01-07 06:59:49.537136",
-    "name": "consu",
-    "remark": null,
-    "sort_order": "1"
-  }
+ {
+  "code": "service",
+  "code_description": "Service without stock",
+  "code_name": "Service",
+  "docstatus": 0,
+  "doctype": "Navari eTims Product Type",
+  "modified": "2025-01-07 06:59:49.594619",
+  "name": "service",
+  "remark": null,
+  "sort_order": "3"
+ },
+ {
+  "code": "sku",
+  "code_description": "Store Keeping Unit (SKU)",
+  "code_name": "Store Keeping Unit (SKU)",
+  "docstatus": 0,
+  "doctype": "Navari eTims Product Type",
+  "modified": "2025-01-07 06:59:49.618533",
+  "name": "sku",
+  "remark": null,
+  "sort_order": "2"
+ },
+ {
+  "code": "consu",
+  "code_description": "Consumable",
+  "code_name": "Consumable",
+  "docstatus": 0,
+  "doctype": "Navari eTims Product Type",
+  "modified": "2025-01-07 06:59:49.537136",
+  "name": "consu",
+  "remark": null,
+  "sort_order": "1"
+ }
 ]

@@ -1,506 +1,578 @@
 [
-  {
-    "doctype": "Navari eTims Routes",
-    "modified": "2025-02-18 11:27:09.360695",
-    "name": "VSCU Slade 360",
-    "routes_table": [
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/etims/etims_notices/",
-        "url_path_function": "NoticeSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/etims/item_classifications/",
-        "url_path_function": "ItemClsSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/taxes/",
-        "url_path_function": "TaxSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/etims/etims_currencies/get_currencies",
-        "url_path_function": "CurrencyCountrySearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/financial_accounts/paymentmethods/",
-        "url_path_function": "PaymentMtdSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/common/currencys/",
-        "url_path_function": "CurrencySearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/packaging_units/",
-        "url_path_function": "PackagingUnitSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/quantity_units/",
-        "url_path_function": "QuantityUnitsSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/products/",
-        "url_path_function": "ItemSaveReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/products/",
-        "url_path_function": "ItemsSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/etims/etims_imports/",
-        "url_path_function": "ImportItemSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/branches/branches",
-        "url_path_function": "BhfSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/business_partners/customers/search_customer_on_kra/",
-        "url_path_function": "CustSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/business_partners/customers/",
-        "url_path_function": "BhfCustSaveReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/branches/branches/initialize_etims_device/",
-        "url_path_function": "DeviceVerificationReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/common/organisations/",
-        "url_path_function": "OrgSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/branches/departments/",
-        "url_path_function": "DeptSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/etims/purchases/",
-        "url_path_function": "TrnsPurchaseSaveReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/sales/salesinvoices/",
-        "url_path_function": "TrnsSalesSaveWrReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/sales/salesinvoicelines/",
-        "url_path_function": "SalesLineSaveReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/sales/salesinvoices/{invoice_id}/transition/DRAFT_SUBMIT_APPROVE/",
-        "url_path_function": "SalesTransitionReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/sales/salesinvoices/{invoice_id}/sign_sales_invoice/",
-        "url_path_function": "SalesSignInvReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/etims/purchases/",
-        "url_path_function": "TrnsPurchaseSalesReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/etims/purchasesitems/",
-        "url_path_function": "TrnsPurchaseItemReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/auth/users/",
-        "url_path_function": "BhfUserSaveReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/me",
-        "url_path_function": "BhfUserSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/etims/etims_imports/{id}/",
-        "url_path_function": "ImportItemUpdateReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/business_partners/customers",
-        "url_path_function": "CustomersSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/business_partners/customers/{id}",
-        "url_path_function": "CustomerSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/etims/purchases/{id}",
-        "url_path_function": "TrnsPurchaseSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/branches/workstations/",
-        "url_path_function": "WorkstationSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/sales/salesinvoices/{id}/",
-        "url_path_function": "TrnsSalesSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/products/{id}/",
-        "url_path_function": "ItemSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/uom_category/",
-        "url_path_function": "UOMCategoriesSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/uom_category/{id}/",
-        "url_path_function": "UOMCategorySearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/uom/",
-        "url_path_function": "UOMListSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/uom/{id}/",
-        "url_path_function": "UOMDetailSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventorylocation/",
-        "url_path_function": "LocationsSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventorylocation/{id}/",
-        "url_path_function": "LocationSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/warehouse/",
-        "url_path_function": "WarehousesSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/warehouse/{id}/",
-        "url_path_function": "WarehouseSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/pricelists/",
-        "url_path_function": "PriceListsSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/pricelists/{id}/",
-        "url_path_function": "PriceListSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/pricelist_products/{id}/",
-        "url_path_function": "ItemPriceSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/pricelist_products/",
-        "url_path_function": "ItemPricesSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventoryoperation/",
-        "url_path_function": "StockIOSaveReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventoryoperationline/",
-        "url_path_function": "StockIOLineReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventoryoperation/create_inventory_transfer/",
-        "url_path_function": "StockMoveReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventoryadjustment/",
-        "url_path_function": "StockMasterSaveReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventoryadjustmentline/",
-        "url_path_function": "StockMasterLineReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventoryoperationtype/",
-        "url_path_function": "OperationTypesReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventoryoperationtype/{id}/",
-        "url_path_function": "OperationTypeReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventoryadjustment/{id}/transition/DRAFT_SUBMIT_APPROVE/",
-        "url_path_function": "StockAdjustmentTransitionReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/inventoryoperation/{id}/transition/DRAFT_SUBMIT_APPROVE/",
-        "url_path_function": "StockOperationTransitionReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/financial_accounts/accounts/",
-        "url_path_function": "AccountsSearchReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/boms/",
-        "url_path_function": "BOMReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/products/bom_components/",
-        "url_path_function": "BOMItemReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/sales/salescreditnotes/",
-        "url_path_function": "SalesCreditNoteSaveReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/sales/salescreditnotelines/",
-        "url_path_function": "SalesCreditNoteLineReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/sales/salescreditnotes/{invoice_id}/transition/DRAFT_SUBMIT_APPROVE/",
-        "url_path_function": "SalesCreditNoteTransitionReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/sales/salescreditnotes/{invoice_id}/send_credit_note/",
-        "url_path_function": "SalesCreditNoteSignReq"
-      },
-      {
-        "last_request_date": null,
-        "parent": "VSCU Slade 360",
-        "parentfield": "routes_table",
-        "parenttype": "Navari eTims Routes",
-        "url_path": "/api/inventory/stockquantity/",
-        "url_path_function": "GetStockBalanceReq"
-      }
-    ],
-    "vendor": "VSCU Slade 360"
-  }
+ {
+  "docstatus": 0,
+  "doctype": "Navari eTims Routes",
+  "modified": "2025-02-24 17:57:01.215071",
+  "name": "VSCU Slade 360",
+  "routes_table": [
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/etims_notices/",
+    "url_path_function": "NoticeSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/item_classifications/",
+    "url_path_function": "ItemClsSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/taxes/",
+    "url_path_function": "TaxSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/etims_currencies/get_currencies",
+    "url_path_function": "CurrencyCountrySearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/financial_accounts/paymentmethods/",
+    "url_path_function": "PaymentMtdSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/common/currencys/",
+    "url_path_function": "CurrencySearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/packaging_units/",
+    "url_path_function": "PackagingUnitSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/quantity_units/",
+    "url_path_function": "QuantityUnitsSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/products/",
+    "url_path_function": "ItemSaveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/products/",
+    "url_path_function": "ItemsSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/etims_imports/",
+    "url_path_function": "ImportItemSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/branches/branches",
+    "url_path_function": "BhfSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/business_partners/customers/search_customer_on_kra/",
+    "url_path_function": "CustSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/business_partners/customers/",
+    "url_path_function": "BhfCustSaveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/branches/branches/initialize_etims_device/",
+    "url_path_function": "DeviceVerificationReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/common/organisations/",
+    "url_path_function": "OrgSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/branches/departments/",
+    "url_path_function": "DeptSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/purchases/",
+    "url_path_function": "TrnsPurchaseSaveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salesinvoices/",
+    "url_path_function": "TrnsSalesSaveWrReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salesinvoicelines/",
+    "url_path_function": "SalesLineSaveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salesinvoices/{invoice_id}/transition/DRAFT_SUBMIT_APPROVE/",
+    "url_path_function": "SalesTransitionReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salesinvoices/{invoice_id}/sign_sales_invoice/",
+    "url_path_function": "SalesSignInvReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/purchases/",
+    "url_path_function": "TrnsPurchaseSalesReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/purchasesitems/",
+    "url_path_function": "TrnsPurchaseItemReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/auth/users/",
+    "url_path_function": "BhfUserSaveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/me",
+    "url_path_function": "BhfUserSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/etims_imports/{id}/",
+    "url_path_function": "ImportItemUpdateReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/business_partners/customers",
+    "url_path_function": "CustomersSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/business_partners/customers/{id}",
+    "url_path_function": "CustomerSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/etims/purchases/{id}",
+    "url_path_function": "TrnsPurchaseSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/branches/workstations/",
+    "url_path_function": "WorkstationSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salesinvoices/{id}/",
+    "url_path_function": "TrnsSalesSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/products/{id}/",
+    "url_path_function": "ItemSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/uom_category/",
+    "url_path_function": "UOMCategoriesSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/uom_category/{id}/",
+    "url_path_function": "UOMCategorySearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/uom/",
+    "url_path_function": "UOMListSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/uom/{id}/",
+    "url_path_function": "UOMDetailSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventorylocation/",
+    "url_path_function": "LocationsSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventorylocation/{id}/",
+    "url_path_function": "LocationSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/warehouse/",
+    "url_path_function": "WarehousesSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/warehouse/{id}/",
+    "url_path_function": "WarehouseSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/pricelists/",
+    "url_path_function": "PriceListsSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/pricelists/{id}/",
+    "url_path_function": "PriceListSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/pricelist_products/{id}/",
+    "url_path_function": "ItemPriceSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/pricelist_products/",
+    "url_path_function": "ItemPricesSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventoryoperation/",
+    "url_path_function": "StockIOSaveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventoryoperationline/",
+    "url_path_function": "StockIOLineReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventoryoperation/create_inventory_transfer/",
+    "url_path_function": "StockMoveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventoryadjustment/",
+    "url_path_function": "StockMasterSaveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventoryadjustmentline/",
+    "url_path_function": "StockMasterLineReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventoryoperationtype/",
+    "url_path_function": "OperationTypesReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventoryoperationtype/{id}/",
+    "url_path_function": "OperationTypeReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventoryadjustment/{id}/transition/DRAFT_SUBMIT_APPROVE/",
+    "url_path_function": "StockAdjustmentTransitionReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/inventoryoperation/{id}/transition/DRAFT_SUBMIT_APPROVE/",
+    "url_path_function": "StockOperationTransitionReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/financial_accounts/accounts/",
+    "url_path_function": "AccountsSearchReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/boms/",
+    "url_path_function": "BOMReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/products/bom_components/",
+    "url_path_function": "BOMItemReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salescreditnotes/",
+    "url_path_function": "SalesCreditNoteSaveReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salescreditnotelines/",
+    "url_path_function": "SalesCreditNoteLineReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salescreditnotes/{invoice_id}/transition/DRAFT_SUBMIT/",
+    "url_path_function": "SalesCreditNoteTransitionReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/sales/salescreditnotes/{invoice_id}/send_credit_note/",
+    "url_path_function": "SalesCreditNoteSignReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/stockquantity/",
+    "url_path_function": "GetStockBalanceReq"
+   },
+   {
+    "description": null,
+    "last_request_date": null,
+    "parent": "VSCU Slade 360",
+    "parentfield": "routes_table",
+    "parenttype": "Navari eTims Routes",
+    "url_path": "/api/inventory/stockquantity/{id}/",
+    "url_path_function": "SaveStockBalanceReq"
+   }
+  ],
+  "vendor": "VSCU Slade 360"
+ }
 ]
