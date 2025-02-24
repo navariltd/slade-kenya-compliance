@@ -1,0 +1,24 @@
+[
+  {
+    "fieldname": "custom_column_break_ou1uu",
+    "fieldtype": "Column Break",
+    "insert_after": "type",
+    "label": "",
+    "name": "Mode of Payment-custom_column_break_ou1uu"
+  },
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_ou1uu",
+    "label": "Slade ID",
+    "name": "Mode of Payment-custom_slade_id",
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_section_break_xtqyh",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_slade_id",
+    "label": "",
+    "name": "Mode of Payment-custom_section_break_xtqyh"
+  }
+]

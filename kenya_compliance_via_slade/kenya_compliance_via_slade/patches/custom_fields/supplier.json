@@ -1,0 +1,44 @@
+[
+  {
+    "fieldname": "custom_supplier_branch",
+    "fieldtype": "Data",
+    "insert_after": "supplier_name",
+    "label": "Supplier Branch",
+    "name": "Supplier-custom_supplier_branch",
+    "options": "",
+    "read_only": 1
+  },
+  {
+    "depends_on": "eval:doc.tax_id;",
+    "description": "Information registered at KRA about the Tax Payer with the ID provided",
+    "fieldname": "custom_kra_registered_tax_payer_details",
+    "fieldtype": "Section Break",
+    "insert_after": "tax_withholding_category",
+    "label": "KRA Registered Tax Payer Details",
+    "name": "Supplier-custom_kra_registered_tax_payer_details"
+  },
+  {
+    "default": "0",
+    "fieldname": "custom_details_submitted_successfully",
+    "fieldtype": "Check",
+    "insert_after": "custom_kra_registered_tax_payer_details",
+    "label": "Details Submitted Successfully",
+    "name": "Supplier-custom_details_submitted_successfully",
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_break_2",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_details_submitted_successfully",
+    "label": "",
+    "name": "Supplier-custom_break_2"
+  },
+  {
+    "fieldname": "slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_break_2",
+    "label": "Slade ID",
+    "name": "Supplier-custom_slade_id",
+    "read_only": 1
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "fieldname": "custom_kra_etims_taxation_details",
+    "fieldtype": "Section Break",
+    "insert_after": "grant_commission",
+    "label": "KRA eTims Taxation Details",
+    "name": "Sales Invoice Item-custom_kra_etims_taxation_details"
+  },
+  {
+    "fieldname": "custom_sent_to_slade",
+    "fieldtype": "Check",
+    "insert_after": "custom_kra_etims_taxation_details",
+    "label": "Sent to Slade",
+    "name": "Sales Invoice Item-custom_sent_to_slade",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_column_break_xv1zb",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_sent_to_slade",
+    "label": "",
+    "name": "Sales Invoice Item-custom_column_break_xv1zb"
+  },
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_xv1zb",
+    "label": "Slade ID",
+    "name": "Sales Invoice Item-custom_slade_id",
+    "no_copy": 1
+  },
+  {
+    "fieldname": "custom_tax_rate",
+    "fieldtype": "Percent",
+    "insert_after": "net_amount",
+    "label": "Tax Rate(%)",
+    "name": "Sales Invoice Item-custom_tax_rate"
+  },
+  {
+    "fieldname": "custom_tax_amount",
+    "fieldtype": "Currency",
+    "insert_after": "custom_tax_rate",
+    "label": "Tax Amount",
+    "name": "Sales Invoice Item-custom_tax_amount"
+  }
+]

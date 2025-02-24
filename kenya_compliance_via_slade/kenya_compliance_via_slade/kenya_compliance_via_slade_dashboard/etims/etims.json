@@ -1,98 +1,98 @@
 {
- "cards": [
-  {
-   "card": "Queued Requests"
-  },
-  {
-   "card": "Total Successful Requests"
-  },
-  {
-   "card": "Total Failed Requests"
-  },
-  {
-   "card": "Pending Item Submissions"
-  },
-  {
-   "card": "Pending Invoice Submissions"
-  },
-  {
-   "card": "Signed Invoices"
-  },
-  {
-   "card": "Failed Invoices"
-  },
-  {
-   "card": "Registered Items"
-  },
-  {
-   "card": "Pending Credit Notes"
-  },
-  {
-   "card": "Successful Credit Notes"
-  },
-  {
-   "card": "Failed Credit Notes"
-  },
-  {
-   "card": "Pending Customer Submissions"
-  },
-  {
-   "card": "Pending Purchase Submissions"
-  },
-  {
-   "card": "Successful Purchases"
-  },
-  {
-   "card": "Failed Purchases"
-  },
-  {
-   "card": "Registered Customers"
-  },
-  {
-   "card": "Pending Stock Ledger Entry Submissions"
-  },
-  {
-   "card": "Successful Stock Ledger Entries"
-  },
-  {
-   "card": "Failed Stock Ledger Entries"
-  },
-  {
-   "card": "Pending Supplier Submissions"
-  },
-  {
-   "card": "Pending BOM Submissions"
-  },
-  {
-   "card": "Successful BOMs"
-  },
-  {
-   "card": "Failed BOMs"
-  },
-  {
-   "card": "Registered Suppliers"
-  }
- ],
- "charts": [
-  {
-   "chart": "Document Submission Status",
-   "width": "Full"
-  },
-  {
-   "chart": "Integration Request Endpoints",
-   "width": "Full"
-  }
- ],
- "creation": "2025-02-19 11:18:21.084677",
- "dashboard_name": "eTims",
- "docstatus": 0,
- "doctype": "Dashboard",
- "idx": 9,
- "is_default": 0,
- "is_standard": 1,
- "modified": "2025-02-20 20:01:09.225075",
- "modified_by": "Administrator",
- "module": "Kenya Compliance Via Slade",
- "name": "eTims",
- "owner": "Administrator"
+  "cards": [
+    {
+      "card": "Queued Requests"
+    },
+    {
+      "card": "Total Successful Requests"
+    },
+    {
+      "card": "Total Failed Requests"
+    },
+    {
+      "card": "Pending Item Submissions"
+    },
+    {
+      "card": "Pending Invoice Submissions"
+    },
+    {
+      "card": "Signed Invoices"
+    },
+    {
+      "card": "Failed Invoices"
+    },
+    {
+      "card": "Registered Items"
+    },
+    {
+      "card": "Pending Credit Notes"
+    },
+    {
+      "card": "Successful Credit Notes"
+    },
+    {
+      "card": "Failed Credit Notes"
+    },
+    {
+      "card": "Pending Customer Submissions"
+    },
+    {
+      "card": "Pending Purchase Submissions"
+    },
+    {
+      "card": "Successful Purchases"
+    },
+    {
+      "card": "Failed Purchases"
+    },
+    {
+      "card": "Registered Customers"
+    },
+    {
+      "card": "Pending Stock Ledger Entry Submissions"
+    },
+    {
+      "card": "Successful Stock Ledger Entries"
+    },
+    {
+      "card": "Failed Stock Ledger Entries"
+    },
+    {
+      "card": "Pending Supplier Submissions"
+    },
+    {
+      "card": "Pending BOM Submissions"
+    },
+    {
+      "card": "Successful BOMs"
+    },
+    {
+      "card": "Failed BOMs"
+    },
+    {
+      "card": "Registered Suppliers"
+    }
+  ],
+  "charts": [
+    {
+      "chart": "Document Submission Status",
+      "width": "Full"
+    },
+    {
+      "chart": "Integration Request Endpoints",
+      "width": "Full"
+    }
+  ],
+  "creation": "2025-02-19 11:18:21.084677",
+  "dashboard_name": "eTims",
+
+  "doctype": "Dashboard",
+  "idx": 9,
+  "is_default": 0,
+  "is_standard": 1,
+  "modified": "2025-02-20 20:01:09.225075",
+  "modified_by": "Administrator",
+  "module": "Kenya Compliance Via Slade",
+  "name": "eTims",
+  "owner": "Administrator"
 }

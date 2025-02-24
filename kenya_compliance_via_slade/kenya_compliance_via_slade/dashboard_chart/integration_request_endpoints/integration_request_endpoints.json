@@ -1,41 +1,41 @@
 {
- "chart_name": "Integration Request Endpoints",
- "chart_type": "Report",
- "creation": "2025-02-19 16:26:38.454183",
- "custom_options": "{\"x_field\": \"integration_request_service\", \"chart_type\": \"Bar\", \"y_axis_fields\": [{\"idx\": 1, \"__islocal\": true, \"y_field\": \"queued\", \"color\": \"#c2b299\", \"name\": \"row 1\"}, {\"idx\": 2, \"__islocal\": true, \"y_field\": \"failed\", \"color\": \"#f70505\", \"name\": \"row 3\"}, {\"idx\": 3, \"__islocal\": true, \"y_field\": \"completed\", \"color\": \"#29CD42\", \"name\": \"row 2\"}], \"y_fields\": [\"queued\", \"failed\", \"completed\"], \"colors\": [\"#c2b299\", \"#f70505\", \"#29CD42\"]}",
- "docstatus": 0,
- "doctype": "Dashboard Chart",
- "filters_json": "{\"integration_request_service\":[\"SalesCreditNoteSignReq\",\"SalesCreditNoteTransitionReq\",\"SalesSignInvReq\",\"SalesTransitionReq\",\"StockAdjustmentTransitionReq\",\"StockOperationTransitionReq\",\"ItemsSearchReq\"]}",
- "group_by_type": "Count",
- "idx": 15,
- "is_public": 1,
- "is_standard": 1,
- "modified": "2025-02-19 19:15:01.070741",
- "modified_by": "Administrator",
- "module": "Kenya Compliance Via Slade",
- "name": "Integration Request Endpoints",
- "number_of_groups": 0,
- "owner": "Administrator",
- "report_name": "Integration Requests",
- "roles": [],
- "time_interval": "Yearly",
- "timeseries": 0,
- "timespan": "Last Year",
- "type": "Bar",
- "use_report_chart": 0,
- "x_field": "integration_request_service",
- "y_axis": [
-  {
-   "color": "#c2b299",
-   "y_field": "queued"
-  },
-  {
-   "color": "#f70505",
-   "y_field": "failed"
-  },
-  {
-   "color": "#29CD42",
-   "y_field": "completed"
-  }
- ]
+  "chart_name": "Integration Request Endpoints",
+  "chart_type": "Report",
+  "creation": "2025-02-19 16:26:38.454183",
+  "custom_options": "{\"x_field\": \"integration_request_service\", \"chart_type\": \"Bar\", \"y_axis_fields\": [{\"idx\": 1, \"__islocal\": true, \"y_field\": \"queued\", \"color\": \"#c2b299\", \"name\": \"row 1\"}, {\"idx\": 2, \"__islocal\": true, \"y_field\": \"failed\", \"color\": \"#f70505\", \"name\": \"row 3\"}, {\"idx\": 3, \"__islocal\": true, \"y_field\": \"completed\", \"color\": \"#29CD42\", \"name\": \"row 2\"}], \"y_fields\": [\"queued\", \"failed\", \"completed\"], \"colors\": [\"#c2b299\", \"#f70505\", \"#29CD42\"]}",
+
+  "doctype": "Dashboard Chart",
+  "filters_json": "{\"integration_request_service\":[\"SalesCreditNoteSignReq\",\"SalesCreditNoteTransitionReq\",\"SalesSignInvReq\",\"SalesTransitionReq\",\"StockAdjustmentTransitionReq\",\"StockOperationTransitionReq\",\"ItemsSearchReq\"]}",
+  "group_by_type": "Count",
+  "idx": 15,
+  "is_public": 1,
+  "is_standard": 1,
+  "modified": "2025-02-19 19:15:01.070741",
+  "modified_by": "Administrator",
+  "module": "Kenya Compliance Via Slade",
+  "name": "Integration Request Endpoints",
+  "number_of_groups": 0,
+  "owner": "Administrator",
+  "report_name": "Integration Requests",
+  "roles": [],
+  "time_interval": "Yearly",
+  "timeseries": 0,
+  "timespan": "Last Year",
+  "type": "Bar",
+  "use_report_chart": 0,
+  "x_field": "integration_request_service",
+  "y_axis": [
+    {
+      "color": "#c2b299",
+      "y_field": "queued"
+    },
+    {
+      "color": "#f70505",
+      "y_field": "failed"
+    },
+    {
+      "color": "#29CD42",
+      "y_field": "completed"
+    }
+  ]
 }

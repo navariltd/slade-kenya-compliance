@@ -1,0 +1,53 @@
+[
+  {
+    "fieldname": "custom_etims_details",
+    "fieldtype": "Section Break",
+    "insert_after": "warehouse_name",
+    "label": "eTims Details",
+    "name": "Warehouse-custom_etims_details"
+  },
+  {
+    "fieldname": "custom_branch",
+    "fieldtype": "Link",
+    "insert_after": "custom_etims_details",
+    "label": "Branch",
+    "name": "Warehouse-custom_branch",
+    "options": "Branch"
+  },
+  {
+    "fieldname": "custom_slade_supplier_warehouse",
+    "fieldtype": "Data",
+    "insert_after": "custom_branch",
+    "label": "Slade Supplier Warehouse",
+    "name": "Warehouse-custom_slade_supplier_warehouse",
+    "no_copy": 1,
+    "read_only": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_column_break_nbu4t",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_slade_supplier_warehouse",
+    "label": "",
+    "name": "Warehouse-custom_column_break_nbu4t"
+  },
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_nbu4t",
+    "label": "Slade ID",
+    "name": "Warehouse-custom_slade_id",
+    "no_copy": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_slade_customer_warehouse",
+    "fieldtype": "Data",
+    "insert_after": "custom_slade_id",
+    "label": "Slade Customer Warehouse",
+    "name": "Warehouse-custom_slade_customer_warehouse",
+    "no_copy": 1,
+    "read_only": 1,
+    "translatable": 1
+  }
+]
