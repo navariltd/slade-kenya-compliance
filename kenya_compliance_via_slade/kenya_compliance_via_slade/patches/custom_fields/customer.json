@@ -29,7 +29,7 @@
     "fieldtype": "Data",
     "insert_after": "custom_column_break_ptw1z",
     "label": "Slade ID",
-    "name": "Customer-custom_slade_id",
+    "name": "Customer-slade_id",
     "no_copy": 1,
     "read_only": 1
   }

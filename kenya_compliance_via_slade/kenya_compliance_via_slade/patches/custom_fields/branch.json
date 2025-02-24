@@ -44,7 +44,7 @@
     "fieldtype": "Data",
     "insert_after": "custom_pin",
     "label": "Slade ID",
-    "name": "Branch-custom_slade_id",
+    "name": "Branch-slade_id",
     "no_copy": 1
   },
   {
