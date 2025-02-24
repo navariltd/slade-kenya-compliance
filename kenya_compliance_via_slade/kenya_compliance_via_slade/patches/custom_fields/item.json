@@ -229,7 +229,7 @@
     "fieldtype": "Link",
     "insert_after": "custom_product_type",
     "label": "Navari eTims Item Type",
-    "name": "Item-custom_navari_etims_item_type",
+    "name": "Item-custom_item_type",
     "options": "Navari eTims Item Type",
     "reqd": 1
   },

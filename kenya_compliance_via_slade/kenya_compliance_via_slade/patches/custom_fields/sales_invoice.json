@@ -4,7 +4,7 @@
     "fieldtype": "Link",
     "insert_after": "department",
     "label": "Branch",
-    "name": "Sales Invoice-custom_branch",
+    "name": "Sales Invoice-branch",
     "options": "Branch"
   },
   {
@@ -267,7 +267,7 @@
     "fieldtype": "Data",
     "insert_after": "custom_section_break_u5cdx",
     "label": "Tax Amount A",
-    "name": "Sales Invoice-custom_tax_amount_a",
+    "name": "Sales Invoice-custom_taxbl_amount_a",
     "no_copy": 1,
     "read_only": 1
   },
@@ -277,7 +277,7 @@
     "fieldtype": "Data",
     "insert_after": "custom_taxbl_amount_a",
     "label": "Tax Amount B",
-    "name": "Sales Invoice-custom_tax_amount_b",
+    "name": "Sales Invoice-custom_taxbl_amount_b",
     "no_copy": 1,
     "read_only": 1
   },
@@ -287,7 +287,7 @@
     "fieldtype": "Data",
     "insert_after": "custom_taxbl_amount_b",
     "label": "Tax Amount C",
-    "name": "Sales Invoice-custom_tax_amount_c",
+    "name": "Sales Invoice-custom_taxbl_amount_c",
     "no_copy": 1,
     "read_only": 1
   },
@@ -297,7 +297,7 @@
     "fieldtype": "Data",
     "insert_after": "custom_taxbl_amount_c",
     "label": "Tax Amount D",
-    "name": "Sales Invoice-custom_tax_amount_d",
+    "name": "Sales Invoice-custom_taxbl_amount_d",
     "no_copy": 1,
     "read_only": 1
   },
@@ -307,7 +307,7 @@
     "fieldtype": "Data",
     "insert_after": "custom_taxbl_amount_d",
     "label": "Tax Amount E",
-    "name": "Sales Invoice-custom_tax_amount_e",
+    "name": "Sales Invoice-custom_taxbl_amount_e",
     "no_copy": 1,
     "read_only": 1
   },
