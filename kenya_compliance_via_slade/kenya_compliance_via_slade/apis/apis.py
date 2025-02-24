@@ -444,38 +444,62 @@ def submit_inventory(name: str) -> None:
         frappe.throw("Item name is required.")
 
     settings = get_settings()
+
+    request_data = {
+        "document_name": name,
+        "inventory_reference": name,
+        "description": f"{name} Stock Adjustment for {name}",
+        "reason": "Opening Stock",
+        "source_organisation_unit": get_link_value(
+            "Department",
+            "name",
+            settings.department,
+            "custom_slade_id",
+        ),
+        "location": get_link_value(
+            "Warehouse",
+            "name",
+            settings.get("warehouse"),
+            "custom_slade_id",
+        ),
+    }
+    process_request(
+        request_data,
+        route_key="StockMasterSaveReq",
+        handler_function=submit_inventory_on_success,
+        request_method="POST",
+        doctype="Item",
+    )
+
+
+@frappe.whitelist()
+def update_stock_quantity(name: str, id: str) -> None:
+    if not name:
+        frappe.throw("Item name is required.")
+
     stock_levels = frappe.db.get_all(
         "Bin",
         filters={"item_code": name},
-        fields=["warehouse", "actual_qty", "reserved_qty", "projected_qty", "name"],
+        fields=["actual_qty"],
     )
 
     if not stock_levels:
-        frappe.msgprint(f"No stock levels found for item {name}.")
+        frappe.log_error(
+            f"No stock levels found for item {name}.", "Stock Update Error"
+        )
     else:
         request_data = {
+            "id": id,
             "document_name": name,
-            "inventory_reference": name,
-            "description": f"{name} Stock Adjustment for {name}",
-            "reason": "Opening Stock",
-            "source_organisation_unit": get_link_value(
-                "Department",
-                "name",
-                settings.department,
-                "custom_slade_id",
-            ),
-            "location": get_link_value(
-                "Warehouse",
-                "name",
-                settings.get("warehouse"),
-                "custom_slade_id",
+            "quantity": sum(
+                [float(stock.get("actual_qty", 0)) for stock in stock_levels]
             ),
         }
         process_request(
             request_data,
-            route_key="StockMasterSaveReq",
+            route_key="SaveStockBalanceReq",
             handler_function=submit_inventory_on_success,
-            request_method="POST",
+            request_method="PATCH",
             doctype="Item",
         )
 
