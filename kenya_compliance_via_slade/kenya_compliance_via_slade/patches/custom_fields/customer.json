@@ -1,0 +1,36 @@
+[
+  {
+    "fieldname": "custom_section_break_lsyni",
+    "fieldtype": "Section Break",
+    "insert_after": "tax_withholding_category",
+    "label": "",
+    "name": "Customer-custom_section_break_lsyni"
+  },
+  {
+    "default": "0",
+
+    "fieldname": "custom_details_submitted_successfully",
+    "fieldtype": "Check",
+    "insert_after": "custom_section_break_lsyni",
+    "label": "Details Submitted Successfully?",
+    "name": "Customer-custom_details_submitted_successfully",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_column_break_ptw1z",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_details_submitted_successfully",
+    "label": "",
+    "name": "Customer-custom_column_break_ptw1z"
+  },
+  {
+    "fieldname": "slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_ptw1z",
+    "label": "Slade ID",
+    "name": "Customer-slade_id",
+    "no_copy": 1,
+    "read_only": 1
+  }
+]

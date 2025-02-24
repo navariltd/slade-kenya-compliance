@@ -1,0 +1,16 @@
+[
+  {
+    "fieldname": "custom_tax_rate",
+    "fieldtype": "Percent",
+    "insert_after": "net_amount",
+    "label": "Tax Rate(%)",
+    "name": "Purchase Invoice Item-custom_tax_rate"
+  },
+  {
+    "fieldname": "custom_tax_amount",
+    "fieldtype": "Currency",
+    "insert_after": "custom_tax_rate",
+    "label": "Tax Amount",
+    "name": "Purchase Invoice Item-custom_tax_amount"
+  }
+]

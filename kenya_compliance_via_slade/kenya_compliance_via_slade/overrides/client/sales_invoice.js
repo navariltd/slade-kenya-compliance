@@ -32,7 +32,7 @@ frappe.ui.form.on(parentDoctype, {
           },
           __("eTims Actions")
         );
-      } else if (!frm.doc.custom_qr_code) {
+      } else {
         frm.add_custom_button(
           __("Sync Invoice Details"),
           function () {

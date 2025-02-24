@@ -1,0 +1,12 @@
+[
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "number_format",
+    "label": "Slade ID",
+    "name": "Currency-custom_slade_id",
+    "no_copy": 1,
+    "read_only": 1,
+    "translatable": 1
+  }
+]

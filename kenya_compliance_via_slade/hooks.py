@@ -1,5 +1,4 @@
 from .kenya_compliance_via_slade.doctype.doctype_names_mapping import (
-    COUNTRIES_DOCTYPE_NAME,
     IMPORTED_ITEMS_STATUS_DOCTYPE_NAME,
     ITEM_TYPE_DOCTYPE_NAME,
     PRODUCT_TYPE_DOCTYPE_NAME,
@@ -15,7 +14,7 @@ app_publisher = "Navari Ltd"
 app_description = (
     "KRA eTIMS Online Sales Control Unit (OSCU) Integration with ERPNext by Navari Ltd"
 )
-app_email = "solutions@navari.co.ke"
+app_email = "support@navari.co.ke"
 app_license = "GNU Affero General Public License v3.0"
 required_apps = ["frappe/erpnext"]
 
@@ -23,41 +22,10 @@ required_apps = ["frappe/erpnext"]
 # Fixtures
 # --------
 fixtures = [
-    {
-        "doctype": "Custom Field",
-        "filters": [
-            [
-                "dt",
-                "in",
-                (
-                    "Item",
-                    "Sales Invoice",
-                    "Sales Invoice Item",
-                    "Purchase Invoice",
-                    "Purchase Invoice Item",
-                    "Customer",
-                    "Stock Ledger Entry",
-                    "BOM",
-                    "BOM Item",
-                    "Warehouse",
-                    "Item Tax Template",
-                    "Branch",
-                    "Supplier",
-                    "Department",
-                    "Company",
-                    "UOM",
-                    "Currency",
-                    "Mode of Payment",
-                ),
-            ],
-            ["is_system_generated", "=", 0],
-        ],
-    },
     {"dt": TRANSACTION_TYPE_DOCTYPE_NAME},
     {"dt": PURCHASE_RECEIPT_DOCTYPE_NAME},
     {"dt": IMPORTED_ITEMS_STATUS_DOCTYPE_NAME},
     {"dt": ROUTES_TABLE_DOCTYPE_NAME},
-    {"dt": COUNTRIES_DOCTYPE_NAME},
     {"dt": ITEM_TYPE_DOCTYPE_NAME},
     {
         "dt": PRODUCT_TYPE_DOCTYPE_NAME,

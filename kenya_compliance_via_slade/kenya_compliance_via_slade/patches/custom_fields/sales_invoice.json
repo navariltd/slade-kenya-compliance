@@ -1,0 +1,371 @@
+[
+  {
+    "fieldname": "branch",
+    "fieldtype": "Link",
+    "insert_after": "department",
+    "label": "Branch",
+    "name": "Sales Invoice-branch",
+    "options": "Branch"
+  },
+  {
+    "fieldname": "custom_defer_etims_submission",
+    "fieldtype": "Check",
+    "hidden": 1,
+    "insert_after": "update_stock",
+    "label": "Defer eTims Submission",
+    "name": "Sales Invoice-custom_defer_etims_submission",
+    "options": "0"
+  },
+  {
+    "fieldname": "custom_etims_details",
+    "fieldtype": "Tab Break",
+    "insert_after": "total_billing_amount",
+    "label": "eTims Details",
+    "name": "Sales Invoice-custom_etims_details"
+  },
+  {
+    "fieldname": "custom_payment_and_transaction_details",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_etims_details",
+    "label": "Payment and Transaction Details",
+    "name": "Sales Invoice-custom_payment_and_transaction_details"
+  },
+  {
+    "allow_on_submit": 1,
+    "default": "",
+    "fieldname": "custom_payment_type",
+    "fieldtype": "Link",
+    "insert_after": "custom_payment_and_transaction_details",
+    "label": "Payment Type",
+    "name": "Sales Invoice-custom_payment_type",
+    "options": "Mode of Payment"
+  },
+  {
+    "default": "Approved",
+    "fieldname": "custom_transaction_progres",
+    "fieldtype": "Link",
+    "insert_after": "custom_payment_type",
+    "label": "Transaction Progress",
+    "name": "Sales Invoice-custom_transaction_progres",
+    "options": "Navari KRA eTims Transaction Progress"
+  },
+  {
+    "fieldname": "custom_column_break_arjmp",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_transaction_progres",
+    "label": "",
+    "name": "Sales Invoice-custom_column_break_arjmp"
+  },
+  {
+    "fieldname": "custom_payment_type_code",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_arjmp",
+    "label": "Payment Type Code",
+    "name": "Sales Invoice-custom_payment_type_code",
+    "read_only": 1
+  },
+  {
+    "fetch_from": "custom_transaction_progres.code",
+    "fieldname": "custom_transaction_progress_code",
+    "fieldtype": "Data",
+    "insert_after": "custom_payment_type_code",
+    "label": "Transaction Progress Code",
+    "name": "Sales Invoice-custom_transaction_progress_code",
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_slade_details",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_transaction_progress_code",
+    "label": "Slade Details",
+    "name": "Sales Invoice-custom_slade_details"
+  },
+  {
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_slade_details",
+    "label": "Slade ID",
+    "name": "Sales Invoice-custom_slade_id",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_submission_attempts",
+    "fieldtype": "Data",
+    "insert_after": "custom_slade_id",
+    "label": "Submission attempts",
+    "name": "Sales Invoice-custom_submission_attempts",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_column_break_hfpyd",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_submission_attempts",
+    "label": "",
+    "name": "Sales Invoice-custom_column_break_hfpyd"
+  },
+  {
+    "default": "0",
+    "fieldname": "custom_successfully_submitted",
+    "fieldtype": "Check",
+    "insert_after": "custom_column_break_hfpyd",
+    "label": "Successfully Submitted?",
+    "name": "Sales Invoice-custom_successfully_submitted",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "default": "0",
+    "fieldname": "custom_transition_successful",
+    "fieldtype": "Check",
+    "insert_after": "custom_successfully_submitted",
+    "label": "Transition Successful?",
+    "name": "Sales Invoice-custom_transition_successful",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_etims_response_details",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_transition_successful",
+    "label": "SCU Data Details",
+    "name": "Sales Invoice-custom_etims_response_details"
+  },
+  {
+    "fieldname": "custom_current_receipt_number",
+    "fieldtype": "Data",
+    "insert_after": "custom_etims_response_details",
+    "label": "Current Receipt Number",
+    "name": "Sales Invoice-custom_current_receipt_number",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_total_receipt_number",
+    "fieldtype": "Data",
+    "insert_after": "custom_current_receipt_number",
+    "label": "Total Receipt Number",
+    "name": "Sales Invoice-custom_total_receipt_number",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_control_unit_date_time",
+    "fieldtype": "Datetime",
+    "insert_after": "custom_total_receipt_number",
+    "label": "Control Unit Date Time",
+    "name": "Sales Invoice-custom_control_unit_date_time",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_qr_code",
+    "fieldtype": "Small Text",
+    "hidden": 1,
+    "insert_after": "custom_control_unit_date_time",
+    "label": "QR Code",
+    "name": "Sales Invoice-custom_qr_code",
+    "no_copy": 1,
+    "read_only": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_qr_code_url",
+    "fieldtype": "Small Text",
+    "insert_after": "custom_qr_code",
+    "label": "QR Code Url",
+    "name": "Sales Invoice-custom_qr_code_url",
+    "no_copy": 1,
+    "read_only": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_scu_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_qr_code_url",
+    "label": "SCU ID",
+    "name": "Sales Invoice-custom_scu_id",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_scu_mrc_no",
+    "fieldtype": "Data",
+    "insert_after": "custom_scu_id",
+    "label": "SCU MRC No",
+    "name": "Sales Invoice-custom_scu_mrc_no",
+    "no_copy": 1,
+    "read_only": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_scu_invoice_number",
+    "fieldtype": "Data",
+    "insert_after": "custom_scu_mrc_no",
+    "label": "SCU Invoice Number",
+    "name": "Sales Invoice-custom_scu_invoice_number",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_column_break_urllr",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_scu_invoice_number",
+    "label": "",
+    "name": "Sales Invoice-custom_column_break_urllr"
+  },
+  {
+    "fieldname": "custom_receipt_signature",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_urllr",
+    "label": "Receipt Signature",
+    "name": "Sales Invoice-custom_receipt_signature",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_internal_data",
+    "fieldtype": "Data",
+    "insert_after": "custom_receipt_signature",
+    "label": "Internal Data",
+    "name": "Sales Invoice-custom_internal_data",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "default": "0",
+    "fieldname": "custom_submission_sequence_number",
+    "fieldtype": "Int",
+    "insert_after": "custom_internal_data",
+    "label": "Submission Sequence Number",
+    "name": "Sales Invoice-custom_submission_sequence_number",
+    "non_negative": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_qr_image",
+    "fieldtype": "Image",
+    "insert_after": "custom_submission_sequence_number",
+    "label": "QR Image",
+    "name": "Sales Invoice-custom_qr_image",
+    "no_copy": 1,
+    "options": "custom_qr_code"
+  },
+  {
+    "fieldname": "custom_section_break_u5cdx",
+    "fieldtype": "Section Break",
+    "hidden": 1,
+    "insert_after": "custom_qr_image",
+    "label": "eTims Tax Response Details",
+    "name": "Sales Invoice-custom_section_break_u5cdx"
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_taxbl_amount_a",
+    "fieldtype": "Data",
+    "insert_after": "custom_section_break_u5cdx",
+    "label": "Tax Amount A",
+    "name": "Sales Invoice-custom_taxbl_amount_a",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_taxbl_amount_b",
+    "fieldtype": "Data",
+    "insert_after": "custom_taxbl_amount_a",
+    "label": "Tax Amount B",
+    "name": "Sales Invoice-custom_taxbl_amount_b",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_taxbl_amount_c",
+    "fieldtype": "Data",
+    "insert_after": "custom_taxbl_amount_b",
+    "label": "Tax Amount C",
+    "name": "Sales Invoice-custom_taxbl_amount_c",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_taxbl_amount_d",
+    "fieldtype": "Data",
+    "insert_after": "custom_taxbl_amount_c",
+    "label": "Tax Amount D",
+    "name": "Sales Invoice-custom_taxbl_amount_d",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_taxbl_amount_e",
+    "fieldtype": "Data",
+    "insert_after": "custom_taxbl_amount_d",
+    "label": "Tax Amount E",
+    "name": "Sales Invoice-custom_taxbl_amount_e",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_column_break_zbgbu",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_taxbl_amount_e",
+    "label": "",
+    "name": "Sales Invoice-custom_column_break_zbgbu"
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_tax_a",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_zbgbu",
+    "label": "Tax A",
+    "name": "Sales Invoice-custom_tax_a",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_tax_b",
+    "fieldtype": "Data",
+    "insert_after": "custom_tax_a",
+    "label": "Tax B",
+    "name": "Sales Invoice-custom_tax_b",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_tax_c",
+    "fieldtype": "Data",
+    "insert_after": "custom_tax_b",
+    "label": "Tax C",
+    "name": "Sales Invoice-custom_tax_c",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_tax_d",
+    "fieldtype": "Data",
+    "insert_after": "custom_tax_c",
+    "label": "Tax D",
+    "name": "Sales Invoice-custom_tax_d",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "allow_on_submit": 1,
+    "fieldname": "custom_tax_e",
+    "fieldtype": "Data",
+    "insert_after": "custom_tax_d",
+    "label": "Tax E",
+    "name": "Sales Invoice-custom_tax_e",
+    "no_copy": 1,
+    "read_only": 1
+  }
+]

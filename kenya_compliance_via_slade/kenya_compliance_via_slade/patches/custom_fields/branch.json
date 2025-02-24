@@ -1,0 +1,139 @@
+[
+  {
+    "fieldname": "custom_company",
+    "fieldtype": "Link",
+    "insert_after": "branch",
+    "label": "Company",
+    "name": "Branch-custom_company",
+    "options": "Company"
+  },
+  {
+    "fieldname": "custom_section_break_zpcqz",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_company",
+    "label": "",
+    "name": "Branch-custom_section_break_zpcqz"
+  },
+  {
+    "fieldname": "custom_branch_code",
+    "fieldtype": "Data",
+    "in_list_view": 1,
+    "insert_after": "custom_section_break_zpcqz",
+    "label": "Branch Code",
+    "name": "Branch-custom_branch_code",
+    "no_copy": 1
+  },
+  {
+    "fieldname": "custom_etims_device_serial_no",
+    "fieldtype": "Data",
+    "insert_after": "custom_branch_code",
+    "label": "eTims Device Serial No",
+    "name": "Branch-custom_etims_device_serial_no"
+  },
+  {
+    "fieldname": "custom_pin",
+    "fieldtype": "Data",
+    "insert_after": "custom_etims_device_serial_no",
+    "label": "PIN",
+    "name": "Branch-custom_pin",
+    "no_copy": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_pin",
+    "label": "Slade ID",
+    "name": "Branch-slade_id",
+    "no_copy": 1
+  },
+  {
+    "fieldname": "custom_column_break_orumh",
+    "fieldtype": "Column Break",
+    "insert_after": "slade_id",
+    "label": "",
+    "name": "Branch-custom_column_break_orumh"
+  },
+  {
+    "fieldname": "custom_county_name",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_orumh",
+    "label": "County Name",
+    "name": "Branch-custom_county_name",
+    "no_copy": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_tax_locality_name",
+    "fieldtype": "Data",
+    "insert_after": "custom_county_name",
+    "label": "Tax Locality Name",
+    "name": "Branch-custom_tax_locality_name",
+    "no_copy": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_subcounty_name",
+    "fieldtype": "Data",
+    "insert_after": "custom_tax_locality_name",
+    "label": "Sub-County Name",
+    "name": "Branch-custom_subcounty_name",
+    "no_copy": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_location_description",
+    "fieldtype": "Data",
+    "insert_after": "custom_subcounty_name",
+    "label": "Location Description",
+    "name": "Branch-custom_location_description",
+    "no_copy": 1,
+    "translatable": 1
+  },
+  {
+    "fieldname": "custom_column_break_yg4ml",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_location_description",
+    "label": "",
+    "name": "Branch-custom_column_break_yg4ml"
+  },
+  {
+    "fieldname": "custom_manager_name",
+    "fieldtype": "Data",
+    "insert_after": "custom_column_break_yg4ml",
+    "label": "Manager Name",
+    "name": "Branch-custom_manager_name",
+    "no_copy": 1,
+    "translatable": 1
+  },
+  {
+    "default": "0",
+
+    "fieldname": "custom_is_etims_branch",
+    "fieldtype": "Check",
+    "insert_after": "custom_manager_name",
+    "label": "Is eTims Branch",
+    "name": "Branch-custom_is_etims_branch",
+    "no_copy": 1
+  },
+  {
+    "default": "0",
+
+    "fieldname": "custom_is_head_office",
+    "fieldtype": "Check",
+    "insert_after": "custom_is_etims_branch",
+    "label": "Is Head Office",
+    "name": "Branch-custom_is_head_office",
+    "no_copy": 1
+  },
+  {
+    "default": "0",
+
+    "fieldname": "custom_is_etims_verified",
+    "fieldtype": "Check",
+    "insert_after": "custom_is_head_office",
+    "label": "Is eTims Verified",
+    "name": "Branch-custom_is_etims_verified",
+    "no_copy": 1
+  }
+]

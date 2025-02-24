@@ -1,0 +1,87 @@
+[
+  {
+    "fieldname": "custom_supplier_branch_id",
+    "fieldtype": "Data",
+    "insert_after": "tax_id",
+    "label": "Supplier Branch ID",
+    "name": "Purchase Invoice-custom_supplier_branch_id",
+    "read_only": 1
+  },
+  {
+    "fieldname": "branch",
+    "fieldtype": "Link",
+    "insert_after": "accounting_dimensions_section",
+    "label": "Branch",
+    "name": "Purchase Invoice-branch",
+    "options": "Branch"
+  },
+  {
+    "fieldname": "custom_etims_details",
+    "fieldtype": "Tab Break",
+    "insert_after": "supplied_items",
+    "label": "eTims Details",
+    "name": "Purchase Invoice-custom_etims_details"
+  },
+  {
+    "fieldname": "custom_section_break_sjdjo",
+    "fieldtype": "Section Break",
+    "insert_after": "custom_etims_details",
+    "label": "",
+    "name": "Purchase Invoice-custom_section_break_sjdjo",
+    "no_copy": 1
+  },
+  {
+    "fieldname": "custom_source_registered_imported_item",
+    "fieldtype": "Link",
+    "insert_after": "custom_section_break_sjdjo",
+    "label": "Source Registered Imported Item",
+    "name": "Purchase Invoice-custom_source_registered_imported_item",
+    "no_copy": 1,
+    "options": "Navari eTims Registered Imported Item",
+    "print_width": null,
+    "read_only": 1,
+    "unique": 1
+  },
+  {
+    "allow_on_submit": 1,
+
+    "default": "0",
+
+    "fieldname": "custom_submitted_successfully",
+    "fieldtype": "Check",
+    "insert_after": "custom_source_registered_imported_item",
+    "label": "Submitted Successfully?",
+    "name": "Purchase Invoice-custom_submitted_successfully",
+    "no_copy": 1,
+    "read_only": 1
+  },
+  {
+    "fieldname": "custom_column_break_duiaj",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_submitted_successfully",
+    "label": "",
+    "name": "Purchase Invoice-custom_column_break_duiaj"
+  },
+  {
+    "fieldname": "custom_source_registered_purchase",
+    "fieldtype": "Link",
+    "insert_after": "custom_column_break_duiaj",
+    "label": "Source Registered Purchase",
+    "name": "Purchase Invoice-custom_source_registered_purchase",
+    "no_copy": 1,
+    "options": "Navari eTims Registered Purchases",
+    "read_only": 1,
+    "unique": 1
+  },
+  {
+    "allow_on_submit": 1,
+
+    "fieldname": "custom_slade_id",
+    "fieldtype": "Data",
+    "insert_after": "custom_source_registered_purchase",
+    "label": "Slade ID",
+    "name": "Purchase Invoice-custom_slade_id",
+    "no_copy": 1,
+    "read_only": 1
+  }
+]

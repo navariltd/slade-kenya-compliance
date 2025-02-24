@@ -378,12 +378,13 @@ def stock_balance_on_success(response: dict, document_name: str, **kwargs) -> No
     actual_balance = float(get_total_stock_balance(doc.item_code))
 
     if actual_balance != slade_balance and slade_balance <= 0:
-        from ...apis.apis import submit_inventory
+        from ...apis.apis import update_stock_quantity
 
         frappe.enqueue(
-            submit_inventory,
+            update_stock_quantity,
             queue="default",
             name=doc.item_code,
+            id=results[0].get("id"),
         )
         return
 
