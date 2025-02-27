@@ -1,0 +1,41 @@
+{
+ "chart_name": "Document Submission Time Analysis",
+ "chart_type": "Report",
+ "creation": "2025-02-25 15:22:47.288293",
+ "custom_options": "{\"x_field\": \"doctype\", \"chart_type\": \"Bar\", \"y_axis_fields\": [{\"idx\": 1, \"__islocal\": true, \"y_field\": \"avg_time\", \"color\": \"#29CD42\", \"name\": \"row 1\"}, {\"idx\": 2, \"__islocal\": true, \"y_field\": \"min_time\", \"color\": \"#ECAD4B\", \"name\": \"row 2\"}, {\"idx\": 3, \"__islocal\": true, \"y_field\": \"max_time\", \"color\": \"#ED6396\", \"name\": \"row 3\"}], \"y_fields\": [\"avg_time\", \"min_time\", \"max_time\"], \"colors\": [\"#29CD42\", \"#ECAD4B\", \"#ED6396\"]}",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "filters_json": "{}",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 0,
+ "is_standard": 1,
+ "modified": "2025-02-25 15:22:47.388318",
+ "modified_by": "Administrator",
+ "module": "Kenya Compliance Via Slade",
+ "name": "Document Submission Time Analysis",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "Document Submission Time Analysis",
+ "roles": [],
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 0,
+ "x_field": "doctype",
+ "y_axis": [
+  {
+   "color": "#29CD42",
+   "y_field": "avg_time"
+  },
+  {
+   "color": "#ECAD4B",
+   "y_field": "min_time"
+  },
+  {
+   "color": "#ED6396",
+   "y_field": "max_time"
+  }
+ ]
+}

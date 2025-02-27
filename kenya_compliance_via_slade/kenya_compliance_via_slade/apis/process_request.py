@@ -16,7 +16,6 @@ from ..utils import (
 from .api_builder import EndpointsBuilder
 
 endpoints_builder = EndpointsBuilder()
-from .remote_response_status_handlers import on_slade_error
 
 
 def process_request(
@@ -25,6 +24,7 @@ def process_request(
     handler_function: Callable,
     request_method: str = "GET",
     doctype: str = SETTINGS_DOCTYPE_NAME,
+    error_callback: Callable = None,
 ) -> str:
     """Reusable function to process requests with common logic."""
     if not frappe.db.exists(SETTINGS_DOCTYPE_NAME, {"is_active": 1}):
@@ -37,7 +37,8 @@ def process_request(
 
     server_url = get_server_url(company_name, branch_id)
     route_path, _ = get_route_path(route_key, "VSCU Slade 360")
-    route_path = process_dynamic_url(route_path, request_data)
+    dynamic_route_path = process_dynamic_url(route_path, request_data)
+    url = f"{server_url}{dynamic_route_path}"
     if request_method != "GET":
         settings = get_settings(company_name, branch_id)
         updates = add_organisation_branch_department(settings)
@@ -46,7 +47,7 @@ def process_request(
     if headers and server_url and route_path:
         return execute_request(
             headers,
-            server_url,
+            url,
             route_path,
             data,
             route_key,
@@ -54,6 +55,7 @@ def process_request(
             request_method,
             doctype,
             document_name,
+            error_callback,
         )
     else:
         return f"Failed to process {route_key}. Missing required configuration."
@@ -118,7 +120,7 @@ def clean_data_for_get_request(data: dict) -> None:
 
 def execute_request(
     headers: dict,
-    server_url: str,
+    url: str,
     route_path: str,
     data: dict,
     route_key: str,
@@ -126,8 +128,8 @@ def execute_request(
     request_method: str,
     doctype: str,
     document_name: str,
+    error_callback: Callable = None,
 ) -> str:
-    url = f"{server_url}{route_path}"
 
     # Clean data for GET request
     if request_method == "GET":
@@ -136,11 +138,12 @@ def execute_request(
     while url:
         endpoints_builder.headers = headers
         endpoints_builder.url = url
+        endpoints_builder.route_path = route_path
         endpoints_builder.payload = data
         endpoints_builder.request_description = route_key
         endpoints_builder.method = request_method
         endpoints_builder.success_callback = handler_function
-        endpoints_builder.error_callback = on_slade_error
+        endpoints_builder.error_callback = error_callback
 
         response = endpoints_builder.make_remote_call(
             doctype=doctype,

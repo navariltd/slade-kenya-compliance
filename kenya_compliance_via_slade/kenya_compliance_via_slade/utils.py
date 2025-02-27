@@ -473,15 +473,16 @@ def update_last_request_date(
     route: str,
     routes_table: str = ROUTES_TABLE_CHILD_DOCTYPE_NAME,
 ) -> None:
+    if len(route) < 5:
+        return
+
     doc = frappe.get_doc(
         routes_table,
         {"url_path": route},
         ["*"],
     )
 
-    doc.last_request_date = build_datetime_from_string(
-        response_datetime, "%Y%m%d%H%M%S"
-    )
+    doc.last_request_date = response_datetime
 
     doc.save(ignore_permissions=True)
     frappe.db.commit()

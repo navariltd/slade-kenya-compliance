@@ -337,7 +337,16 @@ def stock_mvt_submit_items_on_success(
         route_key=route_key,
         handler_function=process_stock_mvt_transition,
         request_method="PATCH",
+        error_callback=stock_operation_on_error,
     )
+
+
+def stock_operation_on_error(response_data: dict, document_name: str, **kwargs) -> None:
+    from ...apis.apis import submit_inventory
+
+    doc = frappe.get_doc("Stock Ledger Entry", document_name)
+
+    submit_inventory(doc.item_code)
 
 
 def process_stock_mvt_transition(response: dict, document_name: str, **kwargs) -> None:
@@ -348,7 +357,6 @@ def process_stock_mvt_transition(response: dict, document_name: str, **kwargs) -
     settings = get_settings(company_name=doc.company)
     requset_data = {
         "document_name": document_name,
-        "id": doc.custom_slade_id,
         "location": frappe.get_value(
             "Warehouse", settings.warehouse, "custom_slade_id"
         ),
@@ -366,6 +374,8 @@ def process_stock_mvt_transition(response: dict, document_name: str, **kwargs) -
 
 
 def stock_balance_on_success(response: dict, document_name: str, **kwargs) -> None:
+    from ...apis.apis import submit_inventory, update_stock_quantity
+
     doc = frappe.get_doc("Stock Ledger Entry", document_name)
 
     results = (
@@ -374,11 +384,13 @@ def stock_balance_on_success(response: dict, document_name: str, **kwargs) -> No
         else response if isinstance(response, list) else []
     )
 
-    slade_balance = float(results[0].get("quantity", 0)) if results else 0
-    actual_balance = float(get_total_stock_balance(doc.item_code))
+    if not results:
+        submit_inventory(doc.item_code)
+        return
 
-    if actual_balance != slade_balance and slade_balance <= 0:
-        from ...apis.apis import update_stock_quantity
+    slade_balance = float(results[0].get("quantity", 0)) if results else 0
+
+    if slade_balance <= 0:
 
         frappe.enqueue(
             update_stock_quantity,
