@@ -442,6 +442,7 @@ def uom_search_on_success(response: dict, **kwargs) -> None:
 
 
 def warehouse_search_on_success(response: dict, **kwargs) -> None:
+    from ..apis.process_request import process_request
     from ..utils import get_settings
 
     if isinstance(response, str):
@@ -483,6 +484,22 @@ def warehouse_search_on_success(response: dict, **kwargs) -> None:
             )
             frappe.enqueue(
                 search_customer_supplier_locations, document_name=settings.name
+            )
+
+        bhfid_slade_id = frappe.db.get_value("Branch", settings.bhfid, "slade_id")
+        if bhfid_slade_id:
+            request_data = {
+                "branch": bhfid_slade_id,
+                "id": selected_record.get("id"),
+            }
+            frappe.enqueue(
+                process_request,
+                queue="default",
+                is_async=True,
+                doctype="Branch",
+                request_data=request_data,
+                route_key="LocationSearchReq",
+                request_method="PATCH",
             )
 
 

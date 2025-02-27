@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Callable, Literal, Optional, Union
 from urllib import parse
 
@@ -10,7 +11,8 @@ from frappe.integrations.utils import create_request_log
 from frappe.model.document import Document
 
 from ..logger import etims_logger
-from ..utils import update_navari_settings_with_token
+from ..utils import update_last_request_date, update_navari_settings_with_token
+from .remote_response_status_handlers import on_slade_error
 
 
 class BaseEndpointsBuilder:
@@ -105,6 +107,14 @@ class EndpointsBuilder(BaseEndpointsBuilder):
         self._url = new_url
 
     @property
+    def route_path(self) -> str | None:
+        return self._route_path
+
+    @route_path.setter
+    def route_path(self, new_route_path: str) -> None:
+        self._route_path = new_route_path
+
+    @property
     def request_description(self) -> str | None:
         return self._request_description
 
@@ -176,7 +186,6 @@ class EndpointsBuilder(BaseEndpointsBuilder):
             or self._headers is None
             or self._method is None
             or self._success_callback_handler is None
-            or self._error_callback_handler is None
         ):
             frappe.throw(
                 """Please ensure all required parameters (URL, headers, method, success, and error callbacks) are set.""",
@@ -228,6 +237,7 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                 )
 
             response_data = get_response_data(response)
+            update_last_request_date(datetime.now(), self._route_path)
 
             if response.status_code in {200, 201}:
                 self._success_callback_handler(
@@ -265,12 +275,19 @@ class EndpointsBuilder(BaseEndpointsBuilder):
                     output=None,
                     error=error,
                 )
-                self._error_callback_handler(
+                on_slade_error(
                     response_data,
                     url=route_path,
                     doctype=doctype,
                     document_name=document_name,
                 )
+                if self._error_callback_handler:
+                    self._error_callback_handler(
+                        response_data,
+                        url=route_path,
+                        doctype=doctype,
+                        document_name=document_name,
+                    )
             return response_data
 
         except requests.exceptions.RequestException as error:
