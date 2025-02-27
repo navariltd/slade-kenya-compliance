@@ -5,6 +5,13 @@ const unitOfQuantityDoctypeName = "Navari eTims Unit of Quantity";
 const taxationTypeDoctypeName = "Navari KRA eTims Taxation Type";
 const settingsDoctypeName = "Navari KRA eTims Settings";
 
+frappe.realtime.on("refresh_form", function (name) {
+  const currentForm = cur_frm;
+  if (currentForm && currentForm.doc.name === name) {
+    currentForm.reload_doc();
+  }
+});
+
 frappe.ui.form.on(parentDoctype, {
   refresh: async function (frm) {
     const { message: activeSetting } = await frappe.db.get_value(
