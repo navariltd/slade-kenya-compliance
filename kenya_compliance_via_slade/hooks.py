@@ -11,8 +11,10 @@ from .kenya_compliance_via_slade.doctype.doctype_names_mapping import (
 app_name = "kenya_compliance_via_slade"
 app_title = "Kenya Compliance (KRA eTIMS)"
 app_publisher = "Navari Ltd"
-app_description = "This app works to integrate ERPNext with KRA's eTIMS via Slade360 Advantage to allow for the sharing of information with the revenue authority."
-app_email = "solutions@navari.co.ke"
+app_description = (
+  "This app works to integrate ERPNext with KRA's eTIMS via Slade360 Advantage to allow for the sharing of information with the revenue authority."
+)
+app_email = "support@navari.co.ke"
 app_license = "GNU Affero General Public License v3.0"
 required_apps = ["frappe/erpnext"]
 
