@@ -69,6 +69,6 @@ Installing on [FrappeCloud](https://frappecloud.com/docs/introduction) can be ac
 
 ### Important Note ⚠️
 
-This integration goes through an approved third party. Please contact them for installation details at: [etims@savannahinformatics.com](mailto:etims@savannahinformatics.com).
+This integration goes through an approved third party. Please contact them for registration with KRA and VSCU setup at: [etims@savannahinformatics.com](mailto:etims@savannahinformatics.com).
 
 For support, contact us at: [support@navari.co.ke](mailto:support@navari.co.ke) or visit [Navari](https://navari.co.ke/).

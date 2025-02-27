@@ -472,6 +472,7 @@ def update_invoice_info(response: dict, **kwargs) -> None:
     )
     if document_name:
         frappe.db.set_value(doctype, document_name, updates)
+        frappe.publish_realtime("refresh_form", document_name)
 
 
 def sales_item_submission_on_success(
