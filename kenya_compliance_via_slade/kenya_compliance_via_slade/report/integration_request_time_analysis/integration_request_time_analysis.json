@@ -1,0 +1,29 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2025-02-25 12:04:29.163900",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{\"columns\":[{\"fieldname\":\"integration_request_service\",\"label\":\"Service\",\"fieldtype\":\"Data\",\"width\":400,\"id\":\"integration_request_service\",\"name\":\"Service\",\"editable\":false,\"compareValue\":null},{\"fieldname\":\"queued\",\"label\":\"Queued\",\"fieldtype\":\"Int\",\"width\":150,\"id\":\"queued\",\"name\":\"Queued\",\"editable\":false,\"compareValue\":null},{\"fieldname\":\"completed\",\"label\":\"Completed\",\"fieldtype\":\"Int\",\"width\":150,\"id\":\"completed\",\"name\":\"Completed\",\"editable\":false,\"compareValue\":null},{\"fieldname\":\"cancelled\",\"label\":\"Cancelled\",\"fieldtype\":\"Int\",\"width\":150,\"id\":\"cancelled\",\"name\":\"Cancelled\",\"editable\":false,\"compareValue\":null},{\"fieldname\":\"failed\",\"label\":\"Failed\",\"fieldtype\":\"Int\",\"width\":150,\"id\":\"failed\",\"name\":\"Failed\",\"editable\":false,\"compareValue\":null},{\"fieldname\":\"total\",\"label\":\"Total\",\"fieldtype\":\"Int\",\"width\":150,\"id\":\"total\",\"name\":\"Total\",\"editable\":false,\"compareValue\":null}],\"filters\":{}}",
+ "letterhead": null,
+ "modified": "2025-02-25 12:05:24.465148",
+ "modified_by": "Administrator",
+ "module": "Kenya Compliance Via Slade",
+ "name": "Integration Request Time Analysis",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Integration Request",
+ "reference_report": "",
+ "report_name": "Integration Request Time Analysis",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "timeout": 0
+}
